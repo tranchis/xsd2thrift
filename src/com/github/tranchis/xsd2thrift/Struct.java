@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.sun.xml.xsom.XmlString;
+
 public class Struct
 {
 	private Map<String,Field>	map;
@@ -20,7 +22,7 @@ public class Struct
 		types = new TreeSet<String>();
 	}
 
-	public void addField(String name, String type, boolean required, Map<String, String> typeMapping)
+	public void addField(String name, String type, boolean required, boolean repeat, XmlString def, Map<String, String> typeMapping)
 	{
 		Field	f;
 		
@@ -34,7 +36,7 @@ public class Struct
 			{
 				type = "binary";
 			}
-			f = new Field(name, type, required);
+			f = new Field(name, type, repeat, def, required);
 			map.put(name, f);
 			if(!type.equals(this.name))
 			{

@@ -1,17 +1,23 @@
 package com.github.tranchis.xsd2thrift;
 
+import com.sun.xml.xsom.XmlString;
+
 public class Field
 {
 
 	private String name;
 	private String type;
 	private boolean required;
+	private boolean repeat;
+	private XmlString def;
 
-	public Field(String name, String type, boolean required)
+	public Field(String name, String type, boolean repeat, XmlString def, boolean required)
 	{
 		this.name = name;
 		this.type = type;
 		this.required = required;
+		this.def = def;
+		this.repeat = repeat;
 	}
 
 	public String getName()
@@ -42,6 +48,26 @@ public class Field
 	public void setRequired(boolean required)
 	{
 		this.required = required;
+	}
+
+	public boolean isRepeat()
+	{
+		return repeat;
+	}
+
+	public void setRepeat(boolean repeat)
+	{
+		this.repeat = repeat;
+	}
+
+	public XmlString getDef()
+	{
+		return def;
+	}
+
+	public void setDef(XmlString def)
+	{
+		this.def = def;
 	}
 
 }

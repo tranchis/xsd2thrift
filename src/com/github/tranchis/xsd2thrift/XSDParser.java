@@ -10,9 +10,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -59,8 +57,6 @@ public class XSDParser implements ErrorHandler
 	
 	public void parse() throws SAXException, IOException
 	{
-		XSParticle	p;
-		
 		XSOMParser parser = new XSOMParser();
 		parser.setErrorHandler(this);
 //		parser.setEntityResolver(xp);
@@ -86,8 +82,6 @@ public class XSDParser implements ErrorHandler
 		
 		ss = new HashSet<Struct>(map.values());
 		declared = new TreeSet<String>(basicTypes);
-		
-		System.out.println("");
 		
 		while(!ss.isEmpty())
 		{
@@ -119,6 +113,10 @@ public class XSDParser implements ErrorHandler
 						{
 							type = "binary";
 						}
+						if(f.isRepeat())
+						{
+							type = "list<" + type + ">";
+						}
 						System.out.println("\t" + order + " : " + getRequired(f.isRequired()) + " " + type + " " + fname + ",");
 						order = order + 1;
 					}
@@ -128,31 +126,6 @@ public class XSDParser implements ErrorHandler
 					
 					// System.out.println("Removing " + st.getName());
 					ss.remove(st);
-				}
-			}
-		}
-	}
-
-	private void updateDeclared(Set<String> declared)
-	{
-		Struct				st;
-		Iterator<String>	it;
-		boolean				modified;
-		Set<String>			copy;
-		
-		modified = true;
-		while(modified)
-		{
-			modified = false;
-			copy = new TreeSet<String>(declared);
-			it = copy.iterator();
-			while(it.hasNext())
-			{
-				st = map.get(it.next());
-				if(st != null && !declared.contains(st.getParent()))
-				{
-					modified = true;
-					declared.add(st.getParent());
 				}
 			}
 		}
@@ -257,8 +230,6 @@ public class XSDParser implements ErrorHandler
 
 	private void write(Struct st, XSTerm term, boolean goingup)
 	{
-		String required;
-		
 		if(term != null)
 		{
 			if(term.isModelGroup())
@@ -275,7 +246,8 @@ public class XSDParser implements ErrorHandler
 					}
 					else if(term.isElementDecl())
 					{
-						st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(), goingup, typeMapping);
+						st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(),
+								goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), typeMapping);
 					}
 					//order = order + 1;
 				}
@@ -313,6 +285,7 @@ public class XSDParser implements ErrorHandler
 	{
 		XSDParser				xp;
 		TreeMap<String,String>	map;
+		String					xsd;
 		
 		map = new TreeMap<String,String>();
 		map.put("anyURI", "string");
@@ -321,7 +294,16 @@ public class XSDParser implements ErrorHandler
 		map.put("EAnnotation", "string");
 		map.put("EGenericType", "string");
 		
-		xp = new XSDParser("/Users/sergio/Documents/Alive/Implementation/EventMetamodel/model/EventModel.Event.xsd", map);
+		if(args.length == 0)
+		{
+			xsd = "/Users/sergio/Documents/Alive/Implementation/EventMetamodel/model/EventModel.Event.xsd";
+		}
+		else
+		{
+			xsd = args[0];
+		}
+		
+		xp = new XSDParser(xsd, map);
 		xp.parse();
 	}
 }
