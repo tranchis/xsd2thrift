@@ -53,6 +53,7 @@ public class XSDParser implements ErrorHandler
 		basicTypes.add("binary");
 		basicTypes.add("i16");
 		basicTypes.add("double");
+		basicTypes.add("boolean");
 		typeMapping.put("positiveInteger", "i16");
 		typeMapping.put("decimal", "double");
 	}
