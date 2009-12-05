@@ -28,14 +28,22 @@ public class Struct
 		
 		if(map.get(name) == null)
 		{
-			if(typeMapping.containsKey(type))
+			if(type == null)
 			{
-				type = typeMapping.get(type);
+				type = new String(name);
 			}
-			else if(type.equals(this.name))
+			else
 			{
-				type = "binary";
+				if(typeMapping.containsKey(type))
+				{
+					type = typeMapping.get(type);
+				}
+				else if(type.equals(this.name))
+				{
+					type = "binary";
+				}
 			}
+//			System.out.println("name: " + name + ", type: " + type);
 			f = new Field(name, type, repeat, def, required);
 			map.put(name, f);
 			if(!type.equals(this.name))

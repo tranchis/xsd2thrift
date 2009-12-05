@@ -2,6 +2,7 @@ package com.github.tranchis.xsd2thrift;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -15,6 +16,9 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.sun.xml.xsom.parser.XSOMParser;
+import com.sun.xml.xsom.ForeignAttributes;
+import com.sun.xml.xsom.XSAttributeDecl;
+import com.sun.xml.xsom.XSAttributeUse;
 import com.sun.xml.xsom.XSComplexType;
 import com.sun.xml.xsom.XSElementDecl;
 import com.sun.xml.xsom.XSModelGroup;
@@ -33,8 +37,8 @@ public class XSDParser implements ErrorHandler
 	
 	public XSDParser(String stFile)
 	{
-		init(stFile);
 		typeMapping = new TreeMap<String,String>();
+		init(stFile);
 	}
 	
 	private void init(String stFile)
@@ -47,12 +51,16 @@ public class XSDParser implements ErrorHandler
 		basicTypes = new TreeSet<String>();
 		basicTypes.add("string");
 		basicTypes.add("binary");
+		basicTypes.add("i16");
+		basicTypes.add("double");
+		typeMapping.put("positiveInteger", "i16");
+		typeMapping.put("decimal", "double");
 	}
 
 	public XSDParser(String stFile, TreeMap<String,String> typeMapping)
 	{
-		init(stFile);
 		this.typeMapping = typeMapping;
+		init(stFile);
 	}
 	
 	public void parse() throws SAXException, IOException
@@ -187,12 +195,7 @@ public class XSDParser implements ErrorHandler
 				{
 					if(parent.isComplexType())
 					{
-						XSParticle particle = parent.asComplexType().getContentType().asParticle();
-						if(particle != null)
-						{
-							write(st, particle.getTerm()/*, order*/, true);
-						}
-
+						write(st, parent.asComplexType(), true);
 						parent = parent.getBaseType();
 					}
 				}
@@ -205,6 +208,23 @@ public class XSDParser implements ErrorHandler
 		else
 		{
 			
+		}
+	}
+
+	private void write(Struct st, XSComplexType type, boolean goingup)
+	{
+		XSParticle particle = type.getContentType().asParticle();
+		if(particle != null)
+		{
+			write(st, particle.getTerm()/*, order*/, true);
+		}
+		Iterator<? extends XSAttributeUse> it = type.getAttributeUses().iterator();
+		while(it.hasNext())
+		{
+			XSAttributeUse att = it.next();
+			XSAttributeDecl decl = att.getDecl();
+			st.addField(decl.getName(), decl.getType().getName(),
+					goingup, false, decl.getFixedValue(), typeMapping);
 		}
 	}
 
@@ -230,6 +250,8 @@ public class XSDParser implements ErrorHandler
 
 	private void write(Struct st, XSTerm term, boolean goingup)
 	{
+		Struct	nested;
+		
 		if(term != null)
 		{
 			if(term.isModelGroup())
@@ -246,13 +268,34 @@ public class XSDParser implements ErrorHandler
 					}
 					else if(term.isElementDecl())
 					{
-						st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(),
+						if(term.asElementDecl().getType().getName() == null)
+						{
+							nested = createNestedType(term.asElementDecl().getName(), term.asElementDecl().getType().asComplexType());
+							st.addField(nested.getName(), null, goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), typeMapping);
+						}
+						else
+						{
+							st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(),
 								goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), typeMapping);
+						}
 					}
 					//order = order + 1;
 				}
 			}
 		}							
+	}
+
+	private Struct createNestedType(String name, XSComplexType type)
+	{
+		Struct		st;
+		XSParticle	xp;
+		
+		st = new Struct(name);
+		map.put(name, st);
+		
+		write(st, type, true);
+		
+		return st;
 	}
 
 	@Override
@@ -296,7 +339,8 @@ public class XSDParser implements ErrorHandler
 		
 		if(args.length == 0)
 		{
-			xsd = "/Users/sergio/Documents/Alive/Implementation/EventMetamodel/model/EventModel.Event.xsd";
+			// xsd = "/Users/sergio/Documents/Alive/Implementation/EventMetamodel/model/EventModel.Event.xsd";
+			xsd = "contrib/shiporder.xsd";
 		}
 		else
 		{
