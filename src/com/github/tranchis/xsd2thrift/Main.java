@@ -35,7 +35,8 @@ public class Main
 {
 	private static boolean	correct;
 	private static String	usage = "" + 
-			"Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME] [--package=NAME] filename.xsd\n" + 
+			"Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]\n" +
+			"                           [--package=NAME] filename.xsd\n" + 
 			"\n" + 
 			"  --thrift          : convert to Thrift\n" + 
 			"  --protobuf        : convert to Protocol Buffers\n" + 
