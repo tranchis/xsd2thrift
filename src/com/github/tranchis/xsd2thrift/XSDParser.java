@@ -36,6 +36,7 @@ import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
 import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.XSAttGroupDecl;
 import com.sun.xml.xsom.XSAttributeDecl;
@@ -59,6 +60,7 @@ public class XSDParser implements ErrorHandler
 	private Map<String,Enumeration>	enums;
 	private Set<String>				keywords, basicTypes;
 	private TreeMap<String, String>	typeMapping, xsdMapping;
+	private IMarshaller				marshaller;
 	
 	public XSDParser(String stFile)
 	{
@@ -533,36 +535,8 @@ public class XSDParser implements ErrorHandler
 		exception.printStackTrace();
 	}
 
-	/**
-	 * @param args
-	 * @throws Exception 
-	 */
-	public static void main(String[] args) throws Exception
+	public void addMarshaller(IMarshaller marshaller)
 	{
-		XSDParser				xp;
-		TreeMap<String,String>	map;
-		String					xsd;
-		
-		map = new TreeMap<String,String>();
-		map.put("schema_._type", "BaseObject");
-		map.put("EString", "string");
-		map.put("EBoolean", "boolean");
-		map.put("EInt", "integer");
-		map.put("EDate", "long");
-		map.put("EChar", "byte");
-		map.put("EFloat", "decimal");
-			
-		if(args.length == 0)
-		{
-			// xsd = "/Users/sergio/Documents/Alive/Implementation/EventMetamodel/model/EventModel.Event.xsd";
-			xsd = "contrib/shiporder.xsd";
-		}
-		else
-		{
-			xsd = args[0];
-		}
-		
-		xp = new XSDParser(xsd, map);
-		xp.parse();
+		this.marshaller = marshaller;
 	}
 }

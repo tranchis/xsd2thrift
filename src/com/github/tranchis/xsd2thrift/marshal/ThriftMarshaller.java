@@ -21,40 +21,9 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.github.tranchis.xsd2thrift;
+package com.github.tranchis.xsd2thrift.marshal;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
-public class Enumeration
+public class ThriftMarshaller implements IMarshaller
 {
-	private String		name;
-	private Set<String>	strings;
 
-	public Enumeration(String name)
-	{
-		this.setName(name);
-		this.strings = new TreeSet<String>();
-	}
-
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-
-	public String getName()
-	{
-		return name;
-	}
-
-	public void addString(String value)
-	{
-		strings.add(value);
-	}
-
-	public Iterator<String> iterator()
-	{
-		return strings.iterator();
-	}
 }
