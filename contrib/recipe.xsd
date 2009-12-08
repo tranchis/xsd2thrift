@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Simple recipe Schema -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	       targetNamespace="http://myrecipes.org/" 
+	       xmlns="http://myrecipes.org/" 
+	       elementFormDefault="qualified">
+  <xs:element name="list">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="recipe"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="recipe">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="meta"/>
+        <xs:element minOccurs="0" ref="recipe_author"/>
+        <xs:element ref="recipe_name"/>
+        <xs:element ref="meal"/>
+        <xs:element ref="ingredients"/>
+        <xs:element ref="directions"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="meta">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="author"/>
+        <xs:element ref="date"/>
+        <xs:element ref="version"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="version" type="xs:string"/>
+  <xs:element name="date" type="xs:string"/>
+  <xs:element name="author" type="xs:string"/>
+  <xs:element name="recipe_author" type="xs:string"/>
+  <xs:element name="recipe_name" type="xs:string"/>
+  <xs:element name="meal" type="xs:string"/>
+  <xs:element name="ingredients">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="item"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="item" type="xs:string"/>
+  <xs:element name="directions">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="para"/>
+        <xs:element ref="bullet"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="bullet">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="strong"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="para">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="strong"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="strong" type="xs:string"/>
+</xs:schema>

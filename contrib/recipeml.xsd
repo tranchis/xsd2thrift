@@ -1,0 +1,1150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ============================================================= -->
+<!-- Recipe Markup Language (RecipeML)  DTD -->
+<!-- Version 0.5 -->
+<!-- 4 November 2000 -->
+<!---->
+<!-- This DTD is identified by the PUBLIC and SYSTEM identifiers: -->
+<!---->
+<!-- PUBLIC  "-//FormatData//DTD RecipeML 0.5//EN" -->
+<!-- SYSTEM  "http://www.formatdata.com/recipeml/recipeml.dtd" -->
+<!---->
+<!-- Copyright (c) 1999, 2000 James Saiya, FormatData -->
+<!---->
+<!-- http://www.formatdata.com -->
+<!-- ============================================================= -->
+<!-- ============================================================= -->
+<!-- attribute entities -->
+<!-- ============================================================= -->
+<!-- attributes common to nearly all elements -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-recipeml.xsd"/>
+  <xs:attributeGroup name="core.att">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="class" type="xs:NMTOKEN"/>
+    <xs:attribute name="title"/>
+  </xs:attributeGroup>
+  <!-- internationalization attributes -->
+  <xs:attributeGroup name="i18n.att">
+    <xs:attribute ref="xml:lang"/>
+  </xs:attributeGroup>
+  <!-- attributes for elements that contain measurements -->
+  <xs:attributeGroup name="measurement.att">
+    <xs:attribute name="system">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="US"/>
+          <xs:enumeration value="Imperial"/>
+          <xs:enumeration value="metric"/>
+          <xs:enumeration value="SI"/>
+          <xs:enumeration value="other"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- attributes common to most elements -->
+  <xs:attributeGroup name="common.att">
+    <xs:attributeGroup ref="core.att"/>
+    <xs:attributeGroup ref="i18n.att"/>
+  </xs:attributeGroup>
+  <!--
+     attributes for elements that are divisions of the ingredients,
+    directions, or tools sections
+  -->
+  <xs:attributeGroup name="div.att">
+    <xs:attributeGroup ref="core.att"/>
+    <xs:attributeGroup ref="i18n.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+    <xs:attribute name="type" default="titled">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="main"/>
+          <xs:enumeration value="variation"/>
+          <xs:enumeration value="titled"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- class entities -->
+  <!-- ============================================================= -->
+  <xs:element name="inline.class" abstract="true" substitutionGroup="step.class"/>
+  <xs:element name="measure.class" abstract="true" substitutionGroup="step.class"/>
+  <xs:element name="step.class" abstract="true"/>
+  <!-- <!ENTITY % misc.class 'extension | syntax-error'> -->
+  <!-- ============================================================= -->
+  <!-- content model entities -->
+  <!-- ============================================================= -->
+  <xs:group name="amt.cont">
+    <xs:sequence>
+      <xs:element ref="amt"/>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element minOccurs="0" ref="sep"/>
+        <xs:element ref="amt"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="time.cont">
+    <xs:sequence>
+      <xs:element ref="time"/>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element minOccurs="0" ref="sep"/>
+        <xs:element ref="time"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ing.cont">
+    <xs:sequence>
+      <xs:group minOccurs="0" ref="amt.cont"/>
+      <xs:element minOccurs="0" ref="modifier"/>
+      <xs:element ref="item"/>
+      <xs:element minOccurs="0" ref="prep"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="ing-note"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="prodcode"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- ============================================================= -->
+  <!-- document element -->
+  <!-- ============================================================= -->
+  <xs:element name="recipeml">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="meta"/>
+        <xs:choice>
+          <xs:element ref="menu"/>
+          <xs:element ref="recipe"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="recipeml.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="recipeml.attlist">
+    <xs:attribute name="version" default="0.5">
+      <xs:simpleType>
+        <xs:restriction base="xs:NMTOKEN">
+          <xs:enumeration value="0.5"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="generator"/>
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <!-- data which describes the whole document -->
+  <!-- the meta attributes match those of the HTML 4.0 meta element -->
+  <xs:element name="meta">
+    <xs:complexType>
+      <xs:attributeGroup ref="meta.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="meta.attlist">
+    <xs:attribute name="name" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="DC.Title"/>
+          <xs:enumeration value="DC.Subject"/>
+          <xs:enumeration value="DC.Description"/>
+          <xs:enumeration value="DC.Type"/>
+          <xs:enumeration value="DC.Source"/>
+          <xs:enumeration value="DC.Relation"/>
+          <xs:enumeration value="DC.Coverage"/>
+          <xs:enumeration value="DC.Creator"/>
+          <xs:enumeration value="DC.Publisher"/>
+          <xs:enumeration value="DC.Contributor"/>
+          <xs:enumeration value="DC.Rights"/>
+          <xs:enumeration value="DC.Date"/>
+          <xs:enumeration value="DC.Format"/>
+          <xs:enumeration value="DC.Identifier"/>
+          <xs:enumeration value="DC.Language"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="content" use="required"/>
+    <xs:attribute name="scheme"/>
+    <xs:attribute name="lang"/>
+  </xs:attributeGroup>
+  <!-- name: values are from the set of Dublin Core (DC) tokens -->
+  <!-- (see http://purl.org/dc) -->
+  <!-- scheme: format of the data in the 'content' attribute -->
+  <!-- (see http://purl.org/dc) -->
+  <!-- lang: language of the data in the 'content' attribute -->
+  <xs:element name="menu">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="head"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="description"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="recipe"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="menu.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="menu.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+  </xs:attributeGroup>
+  <xs:element name="recipe">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="head"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="description"/>
+        <xs:element minOccurs="0" ref="equipment"/>
+        <xs:element ref="ingredients"/>
+        <xs:element ref="directions"/>
+        <xs:element minOccurs="0" ref="nutrition"/>
+        <xs:element minOccurs="0" ref="diet-exchanges"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="recipe.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="recipe.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- head and its children -->
+  <!-- ============================================================= -->
+  <xs:element name="head">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="title"/>
+        <xs:element minOccurs="0" ref="subtitle"/>
+        <xs:element minOccurs="0" ref="version"/>
+        <xs:element minOccurs="0" ref="source"/>
+        <xs:element minOccurs="0" ref="categories"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="preptime"/>
+        <xs:element minOccurs="0" ref="yield"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="title">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="brandname"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="title.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="title.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="subtitle">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="brandname"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="subtitle.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="subtitle.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <!-- which refinement of the recipe is this? -->
+  <xs:element name="version">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="version.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="version.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <!-- credit or source information displayed as a footnote -->
+  <xs:element name="source">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="srcitem"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="source.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="source.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="srcitem">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="inline.class"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="srcitem.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="srcitem.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="type"/>
+  </xs:attributeGroup>
+  <!--
+    type: values could be Dublin Core element names, i.e., DC.Title, 
+    DC.Creator, DC.Publisher, DC.Contributor, DC.Rights, 
+    DC.Date, DC.Identifier)
+  -->
+  <!-- list of categories -->
+  <!--
+    (e.g. dinner (meal), entree (course), pasta (ingredient),
+    Chinese (cuisine), etc.)
+  -->
+  <xs:element name="categories">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="cat"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="categories.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="categories.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="content" type="xs:NMTOKENS"/>
+  </xs:attributeGroup>
+  <!--
+    content: (optional) a list of the categories in an alternate
+    representation
+  -->
+  <!--
+    (optional) way to mark individual categories in the content
+    of <categories> element
+  -->
+  <xs:element name="cat">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="cat.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="cat.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="type"/>
+  </xs:attributeGroup>
+  <!--
+    type: example values - meal, course, ingredient, cuisine,
+    etc.
+  -->
+  <!--
+    can be one of many time periods involved in the
+    preparation process
+  -->
+  <xs:element name="preptime">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="time.cont">
+          <xs:attributeGroup ref="preptime.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="preptime.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="type" use="required"/>
+  </xs:attributeGroup>
+  <!--
+    type: example values - preparation, rising, marinating, cooking,
+    cooling, standing, etc.
+  -->
+  <xs:element name="yield">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="qty"/>
+        <xs:element ref="range"/>
+        <xs:element ref="unit"/>
+      </xs:choice>
+      <xs:attributeGroup ref="yield.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="yield.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- equipment and sub-elements -->
+  <!-- ============================================================= -->
+  <xs:element name="equipment">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element maxOccurs="unbounded" ref="equip-div"/>
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="note"/>
+          <xs:element ref="tool"/>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="note"/>
+            <xs:element ref="tool"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:choice>
+      <xs:attributeGroup ref="equipment.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="equipment.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+  </xs:attributeGroup>
+  <xs:element name="equip-div">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:element minOccurs="0" ref="description"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="note"/>
+        <xs:element ref="tool"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="note"/>
+          <xs:element ref="tool"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="equip-div.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="equip-div.attlist">
+    <xs:attributeGroup ref="div.att"/>
+  </xs:attributeGroup>
+  <xs:element name="tool" substitutionGroup="step.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="brandname"/>
+        <xs:element ref="qty"/>
+        <xs:element ref="range"/>
+        <xs:element ref="size"/>
+        <xs:element ref="unit"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="tool.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tool.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="optional" default="no">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- ingredients and sub-elements -->
+  <!-- ============================================================= -->
+  <xs:element name="ingredients">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element maxOccurs="unbounded" ref="ing-div"/>
+        <xs:sequence>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="note"/>
+          <xs:element ref="ing"/>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="note"/>
+            <xs:element ref="ing"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:choice>
+      <xs:attributeGroup ref="ingredients.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="ingredients.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+  </xs:attributeGroup>
+  <xs:element name="ing-div">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:element minOccurs="0" ref="description"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="note"/>
+        <xs:element ref="ing"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="note"/>
+          <xs:element ref="ing"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="ing-div.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="ing-div.attlist">
+    <xs:attributeGroup ref="div.att"/>
+  </xs:attributeGroup>
+  <xs:element name="ing">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ing.cont">
+          <xs:sequence>
+            <xs:element minOccurs="0" maxOccurs="unbounded" ref="alt-ing"/>
+          </xs:sequence>
+          <xs:attributeGroup ref="ing.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="ing.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="optional" default="no">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- alternate or substitute ingredient -->
+  <xs:element name="alt-ing">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="ing.cont">
+          <xs:attributeGroup ref="alt-ing.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="alt-ing.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="modifier">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="size"/>
+        <xs:element ref="measure.class"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="modifier.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="modifier.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="item">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="brandname"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="item.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="item.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="prep">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="size"/>
+        <xs:element ref="measure.class"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="prep.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="prep.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="ing-note">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="measure.class"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ing-note.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="ing-note.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <!--
+    product code for inventory control systems, automated shopping,
+    etc.
+  -->
+  <xs:element name="prodcode">
+    <xs:complexType>
+      <xs:attributeGroup ref="prodcode.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="prodcode.attlist">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="type" use="required"/>
+    <xs:attribute name="content" use="required"/>
+    <xs:attribute name="domain"/>
+  </xs:attributeGroup>
+  <!-- type: typical values would be: "UPC", "PLU", "SKU" -->
+  <!-- (see http://www.uc-council.org) -->
+  <!-- domain: realm in which the code applies - "Sav-Mart", etc. -->
+  <!-- ============================================================= -->
+  <!-- directions and sub-elements -->
+  <!-- ============================================================= -->
+  <!-- <!ELEMENT directions (dir-div+ | (note*, step, (note | step)*))> -->
+  <xs:element name="directions">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element maxOccurs="unbounded" ref="dir-div"/>
+        <xs:sequence>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="note"/>
+            <xs:element ref="ing"/>
+          </xs:choice>
+          <xs:element ref="step"/>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element ref="note"/>
+            <xs:element ref="ing"/>
+            <xs:element ref="step"/>
+          </xs:choice>
+        </xs:sequence>
+      </xs:choice>
+      <xs:attributeGroup ref="directions.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="directions.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+  </xs:attributeGroup>
+  <!-- <!ELEMENT dir-div (title?, description?, note*, step, (note | step)*)> -->
+  <xs:element name="dir-div">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:element minOccurs="0" ref="description"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="note"/>
+          <xs:element ref="ing"/>
+        </xs:choice>
+        <xs:element ref="step"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="note"/>
+          <xs:element ref="ing"/>
+          <xs:element ref="step"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="dir-div.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="dir-div.attlist">
+    <xs:attributeGroup ref="div.att"/>
+    <xs:attribute name="duration"/>
+  </xs:attributeGroup>
+  <xs:element name="step">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="step.class"/>
+        <xs:element ref="substep"/>
+      </xs:choice>
+      <xs:attributeGroup ref="step.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="step.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="duration"/>
+    <xs:attribute name="type" default="cooking"/>
+    <xs:attribute name="optional" default="no">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="substep">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="step.class"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="substep.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="substep.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="duration"/>
+    <xs:attribute name="type" default="cooking"/>
+    <xs:attribute name="optional" default="no">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="action" substitutionGroup="step.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="measure.class"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="action.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="action.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="code"/>
+  </xs:attributeGroup>
+  <!-- code: machine-processable instruction for cooking automation -->
+  <xs:element name="condition" substitutionGroup="step.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="measure.class"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="condition.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="condition.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="code"/>
+  </xs:attributeGroup>
+  <!-- code: machine-processable instruction for cooking automation -->
+  <!-- setting for heat or speed, etc. -->
+  <xs:element name="setting" substitutionGroup="step.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="measure.class"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="setting.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="setting.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="value"/>
+  </xs:attributeGroup>
+  <!-- value: machine-processable representation of setting -->
+  <xs:element name="toolref" substitutionGroup="step.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="brandname"/>
+        <xs:element ref="qty"/>
+        <xs:element ref="range"/>
+        <xs:element ref="size"/>
+        <xs:element ref="unit"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="toolref.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="toolref.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="toolid" use="required" type="xs:IDREF"/>
+  </xs:attributeGroup>
+  <xs:element name="ingref" substitutionGroup="step.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="brandname"/>
+        <xs:element ref="qty"/>
+        <xs:element ref="range"/>
+        <xs:element ref="size"/>
+        <xs:element ref="unit"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="ingref.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="ingref.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="ingid" use="required" type="xs:IDREF"/>
+  </xs:attributeGroup>
+  <xs:element name="steptime" substitutionGroup="step.class" type="time.cont"/>
+  <!-- ============================================================= -->
+  <!-- nutrition and diet-exchanges elements -->
+  <!-- ============================================================= -->
+  <!-- nutrition information -->
+  <xs:element name="nutrition">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="nutrient-group"/>
+        <xs:element ref="nutrient"/>
+      </xs:choice>
+      <xs:attributeGroup ref="nutrition.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="nutrition.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="standard" default="USDV"/>
+  </xs:attributeGroup>
+  <!-- USDV = U.S. Daily Value -->
+  <xs:element name="nutrient-group">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:element maxOccurs="unbounded" ref="nutrient"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="nutrient-group.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="nutrient-group.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="standard" default="USDV"/>
+  </xs:attributeGroup>
+  <!-- USDV = U.S. Daily Value -->
+  <xs:element name="nutrient">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="n-name"/>
+        <xs:choice maxOccurs="unbounded">
+          <xs:sequence>
+            <xs:element ref="qty"/>
+            <xs:element minOccurs="0" ref="unit"/>
+          </xs:sequence>
+          <xs:element ref="percent"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="nutrient.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="nutrient.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="n-name">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="n-name.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="n-name.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="alternate" default="no">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="yes"/>
+          <xs:enumeration value="no"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="percent">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="frac"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="percent.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <!--
+    CONSTRAINT: content should be restricted to decimal digits; 
+    to be further defined in XML Schema version 
+  -->
+  <xs:attributeGroup name="percent.attlist">
+    <xs:attribute name="standard" default="USDV"/>
+  </xs:attributeGroup>
+  <!-- USDV = U.S. Daily Value -->
+  <!-- diet exchange data -->
+  <xs:element name="diet-exchanges">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="exchange"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="diet-exchanges.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="diet-exchanges.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="authority"/>
+  </xs:attributeGroup>
+  <!-- authority: the organization which created the guidelines -->
+  <xs:element name="exchange">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="qty"/>
+        <xs:element ref="range"/>
+      </xs:choice>
+      <xs:attributeGroup ref="exchange.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="exchange.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <!-- ============================================================= -->
+  <!-- measurments and utility elements -->
+  <!-- ============================================================= -->
+  <!-- explanatory block of text that may precede a recipe or section -->
+  <xs:element name="description">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="measure.class"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="description.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="description.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <!-- informative block of text that may be within a section -->
+  <xs:element name="note">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="measure.class"/>
+        <xs:element ref="inline.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="note.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="note.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="type"/>
+  </xs:attributeGroup>
+  <!--
+    type: typical values would be - Note, Tip, Hint, Suggestion, 
+    Variation, Technique, Warning
+  -->
+  <xs:element name="amt" substitutionGroup="measure.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice minOccurs="0">
+          <xs:element ref="qty"/>
+          <xs:element ref="range"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="size"/>
+        <xs:element minOccurs="0" ref="unit"/>
+        <xs:element minOccurs="0" ref="size"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="amt.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="amt.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+    <xs:attribute name="variation"/>
+  </xs:attributeGroup>
+  <xs:element name="qty">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="frac"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="qty.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="qty.attlist">
+    <xs:attributeGroup ref="core.att"/>
+  </xs:attributeGroup>
+  <xs:element name="range">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="q1"/>
+        <xs:element minOccurs="0" ref="sep"/>
+        <xs:element ref="q2"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="range.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="range.attlist">
+    <xs:attributeGroup ref="core.att"/>
+  </xs:attributeGroup>
+  <xs:element name="q1">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="frac"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="q1.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="q1.attlist">
+    <xs:attributeGroup ref="core.att"/>
+  </xs:attributeGroup>
+  <xs:element name="q2">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="frac"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="q2.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="q2.attlist">
+    <xs:attributeGroup ref="core.att"/>
+  </xs:attributeGroup>
+  <xs:element name="size">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="qty"/>
+        <xs:element ref="range"/>
+        <xs:element ref="unit"/>
+      </xs:choice>
+      <xs:attributeGroup ref="size.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="size.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="code" type="xs:NMTOKEN"/>
+  </xs:attributeGroup>
+  <!-- code: machine-processable representation of size -->
+  <xs:element name="unit">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="unit.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="unit.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+    <xs:attribute name="unit" type="xs:NMTOKEN"/>
+    <xs:attribute name="type">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="mass"/>
+          <xs:enumeration value="weight"/>
+          <xs:enumeration value="volume"/>
+          <xs:enumeration value="area"/>
+          <xs:enumeration value="length"/>
+          <xs:enumeration value="other"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- unit: machine-processable representation of unit -->
+  <xs:element name="time" substitutionGroup="measure.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element ref="qty"/>
+          <xs:element ref="range"/>
+        </xs:choice>
+        <xs:element ref="timeunit"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="time.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="time.attlist">
+    <xs:attributeGroup ref="core.att"/>
+  </xs:attributeGroup>
+  <xs:element name="timeunit">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="timeunit.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="timeunit.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+    <xs:attribute name="unit" type="xs:NMTOKEN"/>
+  </xs:attributeGroup>
+  <!-- unit: machine-processable representation of unit -->
+  <xs:element name="temp" substitutionGroup="measure.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element ref="qty"/>
+          <xs:element ref="range"/>
+        </xs:choice>
+        <xs:element ref="tempunit"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="temp.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="temp.attlist">
+    <xs:attributeGroup ref="core.att"/>
+  </xs:attributeGroup>
+  <xs:element name="tempunit">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="tempunit.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tempunit.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attributeGroup ref="measurement.att"/>
+    <xs:attribute name="unit">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="C"/>
+          <xs:enumeration value="F"/>
+          <xs:enumeration value="K"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <!-- unit: coded representation of unit -->
+  <!-- fraction -->
+  <xs:element name="frac" substitutionGroup="inline.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="n"/>
+        <xs:element minOccurs="0" ref="sep"/>
+        <xs:element ref="d"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="frac.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="frac.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="n" type="xs:string"/>
+  <xs:element name="d" type="xs:string"/>
+  <!-- n, d CONSTRAINT: content must be restricted to decimal digits -->
+  <!-- separator - punctuation or word(s) appearing between elements -->
+  <!-- e.g.: 2 <sep>to</sep> 3 pounds -->
+  <!-- content is optionaly displayed depending on style sheet -->
+  <xs:element name="sep" substitutionGroup="inline.class">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="sep.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="sep.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <xs:element name="brandname" substitutionGroup="step.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="mfr"/>
+        <xs:element ref="product"/>
+      </xs:choice>
+      <xs:attributeGroup ref="brandname.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="brandname.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+  <!-- the part of <brandname> that is the name of the manufacturer -->
+  <xs:element name="mfr">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="inline.class"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="mfr.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="mfr.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="uccMin" type="xs:NMTOKEN"/>
+  </xs:attributeGroup>
+  <!--
+    uccMin: Uniform Code Council Manufacturer Identification 
+    Number
+  -->
+  <!-- (see http://www.uc-council.org) -->
+  <!-- the part of <brandname> that is the name of the product itself -->
+  <xs:element name="product">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="inline.class"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="product.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="product.attlist">
+    <xs:attributeGroup ref="common.att"/>
+    <xs:attribute name="uccIcn" type="xs:NMTOKEN"/>
+  </xs:attributeGroup>
+  <!-- uccIcn: Uniform Code Council Item Code Number -->
+  <!-- (see http://www.uc-council.org) -->
+  <!--
+    useful for associating style information with content otherwise
+    not marked up
+  -->
+  <xs:element name="span" substitutionGroup="inline.class">
+    <xs:complexType mixed="true">
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="inline.class"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="span.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="span.attlist">
+    <xs:attributeGroup ref="common.att"/>
+  </xs:attributeGroup>
+</xs:schema>
+<!-- extensibility mechanism -->
+<!--
+  ** possible future enhancement **
+  <!ELEMENT extension ANY>
+  <!ATTLIST extension 
+    %common.att; >
+-->
+<!-- mark an error in conversion from a legacy format -->
+<!--
+  ** possible future enhancement **
+  <!ELEMENT syntax-error ANY>
+  <!ATTLIST syntax-error 
+    %common.att; 
+    translator  CDATA    #IMPLIED >
+-->
+<!--
+  translator: name (and version) of tool used to 
+  perform conversion
+-->
+<!-- ============================================================= -->
+<!-- END RECIPEML DTD -->
+<!-- ============================================================= -->
