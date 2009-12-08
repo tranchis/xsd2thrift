@@ -23,6 +23,8 @@
  */
 package com.github.tranchis.xsd2thrift;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.TreeMap;
 
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
@@ -32,12 +34,13 @@ import com.github.tranchis.xsd2thrift.marshal.ThriftMarshaller;
 public class Main
 {
 	private static boolean	correct;
-	private static String	usage = "xsd2thrift, version 0.1b\n" + 
+	private static String	usage = "" + 
+			"Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME] [--package=NAME] filename.xsd\n" + 
 			"\n" + 
-			"usage: java xsd2thrift.jar [--thrift] filename\n" + 
-			"\n" + 
-			"  --thrift   : convert to Thrift\n" + 
-			"  --protobuf : convert to Protocol Buffers\n" + 
+			"  --thrift          : convert to Thrift\n" + 
+			"  --protobuf        : convert to Protocol Buffers\n" + 
+			"  --output=FILENAME : store the result in FILENAME instead of standard output\n" + 
+			"  --package=NAME    : set namespace/package of the output file\n" + 
 			"";
 	
 
@@ -49,7 +52,7 @@ public class Main
 
 	private static void usage()
 	{
-		System.err.println(usage);
+		System.err.print(usage);
 		correct = false;
 	}
 
@@ -61,7 +64,7 @@ public class Main
 	{
 		XSDParser				xp;
 		TreeMap<String,String>	map;
-		String					xsd;
+		String					xsd, param;
 		int						i;
 		IMarshaller				im;
 		
@@ -101,7 +104,7 @@ public class Main
 						usage("Only one marshaller can be specified at a time.");
 					}
 				}
-				if(args[i].equals("--protobuf"))
+				else if(args[i].equals("--protobuf"))
 				{
 					if(im == null)
 					{
@@ -112,6 +115,16 @@ public class Main
 					{
 						usage("Only one marshaller can be specified at a time.");
 					}
+				}
+				else if(args[i].startsWith("--filename="))
+				{
+					param = args[i].split("=")[1];
+					xp.setOutputStream(new FileOutputStream(new File(param)));
+				}
+				else if(args[i].startsWith("--package="))
+				{
+					param = args[i].split("=")[1];
+					xp.setPackage(param);
 				}
 				else
 				{

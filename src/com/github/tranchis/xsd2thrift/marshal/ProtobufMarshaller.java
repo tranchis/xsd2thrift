@@ -46,9 +46,20 @@ public class ProtobufMarshaller implements IMarshaller
 	}
 	
 	@Override
-	public String writeHeader()
+	public String writeHeader(String namespace)
 	{
-		return "";
+		String res;
+		
+		if(namespace != null && !namespace.isEmpty())
+		{
+			res = "package " + namespace + ";\n\n";
+		}
+		else
+		{
+			res = "";
+		}
+		
+		return res;
 	}
 
 	@Override

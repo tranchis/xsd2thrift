@@ -24,6 +24,7 @@
 package com.github.tranchis.xsd2thrift;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,6 +63,8 @@ public class XSDParser implements ErrorHandler
 	private Set<String>				keywords, basicTypes;
 	private TreeMap<String, String>	xsdMapping;
 	private IMarshaller				marshaller;
+	private OutputStream			os;
+	private String					namespace;
 	
 	public XSDParser(String stFile)
 	{
@@ -71,6 +74,8 @@ public class XSDParser implements ErrorHandler
 	
 	private void init(String stFile)
 	{
+		os = System.out;
+		
 		this.f = new File(stFile);
 		map = new HashMap<String,Struct>();
 		enums = new HashMap<String,Enumeration>();
@@ -121,10 +126,10 @@ public class XSDParser implements ErrorHandler
 		parser.parse(f);
 		
 		interpretResult(parser.getResult());
-		writeMap(System.out);
+		writeMap();
 	}
 	
-	private void writeMap(OutputStream os) throws Exception
+	private void writeMap() throws Exception
 	{
 		Iterator<Struct>		its;
 		Iterator<Field>			itf;
@@ -139,7 +144,7 @@ public class XSDParser implements ErrorHandler
 		Enumeration				en;
 		boolean					bModified;
 		
-		os.write(marshaller.writeHeader().getBytes());
+		os.write(marshaller.writeHeader(namespace).getBytes());
 		
 		st = createSuperObject();
 		map.put("BaseObject", st);
@@ -540,5 +545,15 @@ public class XSDParser implements ErrorHandler
 	public void addMarshaller(IMarshaller marshaller)
 	{
 		this.marshaller = marshaller;
+	}
+
+	public void setOutputStream(FileOutputStream os)
+	{
+		this.os = os;
+	}
+
+	public void setPackage(String namespace)
+	{
+		this.namespace = namespace;
 	}
 }

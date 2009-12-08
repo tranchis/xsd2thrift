@@ -46,9 +46,20 @@ public class ThriftMarshaller implements IMarshaller
 	}
 	
 	@Override
-	public String writeHeader()
+	public String writeHeader(String namespace)
 	{
-		return "";
+		String res;
+		
+		if(namespace != null && !namespace.isEmpty())
+		{
+			res = "namespace * " + namespace + "\n\n";
+		}
+		else
+		{
+			res = "";
+		}
+		
+		return res;
 	}
 
 	@Override

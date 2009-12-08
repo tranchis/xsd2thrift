@@ -25,7 +25,7 @@ package com.github.tranchis.xsd2thrift.marshal;
 
 public interface IMarshaller
 {
-	String writeHeader();
+	String writeHeader(String namespace);
 	String writeEnumHeader(String name);
 	String writeEnumValue(int order, String value);
 	String writeEnumFooter();
