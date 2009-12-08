@@ -1,8 +1,29 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * XSD2Thrift
+ * 
+ * Copyright (C) 2009 Sergio Alvarez-Napagao http://www.sergio-alvarez.com
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.github.tranchis.xsd2thrift;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,15 +37,18 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.sun.xml.xsom.parser.XSOMParser;
-import com.sun.xml.xsom.ForeignAttributes;
+import com.sun.xml.xsom.XSAttGroupDecl;
 import com.sun.xml.xsom.XSAttributeDecl;
 import com.sun.xml.xsom.XSAttributeUse;
 import com.sun.xml.xsom.XSComplexType;
 import com.sun.xml.xsom.XSElementDecl;
+import com.sun.xml.xsom.XSFacet;
 import com.sun.xml.xsom.XSModelGroup;
 import com.sun.xml.xsom.XSParticle;
+import com.sun.xml.xsom.XSRestrictionSimpleType;
 import com.sun.xml.xsom.XSSchema;
 import com.sun.xml.xsom.XSSchemaSet;
+import com.sun.xml.xsom.XSSimpleType;
 import com.sun.xml.xsom.XSTerm;
 import com.sun.xml.xsom.XSType;
 
@@ -32,12 +56,13 @@ public class XSDParser implements ErrorHandler
 {
 	private File					f;
 	private Map<String,Struct>		map;
+	private Map<String,Enumeration>	enums;
 	private Set<String>				keywords, basicTypes;
-	private TreeMap<String, String>	typeMapping;
+	private TreeMap<String, String>	typeMapping, xsdMapping;
 	
 	public XSDParser(String stFile)
 	{
-		typeMapping = new TreeMap<String,String>();
+		this.xsdMapping = new TreeMap<String,String>();
 		init(stFile);
 	}
 	
@@ -45,56 +70,109 @@ public class XSDParser implements ErrorHandler
 	{
 		this.f = new File(stFile);
 		map = new HashMap<String,Struct>();
+		enums = new HashMap<String,Enumeration>();
 		keywords = new TreeSet<String>();
 		keywords.add("interface");
 		keywords.add("is");
+		keywords.add("class");
+		keywords.add("optional");
+		keywords.add("yield");
+		keywords.add("abstract");
+		keywords.add("required");
+		keywords.add("volatile");
+		keywords.add("transient");
+		keywords.add("service");
+		keywords.add("else");
+		
 		basicTypes = new TreeSet<String>();
 		basicTypes.add("string");
+		basicTypes.add("anyType");
+		basicTypes.add("anyURI");
+		basicTypes.add("anySimpleType");
+		basicTypes.add("integer");
+		basicTypes.add("positiveInteger");
 		basicTypes.add("binary");
-		basicTypes.add("i16");
-		basicTypes.add("double");
 		basicTypes.add("boolean");
+		basicTypes.add("decimal");
+		basicTypes.add("byte");
+		basicTypes.add("long");
+		basicTypes.add("ID");
+		basicTypes.add("IDREF");
+		basicTypes.add("NMTOKEN");
+		basicTypes.add("NMTOKENS");
+		basicTypes.add("BaseObject");
+		
+		typeMapping = new TreeMap<String,String>();
 		typeMapping.put("positiveInteger", "i16");
+		typeMapping.put("integer", "i16");
+		typeMapping.put("long", "i32");
 		typeMapping.put("decimal", "double");
+		typeMapping.put("ID", "string");
+		typeMapping.put("IDREF", "string");
+		typeMapping.put("NMTOKEN", "string");
+		typeMapping.put("NMTOKENS", "list<string>");
+		typeMapping.put("anySimpleType", "BaseObject");
+		typeMapping.put("anyType", "BaseObject");
+		typeMapping.put("anyURI", "BaseObject");
 	}
 
-	public XSDParser(String stFile, TreeMap<String,String> typeMapping)
+	public XSDParser(String stFile, TreeMap<String,String> xsdMapping)
 	{
-		this.typeMapping = typeMapping;
+		this.xsdMapping = xsdMapping;
 		init(stFile);
 	}
 	
-	public void parse() throws SAXException, IOException
+	public void parse() throws Exception
 	{
-		XSOMParser parser = new XSOMParser();
+		XSOMParser parser;
+		
+		parser = new XSOMParser();
 		parser.setErrorHandler(this);
-//		parser.setEntityResolver(xp);
-
 		parser.parse(f);
-		//parser.parseSchema( new File("XHTML.xsd"));
 		
 		interpretResult(parser.getResult());
-
 		writeMap();
 	}
 	
-	private void writeMap()
+	private void writeMap() throws Exception
 	{
-		Iterator<Struct>	its;
-		Iterator<Field>		itf;
-		Struct				st;
-		Field				f;
-		int					order;
-		String				fname, type;
-		Set<Struct>			ss;
-		Set<String>			declared;
+		Iterator<Struct>		its;
+		Iterator<Field>			itf;
+		Struct					st;
+		Field					f;
+		int						order;
+		String					fname, type;
+		Set<Struct>				ss;
+		Set<String>				declared;
+		Iterator<Enumeration>	ite;
+		Iterator<String>		itg;
+		Enumeration				en;
+		boolean					bModified;
+		
+		st = createSuperObject();
+		map.put("BaseObject", st);
+		
+		ite = enums.values().iterator();
+		while(ite.hasNext())
+		{
+			en = ite.next();
+			System.out.println("enum " + escape(en.getName()) + "\n{");
+			itg = en.iterator();
+			while(itg.hasNext())
+			{
+				System.out.println("\t" + escape(itg.next()) + ",");
+			}
+			System.out.println("}\n");
+		}
 		
 		ss = new HashSet<Struct>(map.values());
 		declared = new TreeSet<String>(basicTypes);
+		declared.addAll(enums.keySet());
 		
-		while(!ss.isEmpty())
+		bModified = true;
+		while(bModified && !ss.isEmpty())
 		{
-//			System.out.println(ss);
+			bModified = false;
 			its = map.values().iterator();
 			while(its.hasNext())
 			{
@@ -105,7 +183,7 @@ public class XSDParser implements ErrorHandler
 //				}
 				if(ss.contains(st) && declared.containsAll(st.getTypes()))
 				{
-					System.out.println("struct " + st.getName() + "\n{");
+					System.out.println("struct " + escape(st.getName()) + "\n{");
 					itf = st.getFields().iterator();
 					order = 1;
 					while(itf.hasNext())
@@ -113,31 +191,75 @@ public class XSDParser implements ErrorHandler
 						f = itf.next();
 						fname = f.getName();
 						type = f.getType();
-						if(keywords.contains(fname))
+						if(!map.keySet().contains(type) && !basicTypes.contains(type) && !enums.containsKey(type))
+						{
+							type = "binary";
+						}
+						if(type.equals(fname))
 						{
 							fname = "_" + fname;
 						}
-//						System.out.println(map.keySet());
-						if(!map.keySet().contains(type) && !basicTypes.contains(type))
+						if(typeMapping.containsKey(type))
 						{
-							type = "binary";
+							type = typeMapping.get(type);
 						}
 						if(f.isRepeat())
 						{
 							type = "list<" + type + ">";
 						}
-						System.out.println("\t" + order + " : " + getRequired(f.isRequired()) + " " + type + " " + fname + ",");
+						System.out.println("\t" + order + " : " + getRequired(f.isRequired()) + " " + escape(type) + " " + escape(fname) + ",");
 						order = order + 1;
 					}
 					System.out.println("}\n");
 					declared.add(st.getName());
-					//updateDeclared(declared);
 					
-					// System.out.println("Removing " + st.getName());
 					ss.remove(st);
+					bModified = true;
 				}
 			}
 		}
+		
+		if(!ss.isEmpty())
+		{
+			throw new Exception();
+		}
+	}
+
+	private Struct createSuperObject()
+	{
+		Struct				st, aux;
+		Iterator<Struct>	its;
+		
+		st = new Struct("BaseObject");
+		
+		its = map.values().iterator();
+		st.addField("baseObjectType", "string", true, false, null, xsdMapping);
+		while(its.hasNext())
+		{
+			aux = its.next();
+			st.addField(aux.getName(), aux.getName(),
+				false, false, null, xsdMapping);
+		}
+		
+		return st;
+	}
+
+	private String escape(String name)
+	{
+		String	res;
+		
+		res = name.replace('-', '_');
+		res = res.replace('.', '_');
+		if(res.charAt(0) >= '0' && res.charAt(0) <= '9')
+		{
+			res = '_' + res;
+		}
+		if(keywords.contains(res))
+		{
+			res = "_" + res;
+		}
+		
+		return res;
 	}
 
 	private String getRequired(boolean required)
@@ -158,19 +280,21 @@ public class XSDParser implements ErrorHandler
 
 	private void interpretResult(XSSchemaSet sset)
 	{
-		XSSchema	xs;
+		XSSchema				xs;
+		Iterator<XSSchema>		it;
+		Iterator<XSElementDecl>	itt;
+		XSElementDecl			el;
 		
-		Iterator<XSSchema> it = sset.iterateSchema();
+		it = sset.iterateSchema();
 		while(it.hasNext())
 		{
 			xs = it.next();
 			if(!xs.getTargetNamespace().endsWith("/XMLSchema"))
 			{
-				Iterator<XSElementDecl> itt = xs.iterateElementDecls();
+				itt = xs.iterateElementDecls();
 				while(itt.hasNext())
 				{
-					XSElementDecl el = itt.next();
-
+					el = itt.next();
 					interpretElement(el, sset);				
 				}
 			}
@@ -179,19 +303,20 @@ public class XSDParser implements ErrorHandler
 
 	private void interpretElement(XSElementDecl el, XSSchemaSet sset)
 	{
-		Struct	st;
+		Struct			st;
+		XSComplexType	cType;
+		XSType			parent;
+		XSSimpleType	xs;
 
 		if(el.getType() instanceof XSComplexType && el.getType() != sset.getAnyType())
 		{
-			XSComplexType cType = (XSComplexType)el.getType();
-			//			if(!cType.isAbstract())
-			//			{
+			cType = (XSComplexType)el.getType();
 			if(map.get(el.getName()) == null)
 			{
 				st = new Struct(el.getName());
 				map.put(el.getName(), st);
 
-				XSType parent = cType;
+				parent = cType;
 				while(parent != sset.getAnyType())
 				{
 					if(parent.isComplexType())
@@ -200,50 +325,140 @@ public class XSDParser implements ErrorHandler
 						parent = parent.getBaseType();
 					}
 				}
-				//				}
 				
 				processInheritance(st, cType, sset);
 				st.setParent(cType.getBaseType().getName());
 			}
 		}
-		else
+		else if(el.getType() instanceof XSSimpleType && el.getType() != sset.getAnySimpleType())
 		{
-			
+			xs = el.getType().asSimpleType();
+			if(xs.isRestriction())
+			{
+				createEnum(xs.getName(), xs.asRestriction());
+			}
 		}
 	}
 
 	private void write(Struct st, XSComplexType type, boolean goingup)
 	{
-		XSParticle particle = type.getContentType().asParticle();
+		XSParticle							particle;
+		Iterator<? extends XSAttributeUse>	it;
+		XSAttributeUse						att;
+		XSAttributeDecl						decl;
+		Iterator<? extends XSAttGroupDecl>	itt;
+		
+		particle = type.getContentType().asParticle();
 		if(particle != null)
 		{
-			write(st, particle.getTerm()/*, order*/, true);
+			write(st, particle.getTerm(), true);
 		}
-		Iterator<? extends XSAttributeUse> it = type.getAttributeUses().iterator();
+		
+		itt = type.getAttGroups().iterator();
+		while(itt.hasNext())
+		{
+			write(st, itt.next(), true);
+		}
+		
+		it = type.getAttributeUses().iterator();
 		while(it.hasNext())
 		{
-			XSAttributeUse att = it.next();
-			XSAttributeDecl decl = att.getDecl();
+			att = it.next();
+			decl = att.getDecl();
+			write(st, decl, goingup && att.isRequired());
+		}
+	}
+
+	private void write(Struct st, XSAttributeDecl decl, boolean goingup)
+	{
+		if(decl.getType().isRestriction() && decl.getType().getName() != null && !basicTypes.contains(decl.getType().getName()))
+		{
+			createEnum(decl.getType().getName(), decl.getType().asRestriction());
 			st.addField(decl.getName(), decl.getType().getName(),
-					goingup, false, decl.getFixedValue(), typeMapping);
+				goingup, false, decl.getFixedValue(), xsdMapping);
+		}
+		else if(decl.getType().isList())
+		{
+			st.addField(decl.getName(), decl.getType().asList().getItemType().getName(),
+				goingup, true, null, xsdMapping);
+		}
+		else
+		{
+			st.addField(decl.getName(), decl.getType().getName(),
+				goingup, false, decl.getFixedValue(), xsdMapping);
+		}
+	}
+
+	private void createEnum(String name, XSRestrictionSimpleType type)
+	{
+		Enumeration					en;
+		Iterator<? extends XSFacet> it;
+		
+		if(!enums.containsKey(name))
+		{
+			type = type.asRestriction();
+			en = new Enumeration(name);
+			it = type.getDeclaredFacets().iterator();
+			while(it.hasNext())
+			{
+				en.addString(it.next().getValue().value);
+			}
+			enums.put(name, en);
+		}
+	}
+
+	private void write(Struct st, XSAttGroupDecl attGroup, boolean goingup)
+	{
+		Iterator<? extends XSAttributeUse>	it;
+		Iterator<? extends XSAttGroupDecl>	itg;
+		XSAttributeUse						att;
+		XSAttributeDecl						decl;
+
+		itg = attGroup.getAttGroups().iterator();
+		while(itg.hasNext())
+		{
+			write(st, itg.next(), goingup);
+		}
+		
+		it = attGroup.getDeclaredAttributeUses().iterator();
+		while(it.hasNext())
+		{
+			att = it.next();
+			decl = att.getDecl();
+			if(decl.getType().getName() == null)
+			{
+				if(decl.getType().isRestriction())
+				{
+					createEnum(attGroup.getName() + "_" + decl.getName(), decl.getType().asRestriction());
+					st.addField(decl.getName(), attGroup.getName() + "_" + decl.getName(),
+						goingup, false, decl.getFixedValue(), xsdMapping);
+				}
+			}
+			else
+			{
+				write(st, decl, true);
+			}
 		}
 	}
 
 	private void processInheritance(Struct st, XSComplexType cType, XSSchemaSet sset)
 	{
-		Iterator<XSType> ity = sset.iterateTypes();
+		Iterator<XSType>	ity;
+		XSType				xt;
+		XSParticle			particle;
+		
+		ity = sset.iterateTypes();
 		while(ity.hasNext())
 		{
-			XSType xt = ity.next();
+			xt = ity.next();
 			if(xt.getBaseType() == cType)
 			{
-				XSParticle particle = xt.asComplexType().getContentType().asParticle();
+				particle = xt.asComplexType().getContentType().asParticle();
 				if(particle != null)
 				{
 					write(st, particle.getTerm(), false);
 				}
 				
-				// System.out.println("Processing inheritance from " + cType + " to " + xt.asComplexType());
 				processInheritance(st, xt.asComplexType(), sset);
 			}
 		}
@@ -251,36 +466,35 @@ public class XSDParser implements ErrorHandler
 
 	private void write(Struct st, XSTerm term, boolean goingup)
 	{
-		Struct	nested;
+		Struct			nested;
+		XSModelGroup	modelGroup;
+		XSParticle[]	ps;
+		XSParticle		p;
 		
-		if(term != null)
+		if(term != null && term.isModelGroup())
 		{
-			if(term.isModelGroup())
+			modelGroup = term.asModelGroup();
+			ps = modelGroup.getChildren();
+			for(int i = 0;i<ps.length;i++)
 			{
-				XSModelGroup modelGroup = term.asModelGroup();
-				XSParticle[] ps = modelGroup.getChildren();
-				for(int i = 0;i<ps.length;i++)
+				p = ps[i];
+				term = p.getTerm();
+				if(term.isModelGroup())
 				{
-					XSParticle p = ps[i];
-					term = p.getTerm();
-					if(term.isModelGroup())
+					write(st, term, goingup);
+				}
+				else if(term.isElementDecl())
+				{
+					if(term.asElementDecl().getType().getName() == null)
 					{
-						write(st, term, goingup);
+						nested = createNestedType(term.asElementDecl().getName(), term.asElementDecl().getType().asComplexType());
+						st.addField(nested.getName(), null, goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
 					}
-					else if(term.isElementDecl())
+					else
 					{
-						if(term.asElementDecl().getType().getName() == null)
-						{
-							nested = createNestedType(term.asElementDecl().getName(), term.asElementDecl().getType().asComplexType());
-							st.addField(nested.getName(), null, goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), typeMapping);
-						}
-						else
-						{
-							st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(),
-								goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), typeMapping);
-						}
+						st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(),
+								goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
 					}
-					//order = order + 1;
 				}
 			}
 		}							
@@ -289,7 +503,6 @@ public class XSDParser implements ErrorHandler
 	private Struct createNestedType(String name, XSComplexType type)
 	{
 		Struct		st;
-		XSParticle	xp;
 		
 		st = new Struct(name);
 		map.put(name, st);
@@ -322,22 +535,23 @@ public class XSDParser implements ErrorHandler
 
 	/**
 	 * @param args
-	 * @throws IOException 
-	 * @throws SAXException 
+	 * @throws Exception 
 	 */
-	public static void main(String[] args) throws SAXException, IOException
+	public static void main(String[] args) throws Exception
 	{
 		XSDParser				xp;
 		TreeMap<String,String>	map;
 		String					xsd;
 		
 		map = new TreeMap<String,String>();
-		map.put("anyURI", "string");
-		map.put("anyType", "string");
-		map.put("schema_._type", "string");
-		map.put("EAnnotation", "string");
-		map.put("EGenericType", "string");
-		
+		map.put("schema_._type", "BaseObject");
+		map.put("EString", "string");
+		map.put("EBoolean", "boolean");
+		map.put("EInt", "integer");
+		map.put("EDate", "long");
+		map.put("EChar", "byte");
+		map.put("EFloat", "decimal");
+			
 		if(args.length == 0)
 		{
 			// xsd = "/Users/sergio/Documents/Alive/Implementation/EventMetamodel/model/EventModel.Event.xsd";

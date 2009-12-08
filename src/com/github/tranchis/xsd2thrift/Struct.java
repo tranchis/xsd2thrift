@@ -1,7 +1,32 @@
+/*
+ * ============================================================================
+ * GNU Lesser General Public License
+ * ============================================================================
+ *
+ * XSD2Thrift
+ * 
+ * Copyright (C) 2009 Sergio Alvarez-Napagao http://www.sergio-alvarez.com
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
+ */
 package com.github.tranchis.xsd2thrift;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -12,6 +37,7 @@ public class Struct
 {
 	private Map<String,Field>	map;
 	private Set<String>			types;
+	private List<Field>			orderedFields;
 	private String				name;
 	private String				parent;
 
@@ -20,9 +46,10 @@ public class Struct
 		this.name = name;
 		map = new HashMap<String,Field>();
 		types = new TreeSet<String>();
+		orderedFields = new LinkedList<Field>();
 	}
 
-	public void addField(String name, String type, boolean required, boolean repeat, XmlString def, Map<String, String> typeMapping)
+	public void addField(String name, String type, boolean required, boolean repeat, XmlString def, Map<String, String> xsdMapping)
 	{
 		Field	f;
 		
@@ -34,18 +61,18 @@ public class Struct
 			}
 			else
 			{
-				if(typeMapping.containsKey(type))
+				if(xsdMapping.containsKey(type))
 				{
-					type = typeMapping.get(type);
+					type = xsdMapping.get(type);
 				}
 				else if(type.equals(this.name))
 				{
 					type = "binary";
 				}
 			}
-//			System.out.println("name: " + name + ", type: " + type);
 			f = new Field(name, type, repeat, def, required);
 			map.put(name, f);
+			orderedFields.add(f);
 			if(!type.equals(this.name))
 			{
 				types.add(type);
@@ -63,9 +90,9 @@ public class Struct
 		this.name = name;
 	}
 
-	public Collection<Field> getFields()
+	public List<Field> getFields()
 	{
-		return map.values();
+		return orderedFields;
 	}
 
 	public Collection<String> getTypes()
