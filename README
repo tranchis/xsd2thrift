@@ -1,0 +1,7 @@
+
+
+
+LICENSE OF THE LIBRARIES USED
+-----------------------------
+
+XSOM is covered by GPL v2 with classpath exception (see LICENSE-xsom.1). XSOM internally uses an URI class, which is copyrighted by Thai Open Source Center (see LICENSE-xsom.2).
