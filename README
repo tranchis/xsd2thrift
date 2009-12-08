@@ -24,7 +24,7 @@ Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]
 INSTALLATION
 ------------
 
-No installation is required. The jarfile xsd2thrift is autoexecutable.
+No installation is required. The jarfile dist/xsd2thrift is autoexecutable.
 
 xsd2thrift has been tested on Java SE 6.
 
