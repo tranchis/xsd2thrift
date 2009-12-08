@@ -23,7 +23,90 @@
  */
 package com.github.tranchis.xsd2thrift.marshal;
 
+import java.util.TreeMap;
+
 public class ThriftMarshaller implements IMarshaller
 {
+	private TreeMap<String, String> typeMapping;
 
+	public ThriftMarshaller()
+	{
+		typeMapping = new TreeMap<String,String>();
+		typeMapping.put("positiveInteger", "i16");
+		typeMapping.put("integer", "i16");
+		typeMapping.put("long", "i32");
+		typeMapping.put("decimal", "double");
+		typeMapping.put("ID", "string");
+		typeMapping.put("IDREF", "string");
+		typeMapping.put("NMTOKEN", "string");
+		typeMapping.put("NMTOKENS", "list<string>");
+		typeMapping.put("anySimpleType", "BaseObject");
+		typeMapping.put("anyType", "BaseObject");
+		typeMapping.put("anyURI", "BaseObject");
+	}
+	
+	@Override
+	public String writeHeader()
+	{
+		return "";
+	}
+
+	@Override
+	public String writeEnumHeader(String name)
+	{
+		return "enum " + name + "\n{\n";
+	}
+
+	@Override
+	public String writeEnumValue(String value)
+	{
+		return("\t" + value + ",\n");
+	}
+
+	@Override
+	public String writeEnumFooter()
+	{
+		return "}\n\n";
+	}
+
+	@Override
+	public String writeStructHeader(String name)
+	{
+		return "struct " + name + "\n{\n";
+	}
+
+	@Override
+	public String writeStructParameter(int order, String required, String name, String type)
+	{
+		return "\t" + order + " : " + required + " " + name + " " + type + ",\n";
+	}
+
+	@Override
+	public String getRequired(boolean required)
+	{
+		String res;
+
+		if(required)
+		{
+			res = "required";
+		}
+		else
+		{
+			res = "optional";
+		}
+
+		return res;
+	}
+
+	@Override
+	public String writeStructFooter()
+	{
+		return "}\n\n";
+	}
+
+	@Override
+	public String getTypeMapping(String type)
+	{
+		return typeMapping.get(type);
+	}
 }

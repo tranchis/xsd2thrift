@@ -25,5 +25,13 @@ package com.github.tranchis.xsd2thrift.marshal;
 
 public interface IMarshaller
 {
-
+	String writeHeader();
+	String writeEnumHeader(String name);
+	String writeEnumValue(String value);
+	String writeEnumFooter();
+	String writeStructHeader(String name);
+	String writeStructParameter(int order, String required, String name, String type);
+	String getRequired(boolean required);
+	String writeStructFooter();
+	String getTypeMapping(String type);
 }

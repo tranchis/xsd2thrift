@@ -24,6 +24,7 @@
 package com.github.tranchis.xsd2thrift;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -59,7 +60,7 @@ public class XSDParser implements ErrorHandler
 	private Map<String,Struct>		map;
 	private Map<String,Enumeration>	enums;
 	private Set<String>				keywords, basicTypes;
-	private TreeMap<String, String>	typeMapping, xsdMapping;
+	private TreeMap<String, String>	xsdMapping;
 	private IMarshaller				marshaller;
 	
 	public XSDParser(String stFile)
@@ -103,19 +104,6 @@ public class XSDParser implements ErrorHandler
 		basicTypes.add("NMTOKEN");
 		basicTypes.add("NMTOKENS");
 		basicTypes.add("BaseObject");
-		
-		typeMapping = new TreeMap<String,String>();
-		typeMapping.put("positiveInteger", "i16");
-		typeMapping.put("integer", "i16");
-		typeMapping.put("long", "i32");
-		typeMapping.put("decimal", "double");
-		typeMapping.put("ID", "string");
-		typeMapping.put("IDREF", "string");
-		typeMapping.put("NMTOKEN", "string");
-		typeMapping.put("NMTOKENS", "list<string>");
-		typeMapping.put("anySimpleType", "BaseObject");
-		typeMapping.put("anyType", "BaseObject");
-		typeMapping.put("anyURI", "BaseObject");
 	}
 
 	public XSDParser(String stFile, TreeMap<String,String> xsdMapping)
@@ -133,10 +121,10 @@ public class XSDParser implements ErrorHandler
 		parser.parse(f);
 		
 		interpretResult(parser.getResult());
-		writeMap();
+		writeMap(System.out);
 	}
 	
-	private void writeMap() throws Exception
+	private void writeMap(OutputStream os) throws Exception
 	{
 		Iterator<Struct>		its;
 		Iterator<Field>			itf;
@@ -151,6 +139,8 @@ public class XSDParser implements ErrorHandler
 		Enumeration				en;
 		boolean					bModified;
 		
+		os.write(marshaller.writeHeader().getBytes());
+		
 		st = createSuperObject();
 		map.put("BaseObject", st);
 		
@@ -158,13 +148,13 @@ public class XSDParser implements ErrorHandler
 		while(ite.hasNext())
 		{
 			en = ite.next();
-			System.out.println("enum " + escape(en.getName()) + "\n{");
+			os.write(marshaller.writeEnumHeader(escape(en.getName())).getBytes());
 			itg = en.iterator();
 			while(itg.hasNext())
 			{
-				System.out.println("\t" + escape(itg.next()) + ",");
+				os.write(marshaller.writeEnumValue(escape(itg.next())).getBytes());
 			}
-			System.out.println("}\n");
+			os.write(marshaller.writeEnumFooter().getBytes());
 		}
 		
 		ss = new HashSet<Struct>(map.values());
@@ -185,7 +175,7 @@ public class XSDParser implements ErrorHandler
 //				}
 				if(ss.contains(st) && declared.containsAll(st.getTypes()))
 				{
-					System.out.println("struct " + escape(st.getName()) + "\n{");
+					os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
 					itf = st.getFields().iterator();
 					order = 1;
 					while(itf.hasNext())
@@ -201,18 +191,18 @@ public class XSDParser implements ErrorHandler
 						{
 							fname = "_" + fname;
 						}
-						if(typeMapping.containsKey(type))
+						if(marshaller.getTypeMapping(type) != null)
 						{
-							type = typeMapping.get(type);
+							type = marshaller.getTypeMapping(type);
 						}
 						if(f.isRepeat())
 						{
 							type = "list<" + type + ">";
 						}
-						System.out.println("\t" + order + " : " + getRequired(f.isRequired()) + " " + escape(type) + " " + escape(fname) + ",");
+						os.write(marshaller.writeStructParameter(order, marshaller.getRequired(f.isRequired()), escape(type), escape(fname)).getBytes());
 						order = order + 1;
 					}
-					System.out.println("}\n");
+					os.write(marshaller.writeStructFooter().getBytes());
 					declared.add(st.getName());
 					
 					ss.remove(st);
@@ -259,22 +249,6 @@ public class XSDParser implements ErrorHandler
 		if(keywords.contains(res))
 		{
 			res = "_" + res;
-		}
-		
-		return res;
-	}
-
-	private String getRequired(boolean required)
-	{
-		String res;
-		
-		if(required)
-		{
-			res = "required";
-		}
-		else
-		{
-			res = "optional";
 		}
 		
 		return res;
