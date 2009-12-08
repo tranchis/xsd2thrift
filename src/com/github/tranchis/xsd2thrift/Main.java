@@ -26,6 +26,7 @@ package com.github.tranchis.xsd2thrift;
 import java.util.TreeMap;
 
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
+import com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller;
 import com.github.tranchis.xsd2thrift.marshal.ThriftMarshaller;
 
 public class Main
@@ -35,7 +36,8 @@ public class Main
 			"\n" + 
 			"usage: java xsd2thrift.jar [--thrift] filename\n" + 
 			"\n" + 
-			"  --thrift : convert to thrift\n" + 
+			"  --thrift   : convert to Thrift\n" + 
+			"  --protobuf : convert to Protocol Buffers\n" + 
 			"";
 	
 
@@ -92,6 +94,18 @@ public class Main
 					if(im == null)
 					{
 						im = new ThriftMarshaller();
+						xp.addMarshaller(im);
+					}
+					else
+					{
+						usage("Only one marshaller can be specified at a time.");
+					}
+				}
+				if(args[i].equals("--protobuf"))
+				{
+					if(im == null)
+					{
+						im = new ProtobufMarshaller();
 						xp.addMarshaller(im);
 					}
 					else

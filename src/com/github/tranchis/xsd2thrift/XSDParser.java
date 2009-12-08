@@ -131,9 +131,9 @@ public class XSDParser implements ErrorHandler
 		Struct					st;
 		Field					f;
 		int						order;
-		String					fname, type;
+		String					fname, type, enumValue;
 		Set<Struct>				ss;
-		Set<String>				declared;
+		Set<String>				declared, usedInEnums;
 		Iterator<Enumeration>	ite;
 		Iterator<String>		itg;
 		Enumeration				en;
@@ -144,17 +144,22 @@ public class XSDParser implements ErrorHandler
 		st = createSuperObject();
 		map.put("BaseObject", st);
 		
-		ite = enums.values().iterator();
-		while(ite.hasNext())
+		if(!marshaller.isNestedEnums())
 		{
-			en = ite.next();
-			os.write(marshaller.writeEnumHeader(escape(en.getName())).getBytes());
-			itg = en.iterator();
-			while(itg.hasNext())
+			ite = enums.values().iterator();
+			while(ite.hasNext())
 			{
-				os.write(marshaller.writeEnumValue(escape(itg.next())).getBytes());
+				en = ite.next();
+				os.write(marshaller.writeEnumHeader(escape(en.getName())).getBytes());
+				itg = en.iterator();
+				order = 1;
+				while(itg.hasNext())
+				{
+					os.write(marshaller.writeEnumValue(order, escape(itg.next())).getBytes());
+					order = order + 1;
+				}
+				os.write(marshaller.writeEnumFooter().getBytes());
 			}
-			os.write(marshaller.writeEnumFooter().getBytes());
 		}
 		
 		ss = new HashSet<Struct>(map.values());
@@ -177,12 +182,39 @@ public class XSDParser implements ErrorHandler
 				{
 					os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
 					itf = st.getFields().iterator();
+					usedInEnums = new TreeSet<String>();
 					order = 1;
 					while(itf.hasNext())
 					{
 						f = itf.next();
 						fname = f.getName();
 						type = f.getType();
+						
+						if(marshaller.isNestedEnums() && enums.containsKey(type))
+						{
+							en = enums.get(type);
+							enumValue = escape(en.getName());
+							while(usedInEnums.contains(enumValue))
+							{
+								enumValue = "_" + enumValue;
+							}
+							usedInEnums.add(enumValue);
+							os.write(marshaller.writeEnumHeader(enumValue).getBytes());
+							itg = en.iterator();
+							while(itg.hasNext())
+							{
+								enumValue = escape(itg.next());
+								while(usedInEnums.contains(enumValue))
+								{
+									enumValue = "_" + enumValue;
+								}
+								usedInEnums.add(enumValue);
+								os.write(marshaller.writeEnumValue(order, enumValue).getBytes());
+								order = order + 1;
+							}
+							os.write(marshaller.writeEnumFooter().getBytes());
+						}
+						
 						if(!map.keySet().contains(type) && !basicTypes.contains(type) && !enums.containsKey(type))
 						{
 							type = "binary";
@@ -195,11 +227,7 @@ public class XSDParser implements ErrorHandler
 						{
 							type = marshaller.getTypeMapping(type);
 						}
-						if(f.isRepeat())
-						{
-							type = "list<" + type + ">";
-						}
-						os.write(marshaller.writeStructParameter(order, marshaller.getRequired(f.isRequired()), escape(type), escape(fname)).getBytes());
+						os.write(marshaller.writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname), escape(type)).getBytes());
 						order = order + 1;
 					}
 					os.write(marshaller.writeStructFooter().getBytes());

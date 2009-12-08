@@ -27,11 +27,11 @@ public interface IMarshaller
 {
 	String writeHeader();
 	String writeEnumHeader(String name);
-	String writeEnumValue(String value);
+	String writeEnumValue(int order, String value);
 	String writeEnumFooter();
 	String writeStructHeader(String name);
-	String writeStructParameter(int order, String required, String name, String type);
-	String getRequired(boolean required);
+	String writeStructParameter(int order, boolean required, boolean repeated, String name, String type);
 	String writeStructFooter();
 	String getTypeMapping(String type);
+	boolean isNestedEnums();
 }

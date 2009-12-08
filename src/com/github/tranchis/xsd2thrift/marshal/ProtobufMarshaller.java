@@ -25,11 +25,11 @@ package com.github.tranchis.xsd2thrift.marshal;
 
 import java.util.TreeMap;
 
-public class ThriftMarshaller implements IMarshaller
+public class ProtobufMarshaller implements IMarshaller
 {
 	private TreeMap<String, String> typeMapping;
 
-	public ThriftMarshaller()
+	public ProtobufMarshaller()
 	{
 		typeMapping = new TreeMap<String,String>();
 		typeMapping.put("positiveInteger", "i16");
@@ -39,7 +39,7 @@ public class ThriftMarshaller implements IMarshaller
 		typeMapping.put("ID", "string");
 		typeMapping.put("IDREF", "string");
 		typeMapping.put("NMTOKEN", "string");
-		typeMapping.put("NMTOKENS", "list<string>");
+		typeMapping.put("NMTOKENS", "string"); // TODO: Fix this
 		typeMapping.put("anySimpleType", "BaseObject");
 		typeMapping.put("anyType", "BaseObject");
 		typeMapping.put("anyURI", "BaseObject");
@@ -54,55 +54,57 @@ public class ThriftMarshaller implements IMarshaller
 	@Override
 	public String writeEnumHeader(String name)
 	{
-		return "enum " + name + "\n{\n";
+		return "\tenum " + name + "\n\t{\n";
 	}
 
 	@Override
 	public String writeEnumValue(int order, String value)
 	{
-		return("\t" + value + ",\n");
+		return("\t\t" + value + " = " + order + ";\n");
 	}
 
 	@Override
 	public String writeEnumFooter()
 	{
-		return "}\n\n";
+		return "\t}\n";
 	}
 
 	@Override
 	public String writeStructHeader(String name)
 	{
-		return "struct " + name + "\n{\n";
+		return "message " + name + "\n{\n";
 	}
 
 	@Override
 	public String writeStructParameter(int order, boolean required, boolean repeated, String name, String type)
 	{
-		String	sType, sRequired;
+		String	sRequired;
 		
-		sRequired = getRequired(required);
-		sType = type;
-		if(repeated)
-		{
-			sType = "list<" + type + ">";
-		}
+		sRequired = getRequired(required, repeated);
 		
-		return "\t" + order + " : " + sRequired + " " + sType + " " + name + ",\n";
+		return "\t" + sRequired + " " + type + " " + name + " = " + order + ";\n";
 	}
 
-	private String getRequired(boolean required)
+	private String getRequired(boolean required, boolean repeated)
 	{
 		String res;
 
-		if(required)
+		if(repeated)
 		{
-			res = "required";
+			res = "repeated";
 		}
 		else
 		{
-			res = "optional";
+			if(required)
+			{
+				res = "required";
+			}
+			else
+			{
+				res = "optional";
+			}
 		}
-
+		
 		return res;
 	}
 
@@ -121,6 +123,6 @@ public class ThriftMarshaller implements IMarshaller
 	@Override
 	public boolean isNestedEnums()
 	{
-		return false;
+		return true;
 	}
 }
