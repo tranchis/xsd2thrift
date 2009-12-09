@@ -104,6 +104,7 @@ public class XSDParser implements ErrorHandler
 		basicTypes.add("decimal");
 		basicTypes.add("byte");
 		basicTypes.add("long");
+		basicTypes.add("int");
 		basicTypes.add("ID");
 		basicTypes.add("IDREF");
 		basicTypes.add("NMTOKEN");
@@ -228,7 +229,7 @@ public class XSDParser implements ErrorHandler
 						{
 							type = marshaller.getTypeMapping(type);
 						}
-						os.write(marshaller.writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname), escape(type)).getBytes());
+						os.write(marshaller.writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname), escapeType(type)).getBytes());
 						order = order + 1;
 					}
 					os.write(marshaller.writeStructFooter().getBytes());
@@ -276,6 +277,24 @@ public class XSDParser implements ErrorHandler
 	}
 
 	private String escape(String name)
+	{
+		String	res;
+		
+		res = name.replace('-', '_');
+		res = res.replace('.', '_');
+		if(res.charAt(0) >= '0' && res.charAt(0) <= '9')
+		{
+			res = '_' + res;
+		}
+		if(keywords.contains(res) || basicTypes.contains(res))
+		{
+			res = "_" + res;
+		}
+		
+		return res;
+	}
+
+	private String escapeType(String name)
 	{
 		String	res;
 		

@@ -33,6 +33,7 @@ public class ThriftMarshaller implements IMarshaller
 	{
 		typeMapping = new TreeMap<String,String>();
 		typeMapping.put("positiveInteger", "i16");
+		typeMapping.put("int", "i16");
 		typeMapping.put("integer", "i16");
 		typeMapping.put("long", "i32");
 		typeMapping.put("decimal", "double");

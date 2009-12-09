@@ -33,8 +33,9 @@ public class ProtobufMarshaller implements IMarshaller
 	{
 		typeMapping = new TreeMap<String,String>();
 		typeMapping.put("positiveInteger", "i16");
-		typeMapping.put("integer", "i16");
-		typeMapping.put("long", "i32");
+		typeMapping.put("int", "i32");
+		typeMapping.put("integer", "i32");
+		typeMapping.put("long", "i64");
 		typeMapping.put("decimal", "double");
 		typeMapping.put("ID", "string");
 		typeMapping.put("IDREF", "string");
