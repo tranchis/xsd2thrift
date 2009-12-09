@@ -73,13 +73,15 @@ public class Main
 		im = null;
 		
 		map = new TreeMap<String,String>();
-		map.put("schema_._type", "BaseObject");
+		map.put("schema_._type", "binary");
 		map.put("EString", "string");
 		map.put("EBoolean", "boolean");
 		map.put("EInt", "integer");
 		map.put("EDate", "long");
 		map.put("EChar", "byte");
 		map.put("EFloat", "decimal");
+		map.put("EObject", "binary");
+		map.put("Extension", "binary");
 		
 		if(args.length == 0 || args[args.length-1].startsWith("--"))
 		{

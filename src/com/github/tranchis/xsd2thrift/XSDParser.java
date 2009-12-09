@@ -179,10 +179,6 @@ public class XSDParser implements ErrorHandler
 			while(its.hasNext())
 			{
 				st = its.next();
-//				if(ss.contains(st))
-//				{
-//					System.out.println(st.getName() + ": " + st.getTypes());
-//				}
 				if(ss.contains(st) && declared.containsAll(st.getTypes()))
 				{
 					os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
@@ -246,6 +242,16 @@ public class XSDParser implements ErrorHandler
 		
 		if(!ss.isEmpty())
 		{
+			System.err.println("Bug: unable to interpret the file. Dumping conflicting structs...");
+			its = map.values().iterator();
+			while(its.hasNext())
+			{
+				st = its.next();
+				if(ss.contains(st))
+				{
+					System.err.println(st.getName() + ": " + st.getTypes());
+				}
+			}
 			throw new Exception();
 		}
 	}
@@ -524,21 +530,21 @@ public class XSDParser implements ErrorHandler
 	@Override
 	public void error(SAXParseException exception) throws SAXException
 	{
-		System.out.println(exception.getMessage());
+		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
 		exception.printStackTrace();
 	}
 
 	@Override
 	public void fatalError(SAXParseException exception) throws SAXException
 	{
-		System.out.println(exception.getMessage());
+		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
 		exception.printStackTrace();
 	}
 
 	@Override
 	public void warning(SAXParseException exception) throws SAXException
 	{
-		System.out.println(exception.getMessage());
+		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
 		exception.printStackTrace();
 	}
 

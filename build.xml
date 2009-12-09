@@ -32,8 +32,7 @@
 		<jar destfile="dist/xsd2thrift.jar"
 		         basedir="bin/"
 		         includes="**/*.class"
-				 manifest="META-INF/MANIFEST.MF"
-		         />
+				 manifest="META-INF/MANIFEST.MF" />
 	</target>
     <target name="build-subprojects"/>
     <target depends="init" name="build-project">
