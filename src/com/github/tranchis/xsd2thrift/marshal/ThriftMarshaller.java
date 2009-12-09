@@ -40,9 +40,9 @@ public class ThriftMarshaller implements IMarshaller
 		typeMapping.put("IDREF", "string");
 		typeMapping.put("NMTOKEN", "string");
 		typeMapping.put("NMTOKENS", "list<string>");
-		typeMapping.put("anySimpleType", "bytes");
-		typeMapping.put("anyType", "bytes");
-		typeMapping.put("anyURI", "bytes");
+		typeMapping.put("anySimpleType", "binary");
+		typeMapping.put("anyType", "binary");
+		typeMapping.put("anyURI", "binary");
 	}
 	
 	@Override

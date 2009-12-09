@@ -40,9 +40,9 @@ public class ProtobufMarshaller implements IMarshaller
 		typeMapping.put("IDREF", "string");
 		typeMapping.put("NMTOKEN", "string");
 		typeMapping.put("NMTOKENS", "string"); // TODO: Fix this
-		typeMapping.put("anySimpleType", "binary");
-		typeMapping.put("anyType", "binary");
-		typeMapping.put("anyURI", "binary");
+		typeMapping.put("anySimpleType", "bytes");
+		typeMapping.put("anyType", "bytes");
+		typeMapping.put("anyURI", "bytes");
 	}
 	
 	@Override
