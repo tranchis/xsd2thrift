@@ -25,6 +25,7 @@ package com.github.tranchis.xsd2thrift;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -133,13 +134,10 @@ public class XSDParser implements ErrorHandler
 	private void writeMap() throws Exception
 	{
 		Iterator<Struct>		its;
-		Iterator<Field>			itf;
 		Struct					st;
-		Field					f;
 		int						order;
-		String					fname, type, enumValue;
 		Set<Struct>				ss;
-		Set<String>				declared, usedInEnums;
+		Set<String>				declared;
 		Iterator<Enumeration>	ite;
 		Iterator<String>		itg;
 		Enumeration				en;
@@ -148,7 +146,6 @@ public class XSDParser implements ErrorHandler
 		os.write(marshaller.writeHeader(namespace).getBytes());
 		
 		st = createSuperObject();
-//		map.put("BaseObject", st);
 		
 		if(!marshaller.isNestedEnums())
 		{
@@ -172,6 +169,8 @@ public class XSDParser implements ErrorHandler
 		declared = new TreeSet<String>(basicTypes);
 		declared.addAll(enums.keySet());
 		
+		writeStruct(st, declared);
+		
 		bModified = true;
 		while(bModified && !ss.isEmpty())
 		{
@@ -182,59 +181,7 @@ public class XSDParser implements ErrorHandler
 				st = its.next();
 				if(ss.contains(st) && declared.containsAll(st.getTypes()))
 				{
-					os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
-					itf = st.getFields().iterator();
-					usedInEnums = new TreeSet<String>();
-					order = 1;
-					while(itf.hasNext())
-					{
-						f = itf.next();
-						fname = f.getName();
-						type = f.getType();
-						
-						if(marshaller.isNestedEnums() && enums.containsKey(type))
-						{
-							en = enums.get(type);
-							enumValue = escape(en.getName());
-							while(usedInEnums.contains(enumValue))
-							{
-								enumValue = "_" + enumValue;
-							}
-							usedInEnums.add(enumValue);
-							os.write(marshaller.writeEnumHeader(enumValue).getBytes());
-							itg = en.iterator();
-							while(itg.hasNext())
-							{
-								enumValue = escape(itg.next());
-								while(usedInEnums.contains(enumValue))
-								{
-									enumValue = "_" + enumValue;
-								}
-								usedInEnums.add(enumValue);
-								os.write(marshaller.writeEnumValue(order, enumValue).getBytes());
-								order = order + 1;
-							}
-							os.write(marshaller.writeEnumFooter().getBytes());
-						}
-						
-						if(!map.keySet().contains(type) && !basicTypes.contains(type) && !enums.containsKey(type))
-						{
-							type = "binary";
-						}
-						if(type.equals(fname))
-						{
-							fname = "_" + fname;
-						}
-						if(marshaller.getTypeMapping(type) != null)
-						{
-							type = marshaller.getTypeMapping(type);
-						}
-						os.write(marshaller.writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname), escapeType(type)).getBytes());
-						order = order + 1;
-					}
-					os.write(marshaller.writeStructFooter().getBytes());
-					declared.add(st.getName());
-					
+					writeStruct(st, declared);					
 					ss.remove(st);
 					bModified = true;
 				}
@@ -257,21 +204,78 @@ public class XSDParser implements ErrorHandler
 		}
 	}
 
+	private void writeStruct(Struct st, Set<String> declared) throws IOException
+	{
+		Iterator<Field>		itf;
+		Field				f;
+		String				fname, type, enumValue;
+		Set<String>			usedInEnums;
+		int					order;
+		Enumeration			en;
+		Iterator<String>	itg;
+
+		os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
+		itf = st.getFields().iterator();
+		usedInEnums = new TreeSet<String>();
+		order = 1;
+		while(itf.hasNext())
+		{
+			f = itf.next();
+			fname = f.getName();
+			type = f.getType();
+			
+			if(marshaller.isNestedEnums() && enums.containsKey(type))
+			{
+				en = enums.get(type);
+				enumValue = escape(en.getName());
+				while(usedInEnums.contains(enumValue))
+				{
+					enumValue = "_" + enumValue;
+				}
+				usedInEnums.add(enumValue);
+				os.write(marshaller.writeEnumHeader(enumValue).getBytes());
+				itg = en.iterator();
+				while(itg.hasNext())
+				{
+					enumValue = escape(itg.next());
+					while(usedInEnums.contains(enumValue))
+					{
+						enumValue = "_" + enumValue;
+					}
+					usedInEnums.add(enumValue);
+					os.write(marshaller.writeEnumValue(order, enumValue).getBytes());
+					order = order + 1;
+				}
+				os.write(marshaller.writeEnumFooter().getBytes());
+			}
+			
+			if(!map.keySet().contains(type) && !basicTypes.contains(type) && !enums.containsKey(type))
+			{
+				type = "binary";
+			}
+			if(type.equals(fname))
+			{
+				fname = "_" + fname;
+			}
+			if(marshaller.getTypeMapping(type) != null)
+			{
+				type = marshaller.getTypeMapping(type);
+			}
+			os.write(marshaller.writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname), escapeType(type)).getBytes());
+			order = order + 1;
+		}
+		os.write(marshaller.writeStructFooter().getBytes());
+		declared.add(st.getName());
+	}
+
 	private Struct createSuperObject()
 	{
-		Struct				st, aux;
-		Iterator<Struct>	its;
+		Struct				st;
 		
-		st = new Struct("BaseObject");
+		st = new Struct("UnspecifiedType");
 		
-		its = map.values().iterator();
 		st.addField("baseObjectType", "string", true, false, null, xsdMapping);
-		while(its.hasNext())
-		{
-			aux = its.next();
-			st.addField(aux.getName(), aux.getName(),
-				false, false, null, xsdMapping);
-		}
+		st.addField("object", "binary", true, false, null, xsdMapping);
 		
 		return st;
 	}
