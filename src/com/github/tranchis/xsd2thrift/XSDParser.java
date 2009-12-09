@@ -156,11 +156,20 @@ public class XSDParser implements ErrorHandler
 				os.write(marshaller.writeEnumHeader(escape(en.getName())).getBytes());
 				itg = en.iterator();
 				order = 1;
-				while(itg.hasNext())
+				
+				if(itg.hasNext())
 				{
-					os.write(marshaller.writeEnumValue(order, escape(itg.next())).getBytes());
-					order = order + 1;
+					while(itg.hasNext())
+					{
+						os.write(marshaller.writeEnumValue(order, escape(itg.next())).getBytes());
+						order = order + 1;
+					}
 				}
+				else
+				{
+					os.write(marshaller.writeEnumValue(order, escape("UnspecifiedValue")).getBytes());
+				}
+				
 				os.write(marshaller.writeEnumFooter().getBytes());
 			}
 		}
@@ -235,17 +244,20 @@ public class XSDParser implements ErrorHandler
 				usedInEnums.add(enumValue);
 				os.write(marshaller.writeEnumHeader(enumValue).getBytes());
 				itg = en.iterator();
-				while(itg.hasNext())
+				
+				if(itg.hasNext())
 				{
-					enumValue = escape(itg.next());
-					while(usedInEnums.contains(enumValue))
+					while(itg.hasNext())
 					{
-						enumValue = "_" + enumValue;
+						os.write(marshaller.writeEnumValue(order, escape(itg.next())).getBytes());
+						order = order + 1;
 					}
-					usedInEnums.add(enumValue);
-					os.write(marshaller.writeEnumValue(order, enumValue).getBytes());
-					order = order + 1;
 				}
+				else
+				{
+					os.write(marshaller.writeEnumValue(order, escape(st.getName() + "_" + en.getName() + "_UnspecifiedValue")).getBytes());
+				}
+				
 				os.write(marshaller.writeEnumFooter().getBytes());
 			}
 			
