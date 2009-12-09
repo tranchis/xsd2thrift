@@ -108,7 +108,7 @@ public class XSDParser implements ErrorHandler
 		basicTypes.add("IDREF");
 		basicTypes.add("NMTOKEN");
 		basicTypes.add("NMTOKENS");
-		basicTypes.add("BaseObject");
+//		basicTypes.add("BaseObject");
 	}
 
 	public XSDParser(String stFile, TreeMap<String,String> xsdMapping)
