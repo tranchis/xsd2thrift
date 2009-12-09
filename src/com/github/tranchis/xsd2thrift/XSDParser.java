@@ -147,7 +147,7 @@ public class XSDParser implements ErrorHandler
 		os.write(marshaller.writeHeader(namespace).getBytes());
 		
 		st = createSuperObject();
-		map.put("BaseObject", st);
+//		map.put("BaseObject", st);
 		
 		if(!marshaller.isNestedEnums())
 		{
