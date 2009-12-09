@@ -43,6 +43,7 @@ public class ProtobufMarshaller implements IMarshaller
 		typeMapping.put("anySimpleType", "bytes");
 		typeMapping.put("anyType", "bytes");
 		typeMapping.put("anyURI", "bytes");
+		typeMapping.put("boolean", "bool");
 	}
 	
 	@Override

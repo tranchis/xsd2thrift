@@ -43,6 +43,7 @@ public class ThriftMarshaller implements IMarshaller
 		typeMapping.put("anySimpleType", "binary");
 		typeMapping.put("anyType", "binary");
 		typeMapping.put("anyURI", "binary");
+		typeMapping.put("boolean", "bool");
 	}
 	
 	@Override
