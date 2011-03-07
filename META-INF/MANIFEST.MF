@@ -1,3 +1,0 @@
-Manifest-Version: 0.1b
-Class-Path: . xsom.jar
-Main-Class: com.github.tranchis.xsd2thrift.Main
