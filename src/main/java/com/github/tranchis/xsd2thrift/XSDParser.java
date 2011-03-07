@@ -538,12 +538,12 @@ public class XSDParser implements ErrorHandler
 					if(term.asElementDecl().getType().getName() == null)
 					{
 						nested = createNestedType(term.asElementDecl().getName(), term.asElementDecl().getType().asComplexType());
-						st.addField(nested.getName(), null, goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
+						st.addField(nested.getName(), null, goingup, p.getMaxOccurs().intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
 					}
 					else
 					{
 						st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(),
-								goingup, p.getMaxOccurs() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
+								goingup, p.getMaxOccurs().intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
 					}
 				}
 			}
