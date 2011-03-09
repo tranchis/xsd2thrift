@@ -20,13 +20,18 @@
 			<artifactId>xsom</artifactId>
 			<version>20110101-SNAPSHOT</version>
 		</dependency>
-		
+		<!--
 		<dependency>
-			<groupId>relaxngDatatype</groupId> 	
-			<artifactId>relaxngDatatype</artifactId> 	
+			<groupId>relaxngDatatype</groupId>
+			<artifactId>relaxngDatatype</artifactId>
 			<version>20020414</version>
-		</dependency>
-
+		</dependency> 
+<dependency>
+    <groupId>com.sun.xml</groupId>
+    <artifactId>relaxngDatatype</artifactId>
+    <version>1.0</version>
+</dependency>
+-->
 	</dependencies>
 
 
@@ -55,25 +60,27 @@
                 </configuration>
             </plugin>
 			
-            <plugin>
-                <groupId>org.dstovall</groupId>
-                <artifactId>onejar-maven-plugin</artifactId>
-                <version>1.4.4</version>
-                <executions>
-                    <execution>
-                        <configuration>
-                            <!-- Optional, default is false -->
-                            <attachToBuild>true</attachToBuild>
-                            <!-- Optional, default is "onejar" -->
-                            <classifier>onejar</classifier>
-                        </configuration>
-                        <goals>
-                            <goal>one-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        
+			
+			<plugin>
+				<groupId>org.dstovall</groupId>
+				<artifactId>onejar-maven-plugin-rc8fix2</artifactId>
+				<version>1.4.5</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<configuration>
+							<mainClass>com.github.tranchis.xsd2thrift.Main</mainClass>
+							<onejarVersion>0.97-RC10</onejarVersion>
+							<attachToBuild>true</attachToBuild>
+							<classifier>onejar</classifier>
+						</configuration>
+						<goals>
+							<goal>one-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
         </plugins>
 	</build>
 
@@ -114,15 +121,6 @@
 		</repository>
 
 		<repository>
-			<id>repository.tu-bs.de</id>
-			<url>http://www.ibr.cs.tu-bs.de/maven/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<layout>default</layout>
-		</repository>
-
-		<repository>
 			<id>repository.jboss.org</id>
 			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
 			<snapshots>
@@ -138,7 +136,7 @@
 
 	</repositories>
 	
- <pluginRepositories>
+ 	<pluginRepositories>
         <pluginRepository>
             <id>onejar-maven-plugin.googlecode.com</id>
             <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
