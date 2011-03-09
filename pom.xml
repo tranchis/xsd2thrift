@@ -20,18 +20,7 @@
 			<artifactId>xsom</artifactId>
 			<version>20110101-SNAPSHOT</version>
 		</dependency>
-		<!--
-		<dependency>
-			<groupId>relaxngDatatype</groupId>
-			<artifactId>relaxngDatatype</artifactId>
-			<version>20020414</version>
-		</dependency> 
-<dependency>
-    <groupId>com.sun.xml</groupId>
-    <artifactId>relaxngDatatype</artifactId>
-    <version>1.0</version>
-</dependency>
--->
+
 	</dependencies>
 
 
