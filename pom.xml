@@ -38,19 +38,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<mainClass>com.github.tranchis.xsd2thrift.Main</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-
-
-			<plugin>
 				<groupId>org.dstovall</groupId>
 				<artifactId>onejar-maven-plugin-rc8fix</artifactId>
 				<version>1.4.6</version>
