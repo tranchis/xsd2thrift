@@ -14,7 +14,7 @@
 	<version>1.0</version>
 
 	<dependencies>
-	
+
 		<dependency>
 			<groupId>com.sun.xsom</groupId>
 			<artifactId>xsom</artifactId>
@@ -37,31 +37,32 @@
 				</configuration>
 			</plugin>
 
- 			<plugin>	
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.github.tranchis.xsd2thrift.Main</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-			
-			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>com.github.tranchis.xsd2thrift.Main</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+
 			<plugin>
 				<groupId>org.dstovall</groupId>
-				<artifactId>onejar-maven-plugin-rc8fix2</artifactId>
-				<version>1.4.5</version>
+				<artifactId>onejar-maven-plugin-rc8fix</artifactId>
+				<version>1.4.6</version>
 				<executions>
 					<execution>
 						<phase>package</phase>
 						<configuration>
 							<mainClass>com.github.tranchis.xsd2thrift.Main</mainClass>
-							<onejarVersion>0.97-RC10</onejarVersion>
+							<onejarVersion>0.98-RC2</onejarVersion>
 							<attachToBuild>true</attachToBuild>
 							<classifier>onejar</classifier>
+							<urlFactory>com.simontuffs.onejar.JarClassLoader$OneJarURLFactory</urlFactory>
 						</configuration>
 						<goals>
 							<goal>one-jar</goal>
@@ -69,8 +70,8 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-        </plugins>
+
+		</plugins>
 	</build>
 
 	<repositories>
@@ -124,15 +125,19 @@
 		</repository>
 
 	</repositories>
-	
- 	<pluginRepositories>
-        <pluginRepository>
-            <id>onejar-maven-plugin.googlecode.com</id>
-            <url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
-        </pluginRepository>
-    </pluginRepositories>
-	
-	
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>onejar-maven-plugin.googlecode.com</id>
+			<url>http://onejar-maven-plugin.googlecode.com/svn/mavenrepo</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>onejar-maven-plugin-itm-patch</id>
+			<url>http://www.itm.uni-luebeck.de/projects/maven/releases/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+
 </project>
 
 
