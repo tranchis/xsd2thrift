@@ -20,7 +20,7 @@ xsd2thrift has been tested on Java SE 6.
 USAGE
 -----
 
-Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]
+Usage: java -jar target/xsd2thrift-1.0.one-jar.jar [--thrift] [--protobuf] [--output=FILENAME]
                            [--package=NAME] filename.xsd
 
   --thrift          : convert to Thrift
