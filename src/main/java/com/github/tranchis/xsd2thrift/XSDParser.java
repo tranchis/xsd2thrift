@@ -192,7 +192,7 @@ public class XSDParser implements ErrorHandler {
                 } else {
                     // Report circular dependency
                     System.err
-                            .print("Source schema contains circular dependencies and the target marshaller does not support them. Refer to the reduced dependency graph below.");
+                            .println("Source schema contains circular dependencies and the target marshaller does not support them. Refer to the reduced dependency graph below.");
                     for (Struct s : ss) {
                         s.getTypes().removeAll(declared);
                         System.err.println(s.getName() + ": " + s.getTypes());
@@ -201,7 +201,7 @@ public class XSDParser implements ErrorHandler {
                 }
             } else {
                 // Missing types have been detected
-                System.err.print("Source schema contains references missing types.");
+                System.err.println("Source schema contains references missing types.");
                 for (Struct s : ss) {
                     s.getTypes().retainAll(requiredTypes);
                     if (!s.getTypes().isEmpty()) {
