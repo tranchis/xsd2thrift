@@ -56,545 +56,535 @@ import com.sun.xml.xsom.XSSimpleType;
 import com.sun.xml.xsom.XSTerm;
 import com.sun.xml.xsom.XSType;
 
-public class XSDParser implements ErrorHandler
-{
-	private File					f;
-	private Map<String,Struct>		map;
-	private Map<String,Enumeration>	enums;
-	private Set<String>				keywords, basicTypes;
-	private TreeMap<String, String>	xsdMapping;
-	private IMarshaller				marshaller;
-	private OutputStream			os;
-	private String					namespace;
-	
-	public XSDParser(String stFile)
-	{
-		this.xsdMapping = new TreeMap<String,String>();
-		init(stFile);
-	}
-	
-	private void init(String stFile)
-	{
-		os = System.out;
-		
-		this.f = new File(stFile);
-		map = new HashMap<String,Struct>();
-		enums = new HashMap<String,Enumeration>();
-		keywords = new TreeSet<String>();
-		keywords.add("interface");
-		keywords.add("is");
-		keywords.add("class");
-		keywords.add("optional");
-		keywords.add("yield");
-		keywords.add("abstract");
-		keywords.add("required");
-		keywords.add("volatile");
-		keywords.add("transient");
-		keywords.add("service");
-		keywords.add("else");
-		
-		basicTypes = new TreeSet<String>();
-		basicTypes.add("string");
-		basicTypes.add("anyType");
-		basicTypes.add("anyURI");
-		basicTypes.add("anySimpleType");
-		basicTypes.add("integer");
-		basicTypes.add("positiveInteger");
-		basicTypes.add("binary");
-		basicTypes.add("boolean");
-		basicTypes.add("decimal");
-		basicTypes.add("byte");
-		basicTypes.add("long");
-		basicTypes.add("int");
-		basicTypes.add("ID");
-		basicTypes.add("IDREF");
-		basicTypes.add("NMTOKEN");
-		basicTypes.add("NMTOKENS");
-//		basicTypes.add("BaseObject");
-	}
+public class XSDParser implements ErrorHandler {
+    private File f;
+    private Map<String, Struct> map;
+    private Map<String, Enumeration> enums;
+    private Map<String, String> simpleTypes;
+    private Set<String> keywords, basicTypes;
+    private TreeMap<String, String> xsdMapping;
+    private IMarshaller marshaller;
+    private OutputStream os;
+    private String namespace;
 
-	public XSDParser(String stFile, TreeMap<String,String> xsdMapping)
-	{
-		this.xsdMapping = xsdMapping;
-		init(stFile);
-	}
-	
-	public void parse() throws Exception
-	{
-		XSOMParser parser;
-		
-		parser = new XSOMParser();
-		parser.setErrorHandler(this);
-		parser.parse(f);
-		
-		interpretResult(parser.getResult());
-		writeMap();
-	}
-	
-	private void writeMap() throws Exception
-	{
-		Iterator<Struct>		its;
-		Struct					st;
-		int						order;
-		Set<Struct>				ss;
-		Set<String>				declared;
-		Iterator<Enumeration>	ite;
-		Iterator<String>		itg;
-		Enumeration				en;
-		boolean					bModified;
-		
-		os.write(marshaller.writeHeader(namespace).getBytes());
-		
-		st = createSuperObject();
-		
-		if(!marshaller.isNestedEnums())
-		{
-			ite = enums.values().iterator();
-			while(ite.hasNext())
-			{
-				en = ite.next();
-				os.write(marshaller.writeEnumHeader(escape(en.getName())).getBytes());
-				itg = en.iterator();
-				order = 1;
-				
-				if(itg.hasNext())
-				{
-					while(itg.hasNext())
-					{
-						os.write(marshaller.writeEnumValue(order, escape(itg.next())).getBytes());
-						order = order + 1;
-					}
-				}
-				else
-				{
-					os.write(marshaller.writeEnumValue(order, escape("UnspecifiedValue")).getBytes());
-				}
-				
-				os.write(marshaller.writeEnumFooter().getBytes());
-			}
-		}
-		
-		ss = new HashSet<Struct>(map.values());
-		declared = new TreeSet<String>(basicTypes);
-		declared.addAll(enums.keySet());
-		
-		writeStruct(st, declared);
-		
-		bModified = true;
-		while(bModified && !ss.isEmpty())
-		{
-			bModified = false;
-			its = map.values().iterator();
-			while(its.hasNext())
-			{
-				st = its.next();
-				if(ss.contains(st) && declared.containsAll(st.getTypes()))
-				{
-					writeStruct(st, declared);					
-					ss.remove(st);
-					bModified = true;
-				}
-			}
-		}
-		
-		if(!ss.isEmpty())
-		{
-			System.err.println("Bug: unable to interpret the file. Dumping conflicting structs...");
-			its = map.values().iterator();
-			while(its.hasNext())
-			{
-				st = its.next();
-				if(ss.contains(st))
-				{
-					System.err.println(st.getName() + ": " + st.getTypes());
-				}
-			}
-			throw new Exception();
-		}
-	}
+    public XSDParser(String stFile) {
+        this.xsdMapping = new TreeMap<String, String>();
+        init(stFile);
+    }
 
-	private void writeStruct(Struct st, Set<String> declared) throws IOException
-	{
-		Iterator<Field>		itf;
-		Field				f;
-		String				fname, type, enumValue;
-		Set<String>			usedInEnums;
-		int					order;
-		Enumeration			en;
-		Iterator<String>	itg;
+    private void init(String stFile) {
+        os = System.out;
 
-		os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
-		itf = st.getFields().iterator();
-		usedInEnums = new TreeSet<String>();
-		order = 1;
-		while(itf.hasNext())
-		{
-			f = itf.next();
-			fname = f.getName();
-			type = f.getType();
-			
-			if(marshaller.isNestedEnums() && enums.containsKey(type))
-			{
-				en = enums.get(type);
-				enumValue = escape(en.getName());
-				while(usedInEnums.contains(enumValue))
-				{
-					enumValue = "_" + enumValue;
-				}
-				usedInEnums.add(enumValue);
-				os.write(marshaller.writeEnumHeader(enumValue).getBytes());
-				itg = en.iterator();
-				
-				if(itg.hasNext())
-				{
-					while(itg.hasNext())
-					{
-						os.write(marshaller.writeEnumValue(order, escape(itg.next())).getBytes());
-						order = order + 1;
-					}
-				}
-				else
-				{
-					os.write(marshaller.writeEnumValue(order, escape(st.getName() + "_" + en.getName() + "_UnspecifiedValue")).getBytes());
-				}
-				
-				os.write(marshaller.writeEnumFooter().getBytes());
-			}
-			
-			if(!map.keySet().contains(type) && !basicTypes.contains(type) && !enums.containsKey(type))
-			{
-				type = "binary";
-			}
-			if(type.equals(fname))
-			{
-				fname = "_" + fname;
-			}
-			if(marshaller.getTypeMapping(type) != null)
-			{
-				type = marshaller.getTypeMapping(type);
-			}
-			os.write(marshaller.writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname), escapeType(type)).getBytes());
-			order = order + 1;
-		}
-		os.write(marshaller.writeStructFooter().getBytes());
-		declared.add(st.getName());
-	}
+        this.f = new File(stFile);
+        map = new HashMap<String, Struct>();
+        enums = new HashMap<String, Enumeration>();
+        simpleTypes = new HashMap<String, String>();
+        keywords = new TreeSet<String>();
+        keywords.add("interface");
+        keywords.add("is");
+        keywords.add("class");
+        keywords.add("optional");
+        keywords.add("yield");
+        keywords.add("abstract");
+        keywords.add("required");
+        keywords.add("volatile");
+        keywords.add("transient");
+        keywords.add("service");
+        keywords.add("else");
 
-	private Struct createSuperObject()
-	{
-		Struct				st;
-		
-		st = new Struct("UnspecifiedType");
-		
-		st.addField("baseObjectType", "string", true, false, null, xsdMapping);
-		st.addField("object", "binary", true, false, null, xsdMapping);
-		
-		return st;
-	}
+        basicTypes = new TreeSet<String>();
+        basicTypes.add("string");
+        basicTypes.add("anyType");
+        basicTypes.add("anyURI");
+        basicTypes.add("anySimpleType");
+        basicTypes.add("integer");
+        basicTypes.add("positiveInteger");
+        basicTypes.add("binary");
+        basicTypes.add("boolean");
+        basicTypes.add("date");
+        basicTypes.add("dateTime");
+        basicTypes.add("decimal");
+        basicTypes.add("double");
+        basicTypes.add("byte");
+        basicTypes.add("long");
+        basicTypes.add("int");
+        basicTypes.add("ID");
+        basicTypes.add("IDREF");
+        basicTypes.add("NMTOKEN");
+        basicTypes.add("NMTOKENS");
+        // basicTypes.add("BaseObject");
+    }
 
-	private String escape(String name)
-	{
-		String	res;
-		
-		res = name.replace('-', '_');
-		res = res.replace('.', '_');
-		if(res.charAt(0) >= '0' && res.charAt(0) <= '9')
-		{
-			res = '_' + res;
-		}
-		if(keywords.contains(res) || basicTypes.contains(res))
-		{
-			res = "_" + res;
-		}
-		
-		return res;
-	}
+    public XSDParser(String stFile, TreeMap<String, String> xsdMapping) {
+        this.xsdMapping = xsdMapping;
+        init(stFile);
+    }
 
-	private String escapeType(String name)
-	{
-		String	res;
-		
-		res = name.replace('-', '_');
-		res = res.replace('.', '_');
-		if(res.charAt(0) >= '0' && res.charAt(0) <= '9')
-		{
-			res = '_' + res;
-		}
-		if(keywords.contains(res))
-		{
-			res = "_" + res;
-		}
-		
-		return res;
-	}
+    public void parse() throws Exception {
+        XSOMParser parser;
 
-	private void interpretResult(XSSchemaSet sset)
-	{
-		XSSchema				xs;
-		Iterator<XSSchema>		it;
-		Iterator<XSElementDecl>	itt;
-		XSElementDecl			el;
-		
-		it = sset.iterateSchema();
-		while(it.hasNext())
-		{
-			xs = it.next();
-			if(!xs.getTargetNamespace().endsWith("/XMLSchema"))
-			{
-				itt = xs.iterateElementDecls();
-				while(itt.hasNext())
-				{
-					el = itt.next();
-					interpretElement(el, sset);				
-				}
-			}
-		}
-	}
+        parser = new XSOMParser();
+        parser.setErrorHandler(this);
+        parser.parse(f);
 
-	private void interpretElement(XSElementDecl el, XSSchemaSet sset)
-	{
-		Struct			st;
-		XSComplexType	cType;
-		XSType			parent;
-		XSSimpleType	xs;
+        interpretResult(parser.getResult());
+        writeMap();
+    }
 
-		if(el.getType() instanceof XSComplexType && el.getType() != sset.getAnyType())
-		{
-			cType = (XSComplexType)el.getType();
-			if(map.get(el.getName()) == null)
-			{
-				st = new Struct(el.getName());
-				map.put(el.getName(), st);
+    private void writeMap() throws Exception {
+        Iterator<Struct> its;
+        Struct st;
+        int order;
+        Set<Struct> ss;
+        Set<String> declared;
+        Iterator<Enumeration> ite;
+        Iterator<String> itg;
+        Enumeration en;
+        boolean bModified;
 
-				parent = cType;
-				while(parent != sset.getAnyType())
-				{
-					if(parent.isComplexType())
-					{
-						write(st, parent.asComplexType(), true);
-						parent = parent.getBaseType();
-					}
-				}
-				
-				processInheritance(st, cType, sset);
-				st.setParent(cType.getBaseType().getName());
-			}
-		}
-		else if(el.getType() instanceof XSSimpleType && el.getType() != sset.getAnySimpleType())
-		{
-			xs = el.getType().asSimpleType();
-			if(xs.isRestriction())
-			{
-				createEnum(xs.getName(), xs.asRestriction());
-			}
-		}
-	}
+        os.write(marshaller.writeHeader(namespace).getBytes());
 
-	private void write(Struct st, XSComplexType type, boolean goingup)
-	{
-		XSParticle							particle;
-		Iterator<? extends XSAttributeUse>	it;
-		XSAttributeUse						att;
-		XSAttributeDecl						decl;
-		Iterator<? extends XSAttGroupDecl>	itt;
-		
-		particle = type.getContentType().asParticle();
-		if(particle != null)
-		{
-			write(st, particle.getTerm(), true);
-		}
-		
-		itt = type.getAttGroups().iterator();
-		while(itt.hasNext())
-		{
-			write(st, itt.next(), true);
-		}
-		
-		it = type.getAttributeUses().iterator();
-		while(it.hasNext())
-		{
-			att = it.next();
-			decl = att.getDecl();
-			write(st, decl, goingup && att.isRequired());
-		}
-	}
+        st = createSuperObject();
 
-	private void write(Struct st, XSAttributeDecl decl, boolean goingup)
-	{
-		if(decl.getType().isRestriction() && decl.getType().getName() != null && !basicTypes.contains(decl.getType().getName()))
-		{
-			createEnum(decl.getType().getName(), decl.getType().asRestriction());
-			st.addField(decl.getName(), decl.getType().getName(),
-				goingup, false, decl.getFixedValue(), xsdMapping);
-		}
-		else if(decl.getType().isList())
-		{
-			st.addField(decl.getName(), decl.getType().asList().getItemType().getName(),
-				goingup, true, null, xsdMapping);
-		}
-		else
-		{
-			st.addField(decl.getName(), decl.getType().getName(),
-				goingup, false, decl.getFixedValue(), xsdMapping);
-		}
-	}
+        if (!marshaller.isNestedEnums()) {
+            ite = enums.values().iterator();
+            while (ite.hasNext()) {
+                en = ite.next();
+                os.write(marshaller.writeEnumHeader(escape(en.getName())).getBytes());
+                itg = en.iterator();
+                order = 1;
 
-	private void createEnum(String name, XSRestrictionSimpleType type)
-	{
-		Enumeration					en;
-		Iterator<? extends XSFacet> it;
-		
-		if(!enums.containsKey(name))
-		{
-			type = type.asRestriction();
-			en = new Enumeration(name);
-			it = type.getDeclaredFacets().iterator();
-			while(it.hasNext())
-			{
-				en.addString(it.next().getValue().value);
-			}
-			enums.put(name, en);
-		}
-	}
+                if (itg.hasNext()) {
+                    while (itg.hasNext()) {
+                        os.write(marshaller.writeEnumValue(order, escape(itg.next())).getBytes());
+                        order = order + 1;
+                    }
+                } else {
+                    os.write(marshaller.writeEnumValue(order, escape("UnspecifiedValue")).getBytes());
+                }
 
-	private void write(Struct st, XSAttGroupDecl attGroup, boolean goingup)
-	{
-		Iterator<? extends XSAttributeUse>	it;
-		Iterator<? extends XSAttGroupDecl>	itg;
-		XSAttributeUse						att;
-		XSAttributeDecl						decl;
+                os.write(marshaller.writeEnumFooter().getBytes());
+            }
+        }
 
-		itg = attGroup.getAttGroups().iterator();
-		while(itg.hasNext())
-		{
-			write(st, itg.next(), goingup);
-		}
-		
-		it = attGroup.getDeclaredAttributeUses().iterator();
-		while(it.hasNext())
-		{
-			att = it.next();
-			decl = att.getDecl();
-			if(decl.getType().getName() == null)
-			{
-				if(decl.getType().isRestriction())
-				{
-					createEnum(attGroup.getName() + "_" + decl.getName(), decl.getType().asRestriction());
-					st.addField(decl.getName(), attGroup.getName() + "_" + decl.getName(),
-						goingup, false, decl.getFixedValue(), xsdMapping);
-				}
-			}
-			else
-			{
-				write(st, decl, true);
-			}
-		}
-	}
+        ss = new HashSet<Struct>(map.values());
+        declared = new TreeSet<String>(basicTypes);
+        declared.addAll(enums.keySet());
+        declared.addAll(simpleTypes.keySet());
 
-	private void processInheritance(Struct st, XSComplexType cType, XSSchemaSet sset)
-	{
-		Iterator<XSType>	ity;
-		XSType				xt;
-		XSParticle			particle;
-		
-		ity = sset.iterateTypes();
-		while(ity.hasNext())
-		{
-			xt = ity.next();
-			if(xt.getBaseType() == cType)
-			{
-				particle = xt.asComplexType().getContentType().asParticle();
-				if(particle != null)
-				{
-					write(st, particle.getTerm(), false);
-				}
-				
-				processInheritance(st, xt.asComplexType(), sset);
-			}
-		}
-	}
+        writeStruct(st, declared);
 
-	private void write(Struct st, XSTerm term, boolean goingup)
-	{
-		Struct			nested;
-		XSModelGroup	modelGroup;
-		XSParticle[]	ps;
-		XSParticle		p;
-		
-		if(term != null && term.isModelGroup())
-		{
-			modelGroup = term.asModelGroup();
-			ps = modelGroup.getChildren();
-			for(int i = 0;i<ps.length;i++)
-			{
-				p = ps[i];
-				term = p.getTerm();
-				if(term.isModelGroup())
-				{
-					write(st, term, goingup);
-				}
-				else if(term.isElementDecl())
-				{
-					if(term.asElementDecl().getType().getName() == null)
-					{
-						nested = createNestedType(term.asElementDecl().getName(), term.asElementDecl().getType().asComplexType());
-						st.addField(nested.getName(), null, goingup, p.getMaxOccurs().intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
-					}
-					else
-					{
-						st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(),
-								goingup, p.getMaxOccurs().intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
-					}
-				}
-			}
-		}							
-	}
+        bModified = true;
+        while (bModified && !ss.isEmpty()) {
+            bModified = false;
+            its = map.values().iterator();
+            while (its.hasNext()) {
+                st = its.next();
+                if (ss.contains(st) && declared.containsAll(st.getTypes())) {
+                    writeStruct(st, declared);
+                    ss.remove(st);
+                    bModified = true;
+                }
+            }
+        }
 
-	private Struct createNestedType(String name, XSComplexType type)
-	{
-		Struct		st;
-		
-		st = new Struct(name);
-		map.put(name, st);
-		
-		write(st, type, true);
-		
-		return st;
-	}
+        if (!ss.isEmpty()) {
+            // Check if we are missing a type or it's a circular dependency
+            Set<String> requiredTypes = new HashSet<String>();
+            Set<String> notYetDeclaredTypes = new HashSet<String>();
+            for (Struct s : ss) {
+                requiredTypes.addAll(s.getTypes());
+                notYetDeclaredTypes.add(s.getName());
+            }
+            requiredTypes.removeAll(declared);
+            requiredTypes.removeAll(notYetDeclaredTypes);
+            if (requiredTypes.isEmpty()) {
+                // Circular dependencies have been detected
+                if (marshaller.isCircularDependencySupported()) {
+                    // Just dump the rest
+                    for (Struct s : ss) {
+                        writeStruct(s, declared);
+                    }
+                } else {
+                    // Report circular dependency
+                    System.err
+                            .print("Source schema contains circular dependencies and the target marshaller does not support them. Refer to the reduced dependency graph below.");
+                    for (Struct s : ss) {
+                        s.getTypes().removeAll(declared);
+                        System.err.println(s.getName() + ": " + s.getTypes());
+                    }
+                    throw new Exception();
+                }
+            } else {
+                // Missing types have been detected
+                System.err.print("Source schema contains references missing types.");
+                for (Struct s : ss) {
+                    s.getTypes().retainAll(requiredTypes);
+                    if (!s.getTypes().isEmpty()) {
+                        System.err.println(s.getName() + ": " + s.getTypes());
+                    }
+                }
+                throw new Exception();
+            }
+        }
+    }
 
-	@Override
-	public void error(SAXParseException exception) throws SAXException
-	{
-		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
-		exception.printStackTrace();
-	}
+    private void writeStruct(Struct st, Set<String> declared) throws IOException {
+        Iterator<Field> itf;
+        Field f;
+        String fname, type, enumValue;
+        Set<String> usedInEnums;
+        int order;
+        Enumeration en;
+        Iterator<String> itg;
 
-	@Override
-	public void fatalError(SAXParseException exception) throws SAXException
-	{
-		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
-		exception.printStackTrace();
-	}
+        os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
+        itf = st.getFields().iterator();
+        usedInEnums = new TreeSet<String>();
+        order = 1;
+        while (itf.hasNext()) {
+            f = itf.next();
+            fname = f.getName();
+            type = f.getType();
 
-	@Override
-	public void warning(SAXParseException exception) throws SAXException
-	{
-		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
-		exception.printStackTrace();
-	}
+            if (marshaller.isNestedEnums() && enums.containsKey(type) && !usedInEnums.contains(type)) {
+                usedInEnums.add(type);
+                en = enums.get(type);
+                enumValue = escape(en.getName());
+                os.write(marshaller.writeEnumHeader(enumValue).getBytes());
+                itg = en.iterator();
 
-	public void addMarshaller(IMarshaller marshaller)
-	{
-		this.marshaller = marshaller;
-	}
+                if (itg.hasNext()) {
+                    while (itg.hasNext()) {
+                        os.write(marshaller.writeEnumValue(order, escape(en.getName() + "_" + itg.next())).getBytes());
+                        order = order + 1;
+                    }
+                } else {
+                    os.write(marshaller.writeEnumValue(order, escape(st.getName() + "_" + en.getName() + "_UnspecifiedValue")).getBytes());
+                }
 
-	public void setOutputStream(FileOutputStream os)
-	{
-		this.os = os;
-	}
+                os.write(marshaller.writeEnumFooter().getBytes());
+            }
+            
+            if (simpleTypes.containsKey(type)) {
+                type = simpleTypes.get(type);
+            }
 
-	public void setPackage(String namespace)
-	{
-		this.namespace = namespace;
-	}
+            if (!map.keySet().contains(type) && !basicTypes.contains(type) && !enums.containsKey(type)) {
+                type = "binary";
+            }
+            if (type.equals(fname)) {
+                fname = "_" + fname;
+            }
+            if (marshaller.getTypeMapping(type) != null) {
+                type = marshaller.getTypeMapping(type);
+            }
+            os.write(marshaller.writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname), escapeType(type)).getBytes());
+            order = order + 1;
+        }
+        os.write(marshaller.writeStructFooter().getBytes());
+        declared.add(st.getName());
+    }
+
+    private Struct createSuperObject() {
+        Struct st;
+
+        st = new Struct("UnspecifiedType");
+
+        st.addField("baseObjectType", "string", true, false, null, xsdMapping);
+        st.addField("object", "binary", true, false, null, xsdMapping);
+
+        return st;
+    }
+
+    private String escape(String name) {
+        String res = escapeType(name);
+
+        if (basicTypes.contains(res)) {
+            res = "_" + res;
+        }
+
+        return res;
+    }
+
+    private String escapeType(String name) {
+        String res;
+
+        final char[] nameChars = name.toCharArray();
+        
+        for (int i = 0; i < nameChars.length; i++) {
+            if (!Character.isJavaIdentifierPart(nameChars[i])) {
+                nameChars[i] = '_';
+            }
+        }
+
+        res = String.valueOf(nameChars);
+        
+        if (!Character.isJavaIdentifierStart(nameChars[0]) || keywords.contains(res)) {
+            res = "_" + res;
+        }
+
+        return res;
+    }
+
+    private void interpretResult(XSSchemaSet sset) {
+        XSSchema xs;
+        Iterator<XSSchema> it;
+        Iterator<XSElementDecl> itt;
+        XSElementDecl el;
+
+        it = sset.iterateSchema();
+        while (it.hasNext()) {
+            xs = it.next();
+            if (!xs.getTargetNamespace().endsWith("/XMLSchema")) {
+                itt = xs.iterateElementDecls();
+                while (itt.hasNext()) {
+                    el = itt.next();
+                    interpretElement(el, sset);
+                }
+                final Iterator<XSComplexType> ict = xs.iterateComplexTypes();
+                while (ict.hasNext()) {
+                    processComplexType(ict.next(), sset);
+                }
+                final Iterator<XSSimpleType> ist = xs.iterateSimpleTypes();
+                while (ist.hasNext()) {
+                    processSimpleType(ist.next());
+                }
+            }
+        }
+    }
+
+    private void interpretElement(XSElementDecl el, XSSchemaSet sset) {
+        XSComplexType cType;
+        XSSimpleType xs;
+
+        if (el.getType() instanceof XSComplexType && el.getType() != sset.getAnyType()) {
+            cType = (XSComplexType) el.getType();
+            processComplexType(cType, sset);
+        } else if (el.getType() instanceof XSSimpleType && el.getType() != sset.getAnySimpleType()) {
+            xs = el.getType().asSimpleType();
+            processSimpleType(xs);
+        }
+    }
+
+    private String processType(XSType type, XSSchemaSet sset) {
+        if (type instanceof XSComplexType) {
+            return processComplexType(type.asComplexType(), sset);
+        } else {
+            return processSimpleType(type.asSimpleType());
+        }
+    }
+
+    /**
+     * @param xs
+     */
+    private String processSimpleType(XSSimpleType xs) {
+        String typeName = xs.getName();
+        if (typeName == null) {
+            typeName = generateAnonymousName();
+        }
+        if (xs.isRestriction() && xs.getFacet("enumeration") != null) {
+            createEnum(typeName, xs.asRestriction());
+        } else {
+            //This is just a restriction on a basic type, find parent and map it to the type
+            while (xs != null && !basicTypes.contains(xs.getName())) {
+                xs = xs.getBaseType().asSimpleType();
+            }
+            simpleTypes.put(typeName, xs != null ? xs.getName() : "string");
+        }
+        return typeName;
+    }
+
+    /**
+     * @param cType
+     * @param sset
+     */
+    private String processComplexType(XSComplexType cType, XSSchemaSet sset) {
+        Struct st = null;
+        XSType parent;
+        String typeName = cType.getName();
+        if (typeName == null) {
+            typeName = generateAnonymousName();
+        }
+        st = map.get(typeName);
+        if (st == null) {
+            st = new Struct(typeName);
+            map.put(typeName, st);
+
+            parent = cType;
+            while (parent != sset.getAnyType()) {
+                if (parent.isComplexType()) {
+                    write(st, parent.asComplexType(), true, sset);
+                    parent = parent.getBaseType();
+                }
+            }
+
+            processInheritance(st, cType, sset);
+            st.setParent(cType.getBaseType().getName());
+        }
+        return typeName;
+    }
+
+    private int anonymousCounter = 0;
+
+    /**
+     * @return
+     */
+    private String generateAnonymousName() {
+        anonymousCounter++;
+        return String.format("Anonymous%03d", anonymousCounter);
+    }
+
+    private void write(Struct st, XSComplexType type, boolean goingup, XSSchemaSet xss) {
+        XSParticle particle;
+        Iterator<? extends XSAttributeUse> it;
+        XSAttributeUse att;
+        XSAttributeDecl decl;
+        Iterator<? extends XSAttGroupDecl> itt;
+
+        particle = type.getContentType().asParticle();
+        if (particle != null) {
+            write(st, particle.getTerm(), true, xss);
+        }
+
+        itt = type.getAttGroups().iterator();
+        while (itt.hasNext()) {
+            write(st, itt.next(), true);
+        }
+
+        it = type.getAttributeUses().iterator();
+        while (it.hasNext()) {
+            att = it.next();
+            decl = att.getDecl();
+            write(st, decl, goingup && att.isRequired());
+        }
+    }
+
+    private void write(Struct st, XSAttributeDecl decl, boolean goingup) {
+        if (decl.getType().isRestriction() && decl.getType().getName() != null && !basicTypes.contains(decl.getType().getName())) {
+            String typeName = processSimpleType(decl.getType());
+            st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
+        } else if (decl.getType().isList()) {
+            st.addField(decl.getName(), decl.getType().asList().getItemType().getName(), goingup, true, null, xsdMapping);
+        } else {
+            st.addField(decl.getName(), decl.getType().getName(), goingup, false, decl.getFixedValue(), xsdMapping);
+        }
+    }
+
+    private void createEnum(String name, XSRestrictionSimpleType type) {
+        Enumeration en;
+        Iterator<? extends XSFacet> it;
+
+        if (!enums.containsKey(name)) {
+            type = type.asRestriction();
+            en = new Enumeration(name);
+            it = type.getDeclaredFacets().iterator();
+            while (it.hasNext()) {
+                en.addString(it.next().getValue().value);
+            }
+            enums.put(name, en);
+        }
+    }
+
+    private void write(Struct st, XSAttGroupDecl attGroup, boolean goingup) {
+        Iterator<? extends XSAttributeUse> it;
+        Iterator<? extends XSAttGroupDecl> itg;
+        XSAttributeUse att;
+        XSAttributeDecl decl;
+
+        itg = attGroup.getAttGroups().iterator();
+        while (itg.hasNext()) {
+            write(st, itg.next(), goingup);
+        }
+
+        it = attGroup.getDeclaredAttributeUses().iterator();
+        while (it.hasNext()) {
+            att = it.next();
+            decl = att.getDecl();
+            if (decl.getType().getName() == null) {
+                if (decl.getType().isRestriction()) {
+                    String typeName = processSimpleType(decl.getType());
+                    st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
+                }
+            } else {
+                write(st, decl, true);
+            }
+        }
+    }
+
+    private void processInheritance(Struct st, XSComplexType cType, XSSchemaSet sset) {
+        Iterator<XSType> ity;
+        XSType xt;
+        XSParticle particle;
+
+        ity = sset.iterateTypes();
+        while (ity.hasNext()) {
+            xt = ity.next();
+            if (xt.getBaseType() == cType) {
+                particle = xt.asComplexType().getContentType().asParticle();
+                if (particle != null) {
+                    write(st, particle.getTerm(), false, sset);
+                }
+
+                processInheritance(st, xt.asComplexType(), sset);
+            }
+        }
+    }
+
+    private void write(Struct st, XSTerm term, boolean goingup, XSSchemaSet xss) {
+        XSModelGroup modelGroup;
+        XSParticle[] ps;
+        XSParticle p;
+
+        if (term != null && term.isModelGroup()) {
+            modelGroup = term.asModelGroup();
+            ps = modelGroup.getChildren();
+            for (int i = 0; i < ps.length; i++) {
+                p = ps[i];
+                term = p.getTerm();
+                if (term.isModelGroup()) {
+                    write(st, term, goingup, xss);
+                } else if (term.isElementDecl()) {
+                    if (term.asElementDecl().getType().getName() == null) {
+                        final String typeName = processType(term.asElementDecl().getType(), xss);
+                        st.addField(term.asElementDecl().getName(), typeName, goingup, p.getMaxOccurs().intValue() != 1, term
+                                .asElementDecl().getFixedValue(), xsdMapping);
+                    } else {
+                        st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(), goingup, p.getMaxOccurs()
+                                .intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void error(SAXParseException exception) throws SAXException {
+        System.out.println(exception.getMessage() + " at " + exception.getSystemId());
+        exception.printStackTrace();
+    }
+
+    @Override
+    public void fatalError(SAXParseException exception) throws SAXException {
+        System.out.println(exception.getMessage() + " at " + exception.getSystemId());
+        exception.printStackTrace();
+    }
+
+    @Override
+    public void warning(SAXParseException exception) throws SAXException {
+        System.out.println(exception.getMessage() + " at " + exception.getSystemId());
+        exception.printStackTrace();
+    }
+
+    public void addMarshaller(IMarshaller marshaller) {
+        this.marshaller = marshaller;
+    }
+
+    public void setOutputStream(FileOutputStream os) {
+        this.os = os;
+    }
+
+    public void setPackage(String namespace) {
+        this.namespace = namespace;
+    }
 }
