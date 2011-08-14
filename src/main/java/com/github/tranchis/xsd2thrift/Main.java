@@ -38,10 +38,11 @@ public class Main
 			"Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]\n" +
 			"                           [--package=NAME] filename.xsd\n" + 
 			"\n" + 
-			"  --thrift          : convert to Thrift\n" + 
-			"  --protobuf        : convert to Protocol Buffers\n" + 
-			"  --output=FILENAME : store the result in FILENAME instead of standard output\n" + 
-			"  --package=NAME    : set namespace/package of the output file\n" + 
+			"  --thrift          		: convert to Thrift\n" + 
+			"  --protobuf        		: convert to Protocol Buffers\n" + 
+			"  --output=FILENAME 		: store the result in FILENAME instead of standard output\n" + 
+			"  --package=NAME    		: set namespace/package of the output file\n" + 
+			"  --nestEnums=true|false	: nest enum declaration within messages that reference them, only supported by protobuf, defaults to true\n" + 
 			"";
 	
 
@@ -128,6 +129,12 @@ public class Main
 				{
 					param = args[i].split("=")[1];
 					xp.setPackage(param);
+				}
+				else if (args[i].startsWith("--nestEnums="))
+				{
+					param = args[i].split("=")[1];
+					boolean nestEnums = Boolean.valueOf(param);
+					xp.setNestEnums(nestEnums);
 				}
 				else
 				{
