@@ -34,4 +34,5 @@ public interface IMarshaller
 	String writeStructFooter();
 	String getTypeMapping(String type);
 	boolean isNestedEnums();
+    boolean isCircularDependencySupported();
 }
