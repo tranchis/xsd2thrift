@@ -10,10 +10,10 @@ CONTACT
 Any feedback will be greatly appreciated, at the GitHub project page
 (http://github.com/tranchis/xsd2thrift) or at tranchis_-_AT_-_gmail.com.
 
-INSTALLATION / BUILDING
-------------
+BUILDING
+--------
 
-No installation is required. To build xsd2thrift, you need Maven (http://maven.apache.org/) installed. To build xsd2thrift, run "mvn install".
+To build xsd2thrift, you need Maven (http://maven.apache.org/) installed. To build xsd2thrift, run "mvn install".
 
 xsd2thrift has been tested on Java SE 6.
 
