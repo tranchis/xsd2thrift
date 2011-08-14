@@ -13,7 +13,7 @@ Any feedback will be greatly appreciated, at the GitHub project page
 INSTALLATION / BUILDING
 ------------
 
-No installation is required. To build xsd2thrift, you need Maven (http://maven.apache.org/) installed. To build xsd2thrift, run "mvn compile".
+No installation is required. To build xsd2thrift, you need Maven (http://maven.apache.org/) installed. To build xsd2thrift, run "mvn install".
 
 xsd2thrift has been tested on Java SE 6.
 
@@ -38,3 +38,11 @@ XSOM is covered by GPL v2 with classpath exception (see LICENSE-xsom.1).
 
 XSOM internally uses an URI class, which is copyrighted by Thai Open Source
 Center (see LICENSE-xsom.2).
+
+CONTRIBUTORS (@github.com)
+------------
+
+tranchis
+Fred-dy-
+pfisterer
+
