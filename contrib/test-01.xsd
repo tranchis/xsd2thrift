@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.example.org/test-01" xmlns:tns="http://www.example.org/test-01" elementFormDefault="qualified">
+
+    <simpleType name="EnumerationWithWierdValues">
+    	<restriction base="string">
+    		<enumeration value="A Value With Spaces" />
+    		<enumeration value="A/Value-With#Punctuation" />
+    	</restriction>
+    </simpleType>
+
+    <complexType name="ComplexTypeWithTwoElementsOfTheSameEnumType">
+    	<sequence>
+    		<element name="firstEnumeratedElement" type="tns:EnumerationWithWierdValues"></element>
+    		<element name="secondEnumeratedElement" type="tns:EnumerationWithWierdValues"></element>
+    	</sequence>
+    </complexType>
+
+    <complexType name="ComplexTypeAWhichReferencesB">
+    	<sequence>
+    		<element name="b" type="tns:ComplexTypeBWhichReferencesA"></element>
+    	</sequence>
+    </complexType>
+    
+    <complexType name="ComplexTypeBWhichReferencesA">
+    	<sequence>
+    		<element name="a" type="tns:ComplexTypeAWhichReferencesB"></element>
+    	</sequence>
+    </complexType>
+</schema>

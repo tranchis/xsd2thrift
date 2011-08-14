@@ -66,7 +66,8 @@ public class XSDParser implements ErrorHandler {
     private IMarshaller marshaller;
     private OutputStream os;
     private String namespace;
-
+    private boolean nestEnums = true;
+    
     public XSDParser(String stFile) {
         this.xsdMapping = new TreeMap<String, String>();
         init(stFile);
@@ -134,36 +135,19 @@ public class XSDParser implements ErrorHandler {
     private void writeMap() throws Exception {
         Iterator<Struct> its;
         Struct st;
-        int order;
         Set<Struct> ss;
         Set<String> declared;
-        Iterator<Enumeration> ite;
-        Iterator<String> itg;
-        Enumeration en;
+        Iterator<String> ite;
         boolean bModified;
 
         os.write(marshaller.writeHeader(namespace).getBytes());
 
         st = createSuperObject();
 
-        if (!marshaller.isNestedEnums()) {
-            ite = enums.values().iterator();
+        if (!marshaller.isNestedEnums() || !isNestEnums()) {
+            ite = enums.keySet().iterator();
             while (ite.hasNext()) {
-                en = ite.next();
-                os.write(marshaller.writeEnumHeader(escape(en.getName())).getBytes());
-                itg = en.iterator();
-                order = 1;
-
-                if (itg.hasNext()) {
-                    while (itg.hasNext()) {
-                        os.write(marshaller.writeEnumValue(order, escape(itg.next())).getBytes());
-                        order = order + 1;
-                    }
-                } else {
-                    os.write(marshaller.writeEnumValue(order, escape("UnspecifiedValue")).getBytes());
-                }
-
-                os.write(marshaller.writeEnumFooter().getBytes());
+                writeEnum(ite.next());
             }
         }
 
@@ -232,11 +216,9 @@ public class XSDParser implements ErrorHandler {
     private void writeStruct(Struct st, Set<String> declared) throws IOException {
         Iterator<Field> itf;
         Field f;
-        String fname, type, enumValue;
+        String fname, type;
         Set<String> usedInEnums;
         int order;
-        Enumeration en;
-        Iterator<String> itg;
 
         os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
         itf = st.getFields().iterator();
@@ -247,23 +229,9 @@ public class XSDParser implements ErrorHandler {
             fname = f.getName();
             type = f.getType();
 
-            if (marshaller.isNestedEnums() && enums.containsKey(type) && !usedInEnums.contains(type)) {
+            if (isNestEnums() && marshaller.isNestedEnums() && enums.containsKey(type) && !usedInEnums.contains(type)) {
                 usedInEnums.add(type);
-                en = enums.get(type);
-                enumValue = escape(en.getName());
-                os.write(marshaller.writeEnumHeader(enumValue).getBytes());
-                itg = en.iterator();
-
-                if (itg.hasNext()) {
-                    while (itg.hasNext()) {
-                        os.write(marshaller.writeEnumValue(order, escape(en.getName() + "_" + itg.next())).getBytes());
-                        order = order + 1;
-                    }
-                } else {
-                    os.write(marshaller.writeEnumValue(order, escape(st.getName() + "_" + en.getName() + "_UnspecifiedValue")).getBytes());
-                }
-
-                os.write(marshaller.writeEnumFooter().getBytes());
+                writeEnum(type);
             }
             
             if (simpleTypes.containsKey(type)) {
@@ -285,6 +253,28 @@ public class XSDParser implements ErrorHandler {
         os.write(marshaller.writeStructFooter().getBytes());
         declared.add(st.getName());
     }
+
+	private void writeEnum(String type) throws IOException {
+		String enumValue;
+		Enumeration en;
+		Iterator<String> itg;
+		en = enums.get(type);
+		enumValue = escape(en.getName());
+		os.write(marshaller.writeEnumHeader(enumValue).getBytes());
+		itg = en.iterator();
+		int enumOrder = 1;
+
+		if (itg.hasNext()) {
+		    while (itg.hasNext()) {
+		        os.write(marshaller.writeEnumValue(enumOrder, escape(en.getName() + "_" + itg.next())).getBytes());
+		        enumOrder++;
+		    }
+		} else {
+		    os.write(marshaller.writeEnumValue(enumOrder, escape(en.getName() + "_UnspecifiedValue")).getBytes());
+		}
+
+		os.write(marshaller.writeEnumFooter().getBytes());
+	}
 
     private Struct createSuperObject() {
         Struct st;
@@ -344,11 +334,11 @@ public class XSDParser implements ErrorHandler {
                 }
                 final Iterator<XSComplexType> ict = xs.iterateComplexTypes();
                 while (ict.hasNext()) {
-                    processComplexType(ict.next(), sset);
+                    processComplexType(ict.next(), null, sset);
                 }
                 final Iterator<XSSimpleType> ist = xs.iterateSimpleTypes();
                 while (ist.hasNext()) {
-                    processSimpleType(ist.next());
+                    processSimpleType(ist.next(), null);
                 }
             }
         }
@@ -360,28 +350,29 @@ public class XSDParser implements ErrorHandler {
 
         if (el.getType() instanceof XSComplexType && el.getType() != sset.getAnyType()) {
             cType = (XSComplexType) el.getType();
-            processComplexType(cType, sset);
+            processComplexType(cType, el.getName(), sset);
         } else if (el.getType() instanceof XSSimpleType && el.getType() != sset.getAnySimpleType()) {
             xs = el.getType().asSimpleType();
-            processSimpleType(xs);
+            processSimpleType(xs, el.getName());
         }
     }
 
-    private String processType(XSType type, XSSchemaSet sset) {
+    private String processType(XSType type, String elementName, XSSchemaSet sset) {
         if (type instanceof XSComplexType) {
-            return processComplexType(type.asComplexType(), sset);
+            return processComplexType(type.asComplexType(), elementName, sset);
         } else {
-            return processSimpleType(type.asSimpleType());
+            return processSimpleType(type.asSimpleType(), elementName);
         }
     }
 
     /**
      * @param xs
+     * @param elementName 
      */
-    private String processSimpleType(XSSimpleType xs) {
+    private String processSimpleType(XSSimpleType xs, String elementName) {
         String typeName = xs.getName();
         if (typeName == null) {
-            typeName = generateAnonymousName();
+            typeName = elementName != null ? elementName + "Type" : generateAnonymousName();
         }
         if (xs.isRestriction() && xs.getFacet("enumeration") != null) {
             createEnum(typeName, xs.asRestriction());
@@ -397,14 +388,15 @@ public class XSDParser implements ErrorHandler {
 
     /**
      * @param cType
+     * @param elementName 
      * @param sset
      */
-    private String processComplexType(XSComplexType cType, XSSchemaSet sset) {
+    private String processComplexType(XSComplexType cType, String elementName, XSSchemaSet sset) {
         Struct st = null;
         XSType parent;
         String typeName = cType.getName();
         if (typeName == null) {
-            typeName = generateAnonymousName();
+            typeName = elementName != null ? elementName + "Type" : generateAnonymousName();
         }
         st = map.get(typeName);
         if (st == null) {
@@ -462,7 +454,7 @@ public class XSDParser implements ErrorHandler {
 
     private void write(Struct st, XSAttributeDecl decl, boolean goingup) {
         if (decl.getType().isRestriction() && decl.getType().getName() != null && !basicTypes.contains(decl.getType().getName())) {
-            String typeName = processSimpleType(decl.getType());
+            String typeName = processSimpleType(decl.getType(), decl.getName());
             st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
         } else if (decl.getType().isList()) {
             st.addField(decl.getName(), decl.getType().asList().getItemType().getName(), goingup, true, null, xsdMapping);
@@ -503,7 +495,7 @@ public class XSDParser implements ErrorHandler {
             decl = att.getDecl();
             if (decl.getType().getName() == null) {
                 if (decl.getType().isRestriction()) {
-                    String typeName = processSimpleType(decl.getType());
+                    String typeName = processSimpleType(decl.getType(), decl.getName());
                     st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
                 }
             } else {
@@ -546,7 +538,7 @@ public class XSDParser implements ErrorHandler {
                     write(st, term, goingup, xss);
                 } else if (term.isElementDecl()) {
                     if (term.asElementDecl().getType().getName() == null) {
-                        final String typeName = processType(term.asElementDecl().getType(), xss);
+                        final String typeName = processType(term.asElementDecl().getType(), term.asElementDecl().getName(), xss);
                         st.addField(term.asElementDecl().getName(), typeName, goingup, p.getMaxOccurs().intValue() != 1, term
                                 .asElementDecl().getFixedValue(), xsdMapping);
                     } else {
@@ -587,4 +579,12 @@ public class XSDParser implements ErrorHandler {
     public void setPackage(String namespace) {
         this.namespace = namespace;
     }
+
+	public void setNestEnums(boolean nestEnums) {
+		this.nestEnums = nestEnums;
+	}
+	
+	public boolean isNestEnums() {
+		return nestEnums;
+	}
 }

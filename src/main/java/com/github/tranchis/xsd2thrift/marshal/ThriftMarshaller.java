@@ -28,6 +28,7 @@ import java.util.TreeMap;
 public class ThriftMarshaller implements IMarshaller
 {
 	private TreeMap<String, String> typeMapping;
+	private String indent = "";
 
 	public ThriftMarshaller()
 	{
@@ -70,25 +71,30 @@ public class ThriftMarshaller implements IMarshaller
 	@Override
 	public String writeEnumHeader(String name)
 	{
-		return "enum " + name + "\n{\n";
+		final String result = writeIndent() + "enum " + name + "\n{\n";
+		increaseIndent();
+		return result;
 	}
 
 	@Override
 	public String writeEnumValue(int order, String value)
 	{
-		return("\t" + value + ",\n");
+		return(writeIndent() + value + ",\n");
 	}
 
 	@Override
 	public String writeEnumFooter()
 	{
-		return "}\n\n";
+		decreaseIndent();
+		return writeIndent() + "}\n\n";
 	}
 
 	@Override
 	public String writeStructHeader(String name)
 	{
-		return "struct " + name + "\n{\n";
+		final String result = writeIndent() + "struct " + name + "\n{\n";
+		increaseIndent();
+		return result;
 	}
 
 	@Override
@@ -103,7 +109,7 @@ public class ThriftMarshaller implements IMarshaller
 			sType = "list<" + type + ">";
 		}
 		
-		return "\t" + order + " : " + sRequired + " " + sType + " " + name + ",\n";
+		return writeIndent() + order + " : " + sRequired + " " + sType + " " + name + ",\n";
 	}
 
 	private String getRequired(boolean required)
@@ -125,7 +131,8 @@ public class ThriftMarshaller implements IMarshaller
 	@Override
 	public String writeStructFooter()
 	{
-		return "}\n\n";
+		decreaseIndent();
+		return writeIndent() + "}\n\n";
 	}
 
 	@Override
@@ -143,5 +150,17 @@ public class ThriftMarshaller implements IMarshaller
     @Override
     public boolean isCircularDependencySupported() {
         return false;
+    }
+
+	public void increaseIndent() {
+    	indent += "\t";
+    }
+    
+	public void decreaseIndent() {
+    	indent = indent.substring(0, indent.length() > 0 ? indent.length() - 1 : 0);
+    }
+    
+    private String writeIndent() {
+    	return indent;
     }
 }

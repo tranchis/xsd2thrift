@@ -28,6 +28,7 @@ import java.util.TreeMap;
 public class ProtobufMarshaller implements IMarshaller
 {
 	private TreeMap<String, String> typeMapping;
+	private String indent = "";
 
 	public ProtobufMarshaller()
 	{
@@ -71,25 +72,30 @@ public class ProtobufMarshaller implements IMarshaller
 	@Override
 	public String writeEnumHeader(String name)
 	{
-		return "\tenum " + name + "\n\t{\n";
+		final String result = writeIndent() + "enum " + name + "\n" + writeIndent() + "{\n";
+		increaseIndent();
+		return result;
 	}
 
 	@Override
 	public String writeEnumValue(int order, String value)
 	{
-		return("\t\t" + value + " = " + order + ";\n");
+		return(writeIndent() + value + " = " + order + ";\n");
 	}
 
 	@Override
 	public String writeEnumFooter()
 	{
-		return "\t}\n";
+		decreaseIndent();
+		return writeIndent() + "}\n";
 	}
 
 	@Override
 	public String writeStructHeader(String name)
 	{
-		return "message " + name + "\n{\n";
+		final String result = writeIndent() + "message " + name + "\n{\n";
+		increaseIndent();
+		return result;
 	}
 
 	@Override
@@ -99,7 +105,7 @@ public class ProtobufMarshaller implements IMarshaller
 		
 		sRequired = getRequired(required, repeated);
 		
-		return "\t" + sRequired + " " + type + " " + name + " = " + order + ";\n";
+		return writeIndent() + sRequired + " " + type + " " + name + " = " + order + ";\n";
 	}
 
 	private String getRequired(boolean required, boolean repeated)
@@ -128,7 +134,8 @@ public class ProtobufMarshaller implements IMarshaller
 	@Override
 	public String writeStructFooter()
 	{
-		return "}\n\n";
+		decreaseIndent();
+		return writeIndent() + "}\n\n";
 	}
 
 	@Override
@@ -146,5 +153,17 @@ public class ProtobufMarshaller implements IMarshaller
     @Override
     public boolean isCircularDependencySupported() {
         return true;
+    }
+    
+	private void increaseIndent() {
+    	indent += "\t";
+    }
+    
+	private void decreaseIndent() {
+    	indent = indent.substring(0, indent.length() > 0 ? indent.length() - 1 : 0);
+    }
+    
+    private String writeIndent() {
+    	return indent;
     }
 }
