@@ -34,8 +34,18 @@ public class ProtobufMarshaller implements IMarshaller
 	{
 		typeMapping = new TreeMap<String,String>();
 		typeMapping.put("positiveInteger", "int64");
+		typeMapping.put("nonPositiveInteger", "sint64");
+		typeMapping.put("negativeInteger", "sint64");
+		typeMapping.put("nonNegativeInteger", "int64");
 		typeMapping.put("int", "int32");
 		typeMapping.put("integer", "int64");
+
+		typeMapping.put("unsignedLong", "uint64");
+		typeMapping.put("unsignedInt", "uint32");
+		typeMapping.put("unsignedShort", "uint32"); // No 16-bit int in protobuf
+		typeMapping.put("unsignedByte", "uint32"); // No 8-bit int in protobuf
+
+		typeMapping.put("short", "int32"); // No 16-bit int in protobuf
 		typeMapping.put("long", "int64");
 		typeMapping.put("decimal", "double");
 		typeMapping.put("ID", "string");

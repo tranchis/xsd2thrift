@@ -34,10 +34,22 @@ public class ThriftMarshaller implements IMarshaller
 	{
 		typeMapping = new TreeMap<String,String>();
 		typeMapping.put("positiveInteger", "i64");
+		typeMapping.put("nonPositiveInteger", "i64");
+		typeMapping.put("negativeInteger", "i64");
+		typeMapping.put("nonNegativeInteger", "i64");
 		typeMapping.put("int", "i32");
 		typeMapping.put("integer", "i64");
+
+		// no unsigned types in thrift
+		typeMapping.put("unsignedLong", "int64");
+		typeMapping.put("unsignedInt", "int32");
+		typeMapping.put("unsignedShort", "int16"); 
+		typeMapping.put("unsignedByte", "byte"); 
+
+		typeMapping.put("short", "i16");
 		typeMapping.put("long", "i64");
 		typeMapping.put("decimal", "double");
+		typeMapping.put("float", "double"); // No float type in thrift
 		typeMapping.put("ID", "string");
 		typeMapping.put("IDREF", "string");
 		typeMapping.put("NMTOKEN", "string");

@@ -98,15 +98,27 @@ public class XSDParser implements ErrorHandler {
         basicTypes.add("anyType");
         basicTypes.add("anyURI");
         basicTypes.add("anySimpleType");
+
         basicTypes.add("integer");
         basicTypes.add("positiveInteger");
+        basicTypes.add("nonPositiveInteger");
+        basicTypes.add("negativeInteger");
+        basicTypes.add("nonNegativeInteger");
+
+        basicTypes.add("unsignedLong");
+        basicTypes.add("unsignedInt");
+        basicTypes.add("unsignedShort");
+        basicTypes.add("unsignedByte");
+
         basicTypes.add("binary");
         basicTypes.add("boolean");
         basicTypes.add("date");
         basicTypes.add("dateTime");
         basicTypes.add("decimal");
+        basicTypes.add("float");
         basicTypes.add("double");
         basicTypes.add("byte");
+        basicTypes.add("short");
         basicTypes.add("long");
         basicTypes.add("int");
         basicTypes.add("ID");
