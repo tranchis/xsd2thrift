@@ -47,8 +47,8 @@ public class ThriftMarshaller implements IMarshaller
 		typeMapping.put("anyURI", "UnspecifiedType");
 		typeMapping.put("boolean", "bool");
 		typeMapping.put("binary", "binary");
-        typeMapping.put("date", "i32"); //Number of days since January 1st, 1970
-        typeMapping.put("dateTime", "i64"); //Number of milliseconds since January 1st, 1970 
+		typeMapping.put("date", "i32"); //Number of days since January 1st, 1970
+		typeMapping.put("dateTime", "i64"); //Number of milliseconds since January 1st, 1970
 	}
 	
 	@Override

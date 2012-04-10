@@ -47,9 +47,9 @@ public class ProtobufMarshaller implements IMarshaller
 		typeMapping.put("anyURI", "UnspecifiedType");
 		typeMapping.put("boolean", "bool");
 		typeMapping.put("binary", "bytes");
-        typeMapping.put("byte", "bytes");
-        typeMapping.put("date", "int32"); //Number of days since January 1st, 1970
-        typeMapping.put("dateTime", "int64"); //Number of milliseconds since January 1st, 1970 
+		typeMapping.put("byte", "bytes");
+		typeMapping.put("date", "int32"); //Number of days since January 1st, 1970
+		typeMapping.put("dateTime", "int64"); //Number of milliseconds since January 1st, 1970
 	}
 	
 	@Override
