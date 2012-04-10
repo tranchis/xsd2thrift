@@ -56,7 +56,9 @@ public class ProtobufMarshaller implements IMarshaller
 		typeMapping.put("anyType", "UnspecifiedType");
 		typeMapping.put("anyURI", "UnspecifiedType");
 		typeMapping.put("boolean", "bool");
-		typeMapping.put("binary", "bytes");
+		typeMapping.put("binary", "bytes"); // UnspecifiedType.object is declared binary
+		typeMapping.put("hexBinary", "bytes");
+		typeMapping.put("base64Binary", "bytes");
 		typeMapping.put("byte", "bytes");
 		typeMapping.put("date", "int32"); //Number of days since January 1st, 1970
 		typeMapping.put("dateTime", "int64"); //Number of milliseconds since January 1st, 1970

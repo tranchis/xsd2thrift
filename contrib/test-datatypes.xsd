@@ -28,7 +28,8 @@
             <xsd:element name="an_anyType" type="xsd:anyType" />
             <xsd:element name="an_anyURI" type="xsd:anyURI" />
             <xsd:element name="a_boolean" type="xsd:boolean" />
-            <!-- <xsd:element name="a_binary" type="xsd:binary" /> -->
+            <xsd:element name="a_base64Binary" type="xsd:base64Binary" />
+            <xsd:element name="a_hexBinary" type="xsd:hexBinary" /> 
             <xsd:element name="a_byte" type="xsd:byte" />
             <xsd:element name="a_date" type="xsd:date" />
             <xsd:element name="a_dateTime" type="xsd:dateTime" />

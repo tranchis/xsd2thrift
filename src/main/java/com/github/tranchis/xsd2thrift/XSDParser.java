@@ -110,7 +110,8 @@ public class XSDParser implements ErrorHandler {
         basicTypes.add("unsignedShort");
         basicTypes.add("unsignedByte");
 
-        basicTypes.add("binary");
+        basicTypes.add("base64Binary");
+        basicTypes.add("hexBinary");
         basicTypes.add("boolean");
         basicTypes.add("date");
         basicTypes.add("dateTime");
