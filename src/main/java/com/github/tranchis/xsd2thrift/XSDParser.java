@@ -539,10 +539,10 @@ public class XSDParser implements ErrorHandler {
                 } else if (term.isElementDecl()) {
                     if (term.asElementDecl().getType().getName() == null) {
                         final String typeName = processType(term.asElementDecl().getType(), term.asElementDecl().getName(), xss);
-                        st.addField(term.asElementDecl().getName(), typeName, goingup, p.getMaxOccurs().intValue() != 1, term
+                        st.addField(term.asElementDecl().getName(), typeName, p.getMinOccurs().intValue() != 0, p.getMaxOccurs().intValue() != 1, term
                                 .asElementDecl().getFixedValue(), xsdMapping);
                     } else {
-                        st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(), goingup, p.getMaxOccurs()
+                        st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(), p.getMinOccurs().intValue() != 0, p.getMaxOccurs()
                                 .intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
                     }
                 }
