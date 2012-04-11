@@ -112,6 +112,8 @@ public class XSDParser implements ErrorHandler {
 
         basicTypes.add("base64Binary");
         basicTypes.add("hexBinary");
+        // binary is not a valid XSD type, but used as a placeholder internally
+        basicTypes.add("binary"); 
         basicTypes.add("boolean");
         basicTypes.add("date");
         basicTypes.add("dateTime");
