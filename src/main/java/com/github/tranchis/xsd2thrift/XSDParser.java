@@ -370,16 +370,27 @@ public class XSDParser implements ErrorHandler {
      * @param elementName 
      */
     private String processSimpleType(XSSimpleType xs, String elementName) {
+
         String typeName = xs.getName();
         if (typeName == null) {
-            typeName = elementName != null ? elementName + "Type" : generateAnonymousName();
+            if (xs.getFacet("enumeration") != null) {
+                typeName = elementName != null ? elementName + "Type" : generateAnonymousName();
+            } else {
+		// can't use elementName here as it might not be unique (test-range.xsd)
+		typeName = generateAnonymousName();
+            }
         }
+
         if (xs.isRestriction() && xs.getFacet("enumeration") != null) {
             createEnum(typeName, xs.asRestriction());
         } else {
             //This is just a restriction on a basic type, find parent and map it to the type
-            while (xs != null && !basicTypes.contains(xs.getName())) {
+            String baseTypeName = typeName;
+            while (xs != null && !basicTypes.contains(baseTypeName)) {
                 xs = xs.getBaseType().asSimpleType();
+                if (xs != null) {
+                    baseTypeName = xs.getName();
+                }
             }
             simpleTypes.put(typeName, xs != null ? xs.getName() : "string");
         }
