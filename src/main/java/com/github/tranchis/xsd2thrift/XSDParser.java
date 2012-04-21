@@ -556,6 +556,10 @@ public class XSDParser implements ErrorHandler {
 
         if (term != null && term.isModelGroup()) {
             modelGroup = term.asModelGroup();
+            if (XSModelGroup.CHOICE.equals(modelGroup.getCompositor())) {
+                goingup = false;
+            }
+
             ps = modelGroup.getChildren();
             for (int i = 0; i < ps.length; i++) {
                 p = ps[i];
