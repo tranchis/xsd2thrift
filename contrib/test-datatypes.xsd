@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0">
+    <xsd:complexType name="Datatypes">
+        <xsd:sequence>
+            <xsd:element name="a_positiveInteger" type="xsd:positiveInteger" />
+            <xsd:element name="an_int" type="xsd:int" />
+            <xsd:element name="an_integer" type="xsd:integer" />
+            <xsd:element name="a_negativeInteger" type="xsd:negativeInteger" />
+            <xsd:element name="a_nonNegativeInteger" type="xsd:nonNegativeInteger" />
+            <xsd:element name="a_nonPositiveInteger" type="xsd:nonPositiveInteger" />
+
+            <xsd:element name="an_unsignedLong" type="xsd:unsignedLong" />
+            <xsd:element name="an_unsignedInt" type="xsd:unsignedInt" />
+            <xsd:element name="an_unsignedShort" type="xsd:unsignedShort" />
+            <xsd:element name="an_unsignedByte" type="xsd:unsignedByte" />
+
+            <xsd:element name="a_float" type="xsd:float" />
+            <xsd:element name="a_double" type="xsd:double" />
+
+            <xsd:element name="a_short" type="xsd:short" />
+            <xsd:element name="a_long" type="xsd:long" />
+            <xsd:element name="a_decimal" type="xsd:decimal" />
+            <xsd:element name="an_ID" type="xsd:ID" />
+            <xsd:element name="an_IDREF" type="xsd:IDREF" />
+            <xsd:element name="a_NMTOKEN" type="xsd:NMTOKEN" />
+            <xsd:element name="a_NMTOKENS" type="xsd:NMTOKENS" />
+            <xsd:element name="an_anySimpleType" type="xsd:anySimpleType" />
+            <xsd:element name="an_anyType" type="xsd:anyType" />
+            <xsd:element name="an_anyURI" type="xsd:anyURI" />
+            <xsd:element name="a_boolean" type="xsd:boolean" />
+            <xsd:element name="a_base64Binary" type="xsd:base64Binary" />
+            <xsd:element name="a_hexBinary" type="xsd:hexBinary" /> 
+            <xsd:element name="a_byte" type="xsd:byte" />
+            <xsd:element name="a_date" type="xsd:date" />
+            <xsd:element name="a_dateTime" type="xsd:dateTime" />
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

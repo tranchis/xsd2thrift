@@ -98,15 +98,30 @@ public class XSDParser implements ErrorHandler {
         basicTypes.add("anyType");
         basicTypes.add("anyURI");
         basicTypes.add("anySimpleType");
+
         basicTypes.add("integer");
         basicTypes.add("positiveInteger");
-        basicTypes.add("binary");
+        basicTypes.add("nonPositiveInteger");
+        basicTypes.add("negativeInteger");
+        basicTypes.add("nonNegativeInteger");
+
+        basicTypes.add("unsignedLong");
+        basicTypes.add("unsignedInt");
+        basicTypes.add("unsignedShort");
+        basicTypes.add("unsignedByte");
+
+        basicTypes.add("base64Binary");
+        basicTypes.add("hexBinary");
+        // binary is not a valid XSD type, but used as a placeholder internally
+        basicTypes.add("binary"); 
         basicTypes.add("boolean");
         basicTypes.add("date");
         basicTypes.add("dateTime");
         basicTypes.add("decimal");
+        basicTypes.add("float");
         basicTypes.add("double");
         basicTypes.add("byte");
+        basicTypes.add("short");
         basicTypes.add("long");
         basicTypes.add("int");
         basicTypes.add("ID");
@@ -370,16 +385,27 @@ public class XSDParser implements ErrorHandler {
      * @param elementName 
      */
     private String processSimpleType(XSSimpleType xs, String elementName) {
+
         String typeName = xs.getName();
         if (typeName == null) {
-            typeName = elementName != null ? elementName + "Type" : generateAnonymousName();
+            if (xs.getFacet("enumeration") != null) {
+                typeName = elementName != null ? elementName + "Type" : generateAnonymousName();
+            } else {
+		// can't use elementName here as it might not be unique (test-range.xsd)
+		typeName = generateAnonymousName();
+            }
         }
+
         if (xs.isRestriction() && xs.getFacet("enumeration") != null) {
             createEnum(typeName, xs.asRestriction());
         } else {
             //This is just a restriction on a basic type, find parent and map it to the type
-            while (xs != null && !basicTypes.contains(xs.getName())) {
+            String baseTypeName = typeName;
+            while (xs != null && !basicTypes.contains(baseTypeName)) {
                 xs = xs.getBaseType().asSimpleType();
+                if (xs != null) {
+                    baseTypeName = xs.getName();
+                }
             }
             simpleTypes.put(typeName, xs != null ? xs.getName() : "string");
         }
