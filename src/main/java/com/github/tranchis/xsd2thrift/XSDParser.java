@@ -522,10 +522,10 @@ public class XSDParser implements ErrorHandler {
             if (decl.getType().getName() == null) {
                 if (decl.getType().isRestriction()) {
                     String typeName = processSimpleType(decl.getType(), decl.getName());
-                    st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
+                    st.addField(decl.getName(), typeName, (goingup && att.isRequired()), false, decl.getFixedValue(), xsdMapping);
                 }
             } else {
-                write(st, decl, true);
+                write(st, decl, att.isRequired());
             }
         }
     }

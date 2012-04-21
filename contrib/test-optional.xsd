@@ -15,4 +15,17 @@
         <!-- prohibited shouldn't show up in the protobuf declaration -->
         <xsd:attribute name="prohibited_attribute" type="xsd:string" use="prohibited"/>
     </xsd:complexType>
+
+    <xsd:complexType name="OptionalAttributeGroup">
+        <xsd:attributeGroup ref="AttributeGroup"/>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="AttributeGroup">
+        <xsd:attribute name="no_default_attribute" type="xsd:string" />
+        <xsd:attribute name="has_default_attribute" type="xsd:string" default="this is a default"/>
+        <xsd:attribute name="required_attribute" type="xsd:string" use="required"/>
+        <xsd:attribute name="optional_attribute" type="xsd:string" use="optional"/>
+        <!-- prohibited shouldn't show up in the protobuf declaration -->
+        <xsd:attribute name="prohibited_attribute" type="xsd:string" use="prohibited"/>
+    </xsd:attributeGroup>
 </xsd:schema>
