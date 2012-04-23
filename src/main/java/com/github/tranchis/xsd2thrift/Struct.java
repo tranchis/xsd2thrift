@@ -40,7 +40,8 @@ public class Struct
 	private List<Field>			orderedFields;
 	private String				name;
 	private String				parent;
-
+	private boolean debug = false;
+	
 	public Struct(String name)
 	{
 		this.name = name;
@@ -52,6 +53,7 @@ public class Struct
 	public void addField(String name, String type, boolean required, boolean repeat, XmlString def, Map<String, String> xsdMapping)
 	{
 		Field	f;
+		if (debug) { System.err.println("addField name:" + name + " type:" + type + " def:" + def); }
 		
 		if(map.get(name) == null)
 		{

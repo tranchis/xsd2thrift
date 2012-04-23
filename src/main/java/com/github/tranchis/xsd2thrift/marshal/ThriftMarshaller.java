@@ -33,23 +33,11 @@ public class ThriftMarshaller implements IMarshaller
 	public ThriftMarshaller()
 	{
 		typeMapping = new TreeMap<String,String>();
-		typeMapping.put("positiveInteger", "i64");
-		typeMapping.put("nonPositiveInteger", "i64");
-		typeMapping.put("negativeInteger", "i64");
-		typeMapping.put("nonNegativeInteger", "i64");
-		typeMapping.put("int", "i32");
-		typeMapping.put("integer", "i64");
-
-		// no unsigned types in thrift
-		typeMapping.put("unsignedLong", "int64");
-		typeMapping.put("unsignedInt", "int32");
-		typeMapping.put("unsignedShort", "int16"); 
-		typeMapping.put("unsignedByte", "byte"); 
-
-		typeMapping.put("short", "i16");
-		typeMapping.put("long", "i64");
+		typeMapping.put("positiveInteger", "i16");
+		typeMapping.put("int", "i16");
+		typeMapping.put("integer", "i16");
+		typeMapping.put("long", "i32");
 		typeMapping.put("decimal", "double");
-		typeMapping.put("float", "double"); // No float type in thrift
 		typeMapping.put("ID", "string");
 		typeMapping.put("IDREF", "string");
 		typeMapping.put("NMTOKEN", "string");
@@ -58,10 +46,9 @@ public class ThriftMarshaller implements IMarshaller
 		typeMapping.put("anyType", "UnspecifiedType");
 		typeMapping.put("anyURI", "UnspecifiedType");
 		typeMapping.put("boolean", "bool");
-		typeMapping.put("base64Binary", "binary");
-		typeMapping.put("hexBinary", "binary");
-		typeMapping.put("date", "i32"); //Number of days since January 1st, 1970
-		typeMapping.put("dateTime", "i64"); //Number of milliseconds since January 1st, 1970
+		typeMapping.put("binary", "binary");
+        typeMapping.put("date", "i32"); //Number of days since January 1st, 1970
+        typeMapping.put("dateTime", "i64"); //Number of milliseconds since January 1st, 1970 
 	}
 	
 	@Override
