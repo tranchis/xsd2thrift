@@ -67,6 +67,9 @@ public class XSDParser implements ErrorHandler {
     private OutputStream os;
     private String namespace;
     private boolean nestEnums = true;
+    private boolean forceCircular = false;
+    private boolean debug = false;
+    private String postfix = "Type";
     
     public XSDParser(String stFile) {
         this.xsdMapping = new TreeMap<String, String>();
@@ -98,30 +101,15 @@ public class XSDParser implements ErrorHandler {
         basicTypes.add("anyType");
         basicTypes.add("anyURI");
         basicTypes.add("anySimpleType");
-
         basicTypes.add("integer");
         basicTypes.add("positiveInteger");
-        basicTypes.add("nonPositiveInteger");
-        basicTypes.add("negativeInteger");
-        basicTypes.add("nonNegativeInteger");
-
-        basicTypes.add("unsignedLong");
-        basicTypes.add("unsignedInt");
-        basicTypes.add("unsignedShort");
-        basicTypes.add("unsignedByte");
-
-        basicTypes.add("base64Binary");
-        basicTypes.add("hexBinary");
-        // binary is not a valid XSD type, but used as a placeholder internally
-        basicTypes.add("binary"); 
+        basicTypes.add("binary");
         basicTypes.add("boolean");
         basicTypes.add("date");
         basicTypes.add("dateTime");
         basicTypes.add("decimal");
-        basicTypes.add("float");
         basicTypes.add("double");
         basicTypes.add("byte");
-        basicTypes.add("short");
         basicTypes.add("long");
         basicTypes.add("int");
         basicTypes.add("ID");
@@ -136,6 +124,14 @@ public class XSDParser implements ErrorHandler {
         init(stFile);
     }
 
+    public void setPostfix(String pf) { 
+    	postfix = pf;
+    }
+    
+    public void forceCircular(boolean fc) {
+    	forceCircular = fc;
+    }
+    
     public void parse() throws Exception {
         XSOMParser parser;
 
@@ -192,6 +188,7 @@ public class XSDParser implements ErrorHandler {
             Set<String> requiredTypes = new HashSet<String>();
             Set<String> notYetDeclaredTypes = new HashSet<String>();
             for (Struct s : ss) {
+            	if (debug) { System.err.println("write: notYetDeclared: " + s.getName()); }
                 requiredTypes.addAll(s.getTypes());
                 notYetDeclaredTypes.add(s.getName());
             }
@@ -199,7 +196,7 @@ public class XSDParser implements ErrorHandler {
             requiredTypes.removeAll(notYetDeclaredTypes);
             if (requiredTypes.isEmpty()) {
                 // Circular dependencies have been detected
-                if (marshaller.isCircularDependencySupported()) {
+                if (marshaller.isCircularDependencySupported() || forceCircular == true) {
                     // Just dump the rest
                     for (Struct s : ss) {
                         writeStruct(s, declared);
@@ -248,11 +245,10 @@ public class XSDParser implements ErrorHandler {
                 usedInEnums.add(type);
                 writeEnum(type);
             }
-            
+
             if (simpleTypes.containsKey(type)) {
                 type = simpleTypes.get(type);
             }
-
             if (!map.keySet().contains(type) && !basicTypes.contains(type) && !enums.containsKey(type)) {
                 type = "binary";
             }
@@ -351,6 +347,7 @@ public class XSDParser implements ErrorHandler {
                 while (ict.hasNext()) {
                     processComplexType(ict.next(), null, sset);
                 }
+
                 final Iterator<XSSimpleType> ist = xs.iterateSimpleTypes();
                 while (ist.hasNext()) {
                     processSimpleType(ist.next(), null);
@@ -385,30 +382,30 @@ public class XSDParser implements ErrorHandler {
      * @param elementName 
      */
     private String processSimpleType(XSSimpleType xs, String elementName) {
-
         String typeName = xs.getName();
+
+        if (debug) { System.err.println("PST typeName:" + typeName + " elName: " + elementName); }
+
         if (typeName == null) {
-            if (xs.getFacet("enumeration") != null) {
-                typeName = elementName != null ? elementName + "Type" : generateAnonymousName();
-            } else {
-		// can't use elementName here as it might not be unique (test-range.xsd)
-		typeName = generateAnonymousName();
-            }
+            typeName = elementName != null ? elementName + postfix : generateAnonymousName();
         }
 
-        if (xs.isRestriction() && xs.getFacet("enumeration") != null) {
+        //System.out.println("PST " + typeName);
+		if (xs.isRestriction() && xs.getFacet("enumeration") != null) {
+			if (debug) { System.err.println("\tPST isRestrict && getFacet/enum -> createEnum: " + xs.getFacet("enumeration")); }
             createEnum(typeName, xs.asRestriction());
         } else {
+        	if (debug) { System.err.println("\tPST restrict on basic type, find parent"); }
             //This is just a restriction on a basic type, find parent and map it to the type
-            String baseTypeName = typeName;
-            while (xs != null && !basicTypes.contains(baseTypeName)) {
+            while (xs != null && xs.getName() != null && !basicTypes.contains(xs.getName())) {
                 xs = xs.getBaseType().asSimpleType();
-                if (xs != null) {
-                    baseTypeName = xs.getName();
-                }
+                if (debug) { System.err.println("\t\tparent " + xs.getName()); }
             }
-            simpleTypes.put(typeName, xs != null ? xs.getName() : "string");
+
+            if (debug) { System.err.println("\tPST record simpleType name:" + typeName + " val: " +  ((xs != null && xs.getName() != null) ? xs.getName() : "string")); }
+            simpleTypes.put(typeName, (xs != null && xs.getName() != null) ? xs.getName() : "string");
         }
+
         return typeName;
     }
 
@@ -422,21 +419,31 @@ public class XSDParser implements ErrorHandler {
         XSType parent;
         String typeName = cType.getName();
         if (typeName == null) {
-            typeName = elementName != null ? elementName + "Type" : generateAnonymousName();
+        	if (debug) { System.err.println("PCT typeName is null"); }
+            typeName = elementName != null ? elementName + postfix : generateAnonymousName();
         }
+        if (debug) { System.err.println("PCT " + typeName); }
+
         st = map.get(typeName);
         if (st == null) {
+        	if (debug) { System.err.println("\tPCT " + typeName + " doesnt exist in map, adding."); }
             st = new Struct(typeName);
             map.put(typeName, st);
 
             parent = cType;
-            while (parent != sset.getAnyType()) {
+
+            while (parent != sset.getAnyType()) { 
+            	if (debug) { System.err.println("\tPCT parent.getName " + parent.getName()); }
                 if (parent.isComplexType()) {
+                	if (debug) { System.err.println("\t\tPCT parent isComplex"); }
                     write(st, parent.asComplexType(), true, sset);
                     parent = parent.getBaseType();
+                } else {
+                	if (debug) { System.err.println("\t\tPCT parent is not complex"); }
+                	break;
                 }
             }
-
+            if (debug) { System.err.println("\t\tProcess inheritance"); }
             processInheritance(st, cType, sset);
             st.setParent(cType.getBaseType().getName());
         }
@@ -450,6 +457,8 @@ public class XSDParser implements ErrorHandler {
      */
     private String generateAnonymousName() {
         anonymousCounter++;
+        if (debug) { System.err.println("generateAnon " + anonymousCounter); }
+
         return String.format("Anonymous%03d", anonymousCounter);
     }
 
@@ -481,10 +490,16 @@ public class XSDParser implements ErrorHandler {
     private void write(Struct st, XSAttributeDecl decl, boolean goingup) {
         if (decl.getType().isRestriction() && decl.getType().getName() != null && !basicTypes.contains(decl.getType().getName())) {
             String typeName = processSimpleType(decl.getType(), decl.getName());
+            if (debug) { System.err.println("\twrite2 isRestrict==true " + typeName); }
+
             st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
         } else if (decl.getType().isList()) {
+            if (debug) { System.err.println("\twrite2 isList==true " + decl.getType().getName()); }
+
             st.addField(decl.getName(), decl.getType().asList().getItemType().getName(), goingup, true, null, xsdMapping);
         } else {
+            if (debug) { System.err.println("\twrite2 isRestrict==false isList==false " + decl.getName()  + " " + decl.getType().getName()); }
+
             st.addField(decl.getName(), decl.getType().getName(), goingup, false, decl.getFixedValue(), xsdMapping);
         }
     }
@@ -493,14 +508,20 @@ public class XSDParser implements ErrorHandler {
         Enumeration en;
         Iterator<? extends XSFacet> it;
 
+        if (debug) { System.err.println("\t\t\tcreateEnum name:\"" + name + "\""); }
         if (!enums.containsKey(name)) {
             type = type.asRestriction();
             en = new Enumeration(name);
             it = type.getDeclaredFacets().iterator();
             while (it.hasNext()) {
-                en.addString(it.next().getValue().value);
+            	String jj = it.next().getValue().value;
+            	if (debug) { System.err.println("\t\t\t\tcreateEnum add:" + jj); }
+                en.addString(jj);
             }
+            if (debug) { System.err.println("\t\t\tcreateEnum enum.puts name:\"" + name + "\""); }
             enums.put(name, en);
+        } else {
+        	if (debug) { System.err.println("\t\t\tcreateEnum: enums already containsKey name:\"" + name + "\""); }
         }
     }
 
@@ -522,9 +543,12 @@ public class XSDParser implements ErrorHandler {
             if (decl.getType().getName() == null) {
                 if (decl.getType().isRestriction()) {
                     String typeName = processSimpleType(decl.getType(), decl.getName());
+                    if (debug) { System.err.println("\twrite3 isRestrict==true " + typeName); }
                     st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
                 }
             } else {
+                if (debug) { System.err.println("\twrite3 getName!=null " + decl.getType().getName()); }
+
                 write(st, decl, true);
             }
         }
@@ -538,13 +562,21 @@ public class XSDParser implements ErrorHandler {
         ity = sset.iterateTypes();
         while (ity.hasNext()) {
             xt = ity.next();
-            if (xt.getBaseType() == cType) {
+            if (debug) { System.err.println("PI struct:" + st.getName() + " | sset.base: " + xt.getBaseType().getName() + " ==? " + cType.getBaseType().getName()); }
+            if (debug) { System.err.println("\tbase type is " + simpleTypes.get(cType.getBaseType().getName())); }
+            
+            String s1 = (xt != null && xt.getBaseType() != null) ? xt.getBaseType().getName() : null;
+            String s2 = (cType != null) ? cType.getName() : null;
+            if (s1 != null && s2 != null && s1.equals(s2)) {
+            	if (debug) { System.err.println("\tPI yes xt == cType"); }
                 particle = xt.asComplexType().getContentType().asParticle();
                 if (particle != null) {
                     write(st, particle.getTerm(), false, sset);
                 }
 
                 processInheritance(st, xt.asComplexType(), sset);
+            } else {
+            	if (debug) { System.err.println("\tPI NO xt != cType"); }
             }
         }
     }
@@ -565,9 +597,11 @@ public class XSDParser implements ErrorHandler {
                 } else if (term.isElementDecl()) {
                     if (term.asElementDecl().getType().getName() == null) {
                         final String typeName = processType(term.asElementDecl().getType(), term.asElementDecl().getName(), xss);
+                        if (debug) { System.err.println("\twrite4 getType.getName==null so " + typeName); }
                         st.addField(term.asElementDecl().getName(), typeName, goingup, p.getMaxOccurs().intValue() != 1, term
                                 .asElementDecl().getFixedValue(), xsdMapping);
                     } else {
+                        if (debug) { System.err.println("\twrite4 " + term.asElementDecl().getName()); }
                         st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(), goingup, p.getMaxOccurs()
                                 .intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
                     }

@@ -33,19 +33,9 @@ public class ProtobufMarshaller implements IMarshaller
 	public ProtobufMarshaller()
 	{
 		typeMapping = new TreeMap<String,String>();
-		typeMapping.put("positiveInteger", "int64");
-		typeMapping.put("nonPositiveInteger", "sint64");
-		typeMapping.put("negativeInteger", "sint64");
-		typeMapping.put("nonNegativeInteger", "int64");
+		typeMapping.put("positiveInteger", "int16");
 		typeMapping.put("int", "int32");
-		typeMapping.put("integer", "int64");
-
-		typeMapping.put("unsignedLong", "uint64");
-		typeMapping.put("unsignedInt", "uint32");
-		typeMapping.put("unsignedShort", "uint32"); // No 16-bit int in protobuf
-		typeMapping.put("unsignedByte", "uint32"); // No 8-bit int in protobuf
-
-		typeMapping.put("short", "int32"); // No 16-bit int in protobuf
+		typeMapping.put("integer", "int32");
 		typeMapping.put("long", "int64");
 		typeMapping.put("decimal", "double");
 		typeMapping.put("ID", "string");
@@ -56,12 +46,10 @@ public class ProtobufMarshaller implements IMarshaller
 		typeMapping.put("anyType", "UnspecifiedType");
 		typeMapping.put("anyURI", "UnspecifiedType");
 		typeMapping.put("boolean", "bool");
-		typeMapping.put("binary", "bytes"); // UnspecifiedType.object is declared binary
-		typeMapping.put("hexBinary", "bytes");
-		typeMapping.put("base64Binary", "bytes");
-		typeMapping.put("byte", "bytes");
-		typeMapping.put("date", "int32"); //Number of days since January 1st, 1970
-		typeMapping.put("dateTime", "int64"); //Number of milliseconds since January 1st, 1970
+		typeMapping.put("binary", "bytes");
+        typeMapping.put("byte", "bytes");
+        typeMapping.put("date", "int32"); //Number of days since January 1st, 1970
+        typeMapping.put("dateTime", "int64"); //Number of milliseconds since January 1st, 1970 
 	}
 	
 	@Override
