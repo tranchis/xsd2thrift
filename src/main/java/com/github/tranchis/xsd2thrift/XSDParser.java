@@ -433,8 +433,8 @@ public class XSDParser implements ErrorHandler {
             while (parent != sset.getAnyType()) {
                 if (parent.isComplexType()) {
                     write(st, parent.asComplexType(), true, sset);
-                    parent = parent.getBaseType();
                 }
+                parent = parent.getBaseType();
             }
 
             processInheritance(st, cType, sset);
