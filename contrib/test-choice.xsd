@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0">
+    <xsd:complexType name="Choice">
+        <xsd:choice>
+            <xsd:sequence>
+                <xsd:element name="a_default_minoccurs_element" type="xsd:string" />
+                <xsd:element name="a_optional_element" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                <xsd:element name="a_required_element" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                <xsd:element name="a_repeat_element" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:sequence>
+                <xsd:element name="b_default_minoccurs_element" type="xsd:string" />
+                <xsd:element name="b_optional_element" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+                <xsd:element name="b_required_element" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+                <xsd:element name="b_repeat_element" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:choice>
+    </xsd:complexType>
+</xsd:schema>

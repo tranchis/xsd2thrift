@@ -522,10 +522,10 @@ public class XSDParser implements ErrorHandler {
             if (decl.getType().getName() == null) {
                 if (decl.getType().isRestriction()) {
                     String typeName = processSimpleType(decl.getType(), decl.getName());
-                    st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
+                    st.addField(decl.getName(), typeName, (goingup && att.isRequired()), false, decl.getFixedValue(), xsdMapping);
                 }
             } else {
-                write(st, decl, true);
+                write(st, decl, att.isRequired());
             }
         }
     }
@@ -556,6 +556,10 @@ public class XSDParser implements ErrorHandler {
 
         if (term != null && term.isModelGroup()) {
             modelGroup = term.asModelGroup();
+            if (XSModelGroup.CHOICE.equals(modelGroup.getCompositor())) {
+                goingup = false;
+            }
+
             ps = modelGroup.getChildren();
             for (int i = 0; i < ps.length; i++) {
                 p = ps[i];
@@ -565,10 +569,10 @@ public class XSDParser implements ErrorHandler {
                 } else if (term.isElementDecl()) {
                     if (term.asElementDecl().getType().getName() == null) {
                         final String typeName = processType(term.asElementDecl().getType(), term.asElementDecl().getName(), xss);
-                        st.addField(term.asElementDecl().getName(), typeName, goingup, p.getMaxOccurs().intValue() != 1, term
+                        st.addField(term.asElementDecl().getName(), typeName, (goingup && p.getMinOccurs().intValue() != 0), p.getMaxOccurs().intValue() != 1, term
                                 .asElementDecl().getFixedValue(), xsdMapping);
                     } else {
-                        st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(), goingup, p.getMaxOccurs()
+                        st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(), (goingup && p.getMinOccurs().intValue() != 0), p.getMaxOccurs()
                                 .intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
                     }
                 }
