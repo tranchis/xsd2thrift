@@ -433,8 +433,8 @@ public class XSDParser implements ErrorHandler {
             while (parent != sset.getAnyType()) {
                 if (parent.isComplexType()) {
                     write(st, parent.asComplexType(), true, sset);
-                    parent = parent.getBaseType();
                 }
+                parent = parent.getBaseType();
             }
 
             processInheritance(st, cType, sset);
@@ -479,7 +479,7 @@ public class XSDParser implements ErrorHandler {
     }
 
     private void write(Struct st, XSAttributeDecl decl, boolean goingup) {
-        if (decl.getType().isRestriction() && decl.getType().getName() != null && !basicTypes.contains(decl.getType().getName())) {
+        if (decl.getType().isRestriction() && (decl.getType().getName() == null || !basicTypes.contains(decl.getType().getName()))) {
             String typeName = processSimpleType(decl.getType(), decl.getName());
             st.addField(decl.getName(), typeName, goingup, false, decl.getFixedValue(), xsdMapping);
         } else if (decl.getType().isList()) {
