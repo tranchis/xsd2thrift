@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="1.0">
+    <xsd:complexType name="Optional">
+        <xsd:sequence>
+            <xsd:element name="default_minoccurs_element" type="xsd:string" />
+            <xsd:element name="optional_element" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+            <xsd:element name="required_element" type="xsd:string" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="repeat_element" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="no_default_attribute" type="xsd:string" />
+        <xsd:attribute name="has_default_attribute" type="xsd:string" default="this is a default"/>
+        <xsd:attribute name="required_attribute" type="xsd:string" use="required"/>
+        <xsd:attribute name="optional_attribute" type="xsd:string" use="optional"/>
+        <!-- prohibited shouldn't show up in the protobuf declaration -->
+        <xsd:attribute name="prohibited_attribute" type="xsd:string" use="prohibited"/>
+    </xsd:complexType>
+
+    <xsd:complexType name="OptionalAttributeGroup">
+        <xsd:attributeGroup ref="AttributeGroup"/>
+    </xsd:complexType>
+
+    <xsd:attributeGroup name="AttributeGroup">
+        <xsd:attribute name="no_default_attribute" type="xsd:string" />
+        <xsd:attribute name="has_default_attribute" type="xsd:string" default="this is a default"/>
+        <xsd:attribute name="required_attribute" type="xsd:string" use="required"/>
+        <xsd:attribute name="optional_attribute" type="xsd:string" use="optional"/>
+        <!-- prohibited shouldn't show up in the protobuf declaration -->
+        <xsd:attribute name="prohibited_attribute" type="xsd:string" use="prohibited"/>
+    </xsd:attributeGroup>
+</xsd:schema>
