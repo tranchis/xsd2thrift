@@ -606,8 +606,6 @@ public class XSDParser implements ErrorHandler {
         this.marshaller = marshaller;
     }
 
-    }
-
     public void setPackage(String namespace) {
         this.namespace = namespace;
     }

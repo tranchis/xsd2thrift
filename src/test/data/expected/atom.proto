@@ -1,0 +1,152 @@
+package default;
+
+message UnspecifiedType
+{
+	required string baseObjectType = 1;
+	required bytes object = 2;
+}
+
+message idType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+}
+
+message generatorType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+	optional UnspecifiedType uri = 3;
+	optional string version = 4;
+}
+
+message categoryType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+	optional UnspecifiedType scheme = 3;
+	required string term = 4;
+	optional string label = 5;
+}
+
+message linkType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+	optional string type = 3;
+	optional string rel = 4;
+	optional int64 length = 5;
+	optional string title = 6;
+	required UnspecifiedType href = 7;
+	optional string hreflang = 8;
+}
+
+message contentType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+	optional string type = 3;
+	optional UnspecifiedType src = 4;
+}
+
+message uriType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+}
+
+message logoType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+}
+
+message dateTimeType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+}
+
+message textType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+	enum typeType
+	{
+		typeType_html = 1;
+		typeType_text = 2;
+		typeType_xhtml = 3;
+	}
+	optional typeType type = 3;
+}
+
+message personType
+{
+	optional string name = 1;
+	optional uriType uri = 2;
+	optional string email = 3;
+	optional UnspecifiedType base = 4;
+	optional string lang = 5;
+}
+
+message iconType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+}
+
+message sourceType
+{
+	repeated personType author = 1;
+	repeated categoryType category = 2;
+	repeated personType contributor = 3;
+	optional generatorType generator = 4;
+	optional iconType icon = 5;
+	optional idType id = 6;
+	repeated linkType link = 7;
+	optional logoType logo = 8;
+	optional textType rights = 9;
+	optional textType subtitle = 10;
+	optional textType title = 11;
+	optional dateTimeType updated = 12;
+	optional UnspecifiedType base = 13;
+	optional string lang = 14;
+}
+
+message entryType
+{
+	repeated personType author = 1;
+	repeated categoryType category = 2;
+	optional contentType content = 3;
+	repeated personType contributor = 4;
+	optional idType id = 5;
+	repeated linkType link = 6;
+	optional dateTimeType published = 7;
+	optional textType rights = 8;
+	optional textType source = 9;
+	optional textType summary = 10;
+	optional textType title = 11;
+	optional dateTimeType updated = 12;
+	optional UnspecifiedType base = 13;
+	optional string lang = 14;
+}
+
+message feedType
+{
+	repeated personType author = 1;
+	repeated categoryType category = 2;
+	repeated personType contributor = 3;
+	optional generatorType generator = 4;
+	optional iconType icon = 5;
+	optional idType id = 6;
+	repeated linkType link = 7;
+	optional logoType logo = 8;
+	optional textType rights = 9;
+	optional textType subtitle = 10;
+	optional textType title = 11;
+	optional dateTimeType updated = 12;
+	repeated entryType entry = 13;
+	optional UnspecifiedType base = 14;
+	optional string lang = 15;
+}
+
