@@ -23,8 +23,6 @@
  */
 package com.github.tranchis.xsd2thrift;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.TreeMap;
 
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
@@ -69,7 +67,7 @@ public class Main
 		String					xsd, param;
 		int						i;
 		IMarshaller				im;
-		
+        OutputWriter writer;
 		correct = true;
 		im = null;
 		
@@ -92,6 +90,8 @@ public class Main
 		{
 			xsd = args[args.length - 1];
 			xp = new XSDParser(xsd, map);
+            writer = new OutputWriter();
+            xp.setWriter(writer);
 			
 			i = 0;
 			while(correct && i < args.length - 1)
@@ -102,6 +102,8 @@ public class Main
 					{
 						im = new ThriftMarshaller();
 						xp.addMarshaller(im);
+                        writer.setMarshaller(im);
+                        writer.setDefaultExtension("thrift");
 					}
 					else
 					{
@@ -114,6 +116,8 @@ public class Main
 					{
 						im = new ProtobufMarshaller();
 						xp.addMarshaller(im);
+                        writer.setMarshaller(im);
+                        writer.setDefaultExtension("proto");
 					}
 					else
 					{
@@ -123,13 +127,23 @@ public class Main
 				else if(args[i].startsWith("--filename="))
 				{
 					param = args[i].split("=")[1];
-					xp.setOutputStream(new FileOutputStream(new File(param)));
+                    writer.setFilename(param);
 				}
-				else if(args[i].startsWith("--package="))
+				else if(args[i].startsWith("--directory="))
 				{
 					param = args[i].split("=")[1];
-					xp.setPackage(param);
+                    writer.setDirectory(param);
 				}
+                else if (args[i].startsWith("--package="))
+                {
+                    param = args[i].split("=")[1];
+                    writer.setDefaultNamespace(param);
+                }
+                else if (args[i].startsWith("--splitBySchema="))
+                {
+                    param = args[i].split("=")[1];
+                    writer.setSplitBySchema("true".equals(param));
+                }
 				else if (args[i].startsWith("--nestEnums="))
 				{
 					param = args[i].split("=")[1];

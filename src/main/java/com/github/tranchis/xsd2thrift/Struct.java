@@ -39,11 +39,13 @@ public class Struct
 	private Set<String>			types;
 	private List<Field>			orderedFields;
 	private String				name;
+	private String				namespace;
 	private String				parent;
 
-	public Struct(String name)
+	public Struct(String name,String namespace)
 	{
 		this.name = name;
+		this.namespace = namespace;
 		map = new HashMap<String,Field>();
 		types = new TreeSet<String>();
 		orderedFields = new LinkedList<Field>();
@@ -138,5 +140,9 @@ public class Struct
             return false;
         return true;
     }
+
+	public String getNamespace() {
+		return namespace;
+	}
 	
 }

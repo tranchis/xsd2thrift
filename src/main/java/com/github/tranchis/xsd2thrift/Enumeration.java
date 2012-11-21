@@ -31,10 +31,12 @@ public class Enumeration
 {
 	private String		name;
 	private Set<String>	strings;
+	private String		namespace;
 
-	public Enumeration(String name)
+	public Enumeration(String name,String namespace)
 	{
 		this.setName(name);
+		this.namespace = namespace;
 		this.strings = new TreeSet<String>();
 	}
 
@@ -56,5 +58,9 @@ public class Enumeration
 	public Iterator<String> iterator()
 	{
 		return strings.iterator();
+	}
+
+	public String getNamespace() {
+		return namespace;
 	}
 }
