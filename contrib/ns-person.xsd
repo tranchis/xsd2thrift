@@ -1,0 +1,23 @@
+<xs:schema xmlns="http://schemas.com/domain/person"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:c="http://schemas.com/domain/common"
+    xmlns:a="http://schemas.com/domain/address"
+    targetNamespace="http://schemas.com/domain/person" elementFormDefault="qualified"
+    attributeFormDefault="unqualified" xmlns:atom="http://www.w3.org/2005/Atom">
+
+    <xs:import namespace="http://schemas.com/domain/common" schemaLocation="ns-common.xsd"/>
+    <xs:import namespace="http://schemas.com/domain/address" schemaLocation="ns-address.xsd"/>
+
+    <xs:element name="person">
+        <xs:annotation>
+            <xs:documentation>A person</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+	        <xs:sequence>
+		        <xs:element name="name" type="xs:string"/>
+		        <xs:element name="domicile" type="c:country"/>
+		        <xs:element ref="a:address"/>
+	        </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

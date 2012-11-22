@@ -63,7 +63,6 @@ public class XSDParser implements ErrorHandler {
     private Set<String> keywords, basicTypes;
     private TreeMap<String, String> xsdMapping;
     private IMarshaller marshaller;
-    private String namespace;
     private OutputWriter writer;
     private boolean nestEnums = true;
     
@@ -143,6 +142,8 @@ public class XSDParser implements ErrorHandler {
 
         interpretResult(parser.getResult());
         writeMap();
+        
+        writer.postProcessNamespacedFilesForIncludes();
     }
 
     private void writeMap() throws Exception {
@@ -256,12 +257,20 @@ public class XSDParser implements ErrorHandler {
             if (type.equals(fname)) {
                 fname = "_" + fname;
             }
+
+            boolean needsQualification = false;
             if (marshaller.getTypeMapping(type) != null) {
                 type = marshaller.getTypeMapping(type);
+            } else if(!basicTypes.contains(type)&&f.getTypeNamespace()!=null&&!f.getTypeNamespace().equals(st.getNamespace())){
+                needsQualification = true;
+                writer.addInclusion(st.getNamespace(), f.getTypeNamespace());
             }
+            
+            type=(needsQualification?f.getTypeNamespace()+".":"")+escapeType(type);
+
             os(st.getNamespace()).write(
                     marshaller.writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname),
-                            escapeType(type)).getBytes());
+                            type).getBytes());
             order = order + 1;
         }
         os(st.getNamespace()).write(marshaller.writeStructFooter().getBytes());
@@ -430,7 +439,7 @@ public class XSDParser implements ErrorHandler {
         }
         st = map.get(typeName);
         if (st == null) {
-            st = new Struct(typeName, nameSpace);
+            st = new Struct(typeName, NamespaceConverter.convertFromSchema(nameSpace));
             map.put(typeName, st);
 
             parent = cType;
@@ -573,10 +582,14 @@ public class XSDParser implements ErrorHandler {
                 } else if (term.isElementDecl()) {
                     if (term.asElementDecl().getType().getName() == null) {
                         final String typeName = processType(term.asElementDecl().getType(), term.asElementDecl().getName(), xss);
-                        st.addField(term.asElementDecl().getName(), typeName, (goingup && p.getMinOccurs().intValue() != 0), p.getMaxOccurs().intValue() != 1, term
+                        String ns = null;
+                        if(map.containsKey(typeName)) {
+                            ns = map.get(typeName).getNamespace();
+                        }
+                        st.addField(term.asElementDecl().getName(), ns, typeName, (goingup && p.getMinOccurs().intValue() != 0), p.getMaxOccurs().intValue() != 1, term
                                 .asElementDecl().getFixedValue(), xsdMapping);
                     } else {
-                        st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getName(), (goingup && p.getMinOccurs().intValue() != 0), p.getMaxOccurs()
+                        st.addField(term.asElementDecl().getName(), term.asElementDecl().getType().getTargetNamespace(), term.asElementDecl().getType().getName(), (goingup && p.getMinOccurs().intValue() != 0), p.getMaxOccurs()
                                 .intValue() != 1, term.asElementDecl().getFixedValue(), xsdMapping);
                     }
                 }
@@ -604,10 +617,6 @@ public class XSDParser implements ErrorHandler {
 
     public void addMarshaller(IMarshaller marshaller) {
         this.marshaller = marshaller;
-    }
-
-    public void setPackage(String namespace) {
-        this.namespace = namespace;
     }
 
 	public void setNestEnums(boolean nestEnums) {

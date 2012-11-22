@@ -1,0 +1,16 @@
+<xs:schema xmlns="http://schemas.com/domain/common"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="http://schemas.com/domain/common" elementFormDefault="qualified"
+    attributeFormDefault="unqualified" xmlns:atom="http://www.w3.org/2005/Atom">
+
+
+    <xs:complexType name="country">
+        <xs:annotation>
+            <xs:documentation>A country.  ISO3 code is the unique identifier.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="description" type="xs:string"/>
+        </xs:sequence>
+        <xs:attribute name="iso3" type="xs:string" use="required" fixed="3"/>
+    </xs:complexType>
+</xs:schema>

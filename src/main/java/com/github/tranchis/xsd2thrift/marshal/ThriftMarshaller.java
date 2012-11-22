@@ -64,22 +64,39 @@ public class ThriftMarshaller implements IMarshaller
 		typeMapping.put("dateTime", "i64"); //Number of milliseconds since January 1st, 1970
 	}
 	
-	@Override
-	public String writeHeader(String namespace)
-	{
-		String res;
-		
-		if(namespace != null && !namespace.isEmpty())
-		{
-			res = "namespace * " + namespace + "\n\n";
-		}
-		else
-		{
-			res = "";
-		}
-		
-		return res;
-	}
+    @Override
+    public String writeHeader(String namespace)
+    {
+        String res;
+        
+        if(namespace != null && !namespace.isEmpty())
+        {
+            res = "namespace * " + namespace + "\n\n";
+        }
+        else
+        {
+            res = "";
+        }
+        
+        return res;
+    }
+
+    @Override
+    public String writeInclude(String namespace)
+    {
+        String res;
+        
+        if(namespace != null && !namespace.isEmpty())
+        {
+            res = "include \"" + namespace + ".thrift\"\n";
+        }
+        else
+        {
+            res = "";
+        }
+        
+        return res;
+    }
 
 	@Override
 	public String writeEnumHeader(String name)

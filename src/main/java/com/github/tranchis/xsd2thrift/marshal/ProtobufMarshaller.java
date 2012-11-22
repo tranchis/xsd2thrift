@@ -178,4 +178,10 @@ public class ProtobufMarshaller implements IMarshaller
     private String writeIndent() {
     	return indent;
     }
+
+    @Override
+    public String writeInclude(String namespace) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -23,12 +23,18 @@
  */
 package com.github.tranchis.xsd2thrift;
 
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
 
@@ -47,20 +53,15 @@ public class OutputWriter {
 	private IMarshaller marshaller;
     private String defaultNamespace;
     private String defaultExtension;
+    Map<String,Set<String>> inclusions = null;
+
+
 	
     public void setDefaultExtension(String defaultExtension) {
         this.defaultExtension = defaultExtension;
     }
 
-    private String namespace(String ns) {
-        if (ns.contains("://")) {
-            ns = ns.substring(ns.indexOf("://") + 3);
-        }
-        ns = ns.replaceAll("/", ".");
-        if(ns.startsWith(".")) ns = ns.substring(1);
-        if(ns.endsWith(".")) ns = ns.substring(0,ns.length()-1);
-		return ns;
-	}
+
     
     public OutputStream getStream(String ns) throws IOException {
     	if(os==null&&streams==null){
@@ -73,7 +74,7 @@ public class OutputWriter {
         if (ns == null)
             ns = "default";
 
-        return getNamespaceSpecificStream(namespace(ns));
+        return getNamespaceSpecificStream(ns);
     }
 
     private OutputStream getNamespaceSpecificStream(String cleanedNamespace) throws IOException {
@@ -107,10 +108,6 @@ public class OutputWriter {
 		return directory==null?"":directory+"/";
 	}
 
-	public void write(String namespace,String content) throws FileNotFoundException, IOException{
-		getStream(namespace).write(content.getBytes());
-	}
-
     public void setFilename(String filename) {
         this.filename = filename;
     }
@@ -127,4 +124,62 @@ public class OutputWriter {
         this.marshaller = marshaller;
     }
 
+    public void addInclusion(String namespace, String includeNamespace) {
+        if(inclusions==null)
+            inclusions = new HashMap<String, Set<String>>();
+        
+        if(!inclusions.containsKey(namespace))
+            inclusions.put(namespace, new TreeSet<String>());
+        
+        inclusions.get(namespace).add(includeNamespace);
+    }
+
+
+
+    public void postProcessNamespacedFilesForIncludes() throws IOException {
+        
+        if(streams!=null){
+            Iterator<OutputStream> i = streams.values().iterator();
+            while(i.hasNext()){
+                OutputStream o = i.next();
+                o.flush();
+                o.close();
+            }
+            if(inclusions!=null){
+                Iterator<String> namespaces = inclusions.keySet().iterator();
+                while(namespaces.hasNext()){
+                    String namespace = namespaces.next();
+                    File f = new File(directory() + namespace + "." + defaultExtension);
+                    if(f.exists()){
+                        writeIncludes(f,inclusions.get(namespace));
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    private void writeIncludes(File f, Set<String> toInclude) throws IOException {
+        Iterator<String> i = toInclude.iterator();
+        BufferedReader reader = new BufferedReader(new FileReader(f));
+        String line = null;
+        StringBuffer output = new StringBuffer();
+        int count =0;
+        while((line = reader.readLine())!=null){
+            output.append(line+"\n");
+            if(count==1){
+                while(i.hasNext()){
+                    output.append(marshaller.writeInclude(i.next()));
+                }
+                output.append("\n");
+            }
+            count++;
+        }
+        reader.close();
+        FileWriter writer = new FileWriter(f);
+        writer.append(output.toString());
+        writer.flush();
+        writer.close();
+    }
 }

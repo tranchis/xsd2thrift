@@ -1,0 +1,31 @@
+<xs:schema xmlns="http://schemas.com/domain/address"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:c="http://schemas.com/domain/common"
+    targetNamespace="http://schemas.com/domain/address" elementFormDefault="qualified"
+    attributeFormDefault="unqualified" xmlns:atom="http://www.w3.org/2005/Atom">
+
+    <xs:import namespace="http://schemas.com/domain/common" schemaLocation="ns-common.xsd"/>
+
+    <xs:element name="address">
+        <xs:annotation>
+            <xs:documentation>A physical postal address</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="addressLines">
+                    <xs:annotation>
+                        <xs:documentation>Any lines of the address that are not city, postal code or country.  For example region, street name and building name/number.</xs:documentation>
+                    </xs:annotation>
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="line" type="xs:string" maxOccurs="5"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+                <xs:element name="city" type="xs:string"/>
+                <xs:element name="postCode" type="xs:string"/>
+                <xs:element name="country" type="c:country"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

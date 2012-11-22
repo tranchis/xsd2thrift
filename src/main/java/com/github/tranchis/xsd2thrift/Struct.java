@@ -50,8 +50,10 @@ public class Struct
 		types = new TreeSet<String>();
 		orderedFields = new LinkedList<Field>();
 	}
-
-	public void addField(String name, String type, boolean required, boolean repeat, XmlString def, Map<String, String> xsdMapping)
+    public void addField(String name, String type, boolean required, boolean repeat, XmlString def, Map<String, String> xsdMapping){
+        addField(name, null, type, required, repeat, def, xsdMapping);
+    }
+	public void addField(String name, String namespace, String type, boolean required, boolean repeat, XmlString def, Map<String, String> xsdMapping)
 	{
 		Field	f;
 		
@@ -72,7 +74,7 @@ public class Struct
 					type = "binary";
 				}
 			}
-			f = new Field(name, type, repeat, def, required);
+			f = new Field(name,NamespaceConverter.convertFromSchema(namespace), type, repeat, def, required);
 			map.put(name, f);
 			orderedFields.add(f);
 			if(!type.equals(this.name))
