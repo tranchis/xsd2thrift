@@ -133,6 +133,12 @@ public class ThriftMarshaller implements IMarshaller
 		String	sType, sRequired;
 		
 		sRequired = getRequired(required);
+		
+		int lastPeriod = type.lastIndexOf(".");
+		if(lastPeriod>-1){
+		    type = type.substring(0, lastPeriod).replace(".", "_")+type.substring(lastPeriod);
+		}
+		
 		sType = type;
 		if(repeated)
 		{
