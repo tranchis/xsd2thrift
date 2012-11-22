@@ -1,7 +1,7 @@
 namespace * schemas.com.domain.person
 
-include "schemas.com.domain.address.thrift"
-include "schemas.com.domain.common.thrift"
+include "schemas_com_domain_address.thrift"
+include "schemas_com_domain_common.thrift"
 
 struct personType
 {

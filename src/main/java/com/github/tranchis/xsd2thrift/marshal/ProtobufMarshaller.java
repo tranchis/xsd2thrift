@@ -181,7 +181,17 @@ public class ProtobufMarshaller implements IMarshaller
 
     @Override
     public String writeInclude(String namespace) {
-        // TODO Auto-generated method stub
-        return null;
+        String res;
+        
+        if(namespace != null && !namespace.isEmpty())
+        {
+            res = "import \"" + namespace + ".proto\";\n";
+        }
+        else
+        {
+            res = "";
+        }
+        
+        return res;
     }
 }

@@ -79,7 +79,7 @@ public class OutputWriter {
 
     private OutputStream getNamespaceSpecificStream(String cleanedNamespace) throws IOException {
         if (!streams.containsKey(cleanedNamespace)) {
-            OutputStream os = new FileOutputStream(directory() + cleanedNamespace + "." + defaultExtension);
+            OutputStream os = new FileOutputStream(directory() + cleanedNamespace.replace(".","_") + "." + defaultExtension);
             streams.put(cleanedNamespace, os);
             os.write(marshaller.writeHeader(cleanedNamespace).getBytes());
     	}
@@ -149,7 +149,7 @@ public class OutputWriter {
                 Iterator<String> namespaces = inclusions.keySet().iterator();
                 while(namespaces.hasNext()){
                     String namespace = namespaces.next();
-                    File f = new File(directory() + namespace + "." + defaultExtension);
+                    File f = new File(directory() + namespace.replace(".", "_") + "." + defaultExtension);
                     if(f.exists()){
                         writeIncludes(f,inclusions.get(namespace));
                     }
@@ -170,7 +170,7 @@ public class OutputWriter {
             output.append(line+"\n");
             if(count==1){
                 while(i.hasNext()){
-                    output.append(marshaller.writeInclude(i.next()));
+                    output.append(marshaller.writeInclude(i.next().replace(".","_")));
                 }
                 output.append("\n");
             }

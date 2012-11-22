@@ -1,0 +1,17 @@
+package schemas.com.domain.address;
+
+import "schemas_com_domain_common.proto";
+
+message addressLinesType
+{
+	repeated string line = 1;
+}
+
+message addressType
+{
+	required addressLinesType addressLines = 1;
+	required string city = 2;
+	required string postCode = 3;
+	required schemas.com.domain.common.country _country = 4;
+}
+

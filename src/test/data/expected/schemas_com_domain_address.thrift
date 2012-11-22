@@ -1,6 +1,6 @@
 namespace * schemas.com.domain.address
 
-include "schemas.com.domain.common.thrift"
+include "schemas_com_domain_common.thrift"
 
 struct addressLinesType
 {
