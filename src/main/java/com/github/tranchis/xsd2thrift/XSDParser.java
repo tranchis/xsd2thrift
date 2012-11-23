@@ -508,7 +508,7 @@ public class XSDParser implements ErrorHandler {
 
         if (!enums.containsKey(name)) {
             type = type.asRestriction();
-            en = new Enumeration(name, namespace);
+            en = new Enumeration(name, NamespaceConverter.convertFromSchema(namespace));
             it = type.getDeclaredFacets().iterator();
             while (it.hasNext()) {
                 en.addString(it.next().getValue().value);
