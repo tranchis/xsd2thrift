@@ -199,4 +199,12 @@ public class ThriftMarshaller implements IMarshaller
     private String writeIndent() {
     	return indent;
     }
+
+	@Override
+	public void setDatesAsStrings() {
+		typeMapping.put("date", "i32"); // Number of days since January 1st,
+										// 1970
+		typeMapping.put("dateTime", "i64"); // Number of milliseconds since
+											// January 1st, 1970
+	}
 }

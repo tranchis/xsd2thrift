@@ -194,4 +194,12 @@ public class ProtobufMarshaller implements IMarshaller
         
         return res;
     }
+
+	@Override
+	public void setDatesAsStrings() {
+		typeMapping.put("date", "int32"); // Number of days since January 1st,
+											// 1970
+		typeMapping.put("dateTime", "int64"); // Number of milliseconds since
+												// January 1st, 1970
+	}
 }

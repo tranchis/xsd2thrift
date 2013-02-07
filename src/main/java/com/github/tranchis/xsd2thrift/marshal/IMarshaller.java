@@ -36,4 +36,5 @@ public interface IMarshaller
 	String getTypeMapping(String type);
 	boolean isNestedEnums();
     boolean isCircularDependencySupported();
+    void setDatesAsStrings();
 }

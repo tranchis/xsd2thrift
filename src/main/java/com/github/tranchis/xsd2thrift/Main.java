@@ -93,6 +93,7 @@ public class Main
 			xp = new XSDParser(xsd, map);
             writer = new OutputWriter();
             xp.setWriter(writer);
+            boolean datesAsStrings = false;
 			
 			i = 0;
 			while(correct && i < args.length - 1)
@@ -144,6 +145,11 @@ public class Main
                 {
                     param = args[i].split("=")[1];
                     writer.setSplitBySchema("true".equals(param));
+                } 
+                else if (args[i].startsWith("--datesAsStrings="))
+                {
+                	param = args[i].split("=")[1];
+                	datesAsStrings = "true".equals(param);
                 }
 				else if (args[i].startsWith("--nestEnums="))
 				{
@@ -159,10 +165,14 @@ public class Main
 				i = i + 1;
 			}
 			
-			if(im == null)
+			if (im == null)
 			{
-				usage("A marshaller has to be specified.");
+ 				usage("A marshaller has to be specified.");
 			}
+			else if (datesAsStrings) 
+			{
+				im.setDatesAsStrings();
+ 			}
 			
 			if(correct)
 			{
