@@ -24,16 +24,16 @@
 package com.github.tranchis.xsd2thrift;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.sun.xml.xsom.XmlString;
 
-public class Struct
+public class Struct implements Comparable<Struct>
 {
 	private Map<String,Field>	map;
 	private Set<String>			types;
@@ -46,7 +46,7 @@ public class Struct
 	{
 		this.name = name;
 		this.namespace = namespace;
-		map = new HashMap<String,Field>();
+		map = new TreeMap<String, Field>();
 		types = new TreeSet<String>();
 		orderedFields = new LinkedList<Field>();
 	}
@@ -145,6 +145,11 @@ public class Struct
 
 	public String getNamespace() {
 		return namespace;
+	}
+
+	@Override
+	public int compareTo(Struct s) {
+		return name.compareTo(s.name);
 	}
 	
 }

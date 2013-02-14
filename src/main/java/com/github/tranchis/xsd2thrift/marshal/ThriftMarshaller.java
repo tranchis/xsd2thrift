@@ -202,9 +202,9 @@ public class ThriftMarshaller implements IMarshaller
 
 	@Override
 	public void setDatesAsStrings() {
-		typeMapping.put("date", "i32"); // Number of days since January 1st,
+		typeMapping.put("date", "string"); // Number of days since January 1st,
 										// 1970
-		typeMapping.put("dateTime", "i64"); // Number of milliseconds since
+		typeMapping.put("dateTime", "string"); // Number of milliseconds since
 											// January 1st, 1970
 	}
 }

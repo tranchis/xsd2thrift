@@ -27,18 +27,24 @@ public class TestHelper {
             e.printStackTrace();
         }
     }
+    public static String generateThrift(String name,boolean datesAsStrings) {
+        return generate(name,"thrift","thrift",datesAsStrings);
+    }
+    public static String generateProtobuf(String name,boolean datesAsStrings) {
+        return generate(name,"protobuf","proto",datesAsStrings);
+    }
     public static String generateThrift(String name) {
-        return generate(name,"thrift","thrift");
+        return generate(name,"thrift","thrift",false);
     }
     public static String generateProtobuf(String name) {
-        return generate(name,"protobuf","proto");
+        return generate(name,"protobuf","proto",false);
     }
-    private static String generate(String name,String type,String extension) {
+    private static String generate(String name,String type,String extension,boolean datesAsStrings) {
         File dir = new File("src/test/data/actual/");
         if(!dir.exists())dir.mkdir();
         String filename = "src/test/data/actual/"+name+"."+extension;
         try {
-            Main.main(new String[]{"--"+type,"--filename="+filename,"--package=default","contrib/"+name+".xsd"});
+            Main.main(new String[]{"--"+type,"--filename="+filename,"--package=default","--datesAsStrings="+(datesAsStrings?"true":"false"),"contrib/"+name+".xsd"});
         } catch (Exception e) {
             e.printStackTrace();
         }

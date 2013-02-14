@@ -70,11 +70,11 @@ struct UnspecifiedType
 
 struct tempunitType
 {
-	1 : optional string id,
-	2 : optional string _class,
-	3 : optional UnspecifiedType title,
-	4 : optional string lang,
-	5 : optional systemType system,
+	1 : optional systemType system,
+	2 : optional string id,
+	3 : optional string _class,
+	4 : optional UnspecifiedType title,
+	5 : optional string lang,
 	6 : optional unitType unit,
 }
 
@@ -262,11 +262,11 @@ struct fracType
 
 struct timeunitType
 {
-	1 : optional systemType system,
-	2 : optional string id,
-	3 : optional string _class,
-	4 : optional UnspecifiedType title,
-	5 : optional string lang,
+	1 : optional string id,
+	2 : optional string _class,
+	3 : optional UnspecifiedType title,
+	4 : optional string lang,
+	5 : optional systemType system,
 	6 : optional string unit,
 }
 
@@ -598,10 +598,10 @@ struct equip_divType
 	2 : optional descriptionType description,
 	3 : optional list<noteType> note,
 	4 : required toolType tool,
-	5 : optional string id,
-	6 : optional string _class,
-	7 : optional string lang,
-	8 : optional systemType system,
+	5 : optional string lang,
+	6 : optional systemType system,
+	7 : optional string id,
+	8 : optional string _class,
 	9 : optional typeType type,
 }
 
@@ -648,10 +648,10 @@ struct ing_divType
 	2 : optional descriptionType description,
 	3 : optional list<noteType> note,
 	4 : required ingType ing,
-	5 : optional string id,
-	6 : optional string _class,
-	7 : optional string lang,
-	8 : optional systemType system,
+	5 : optional string lang,
+	6 : optional systemType system,
+	7 : optional string id,
+	8 : optional string _class,
 	9 : optional typeType type,
 }
 
@@ -672,11 +672,11 @@ struct ingredientsType
 	1 : optional list<ing_divType> ing_div,
 	2 : optional list<noteType> note,
 	3 : optional ingType ing,
-	4 : optional systemType system,
-	5 : optional string id,
-	6 : optional string _class,
-	7 : optional UnspecifiedType title,
-	8 : optional string lang,
+	4 : optional string id,
+	5 : optional string _class,
+	6 : optional UnspecifiedType title,
+	7 : optional string lang,
+	8 : optional systemType system,
 }
 
 struct dir_divType
@@ -686,10 +686,10 @@ struct dir_divType
 	3 : optional noteType note,
 	4 : optional ingType ing,
 	5 : required stepType step,
-	6 : optional string id,
-	7 : optional string _class,
-	8 : optional string lang,
-	9 : optional systemType system,
+	6 : optional string lang,
+	7 : optional systemType system,
+	8 : optional string id,
+	9 : optional string _class,
 	10 : optional typeType type,
 	11 : optional UnspecifiedType duration,
 }
@@ -700,11 +700,11 @@ struct directionsType
 	2 : optional noteType note,
 	3 : optional ingType ing,
 	4 : optional stepType step,
-	5 : optional systemType system,
-	6 : optional string id,
-	7 : optional string _class,
-	8 : optional UnspecifiedType title,
-	9 : optional string lang,
+	5 : optional string id,
+	6 : optional string _class,
+	7 : optional UnspecifiedType title,
+	8 : optional string lang,
+	9 : optional systemType system,
 }
 
 struct recipeType

@@ -17,10 +17,10 @@ message tempunitType
 		systemType_other = 5;
 	}
 	optional systemType system = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 	enum unitType
 	{
 		unitType_C = 1;
@@ -33,10 +33,10 @@ message tempunitType
 message productType
 {
 	repeated UnspecifiedType inline_class = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 	optional string uccIcn = 6;
 }
 
@@ -52,20 +52,20 @@ message noteType
 {
 	optional UnspecifiedType measure_class = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 	optional UnspecifiedType type = 7;
 }
 
 message mfrType
 {
 	repeated UnspecifiedType inline_class = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 	optional string uccMin = 6;
 }
 
@@ -73,18 +73,14 @@ message ing_noteType
 {
 	optional UnspecifiedType measure_class = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 }
 
 message unitType
 {
-	optional string lang = 1;
-	optional string id = 2;
-	optional string _class = 3;
-	optional UnspecifiedType title = 4;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -93,7 +89,11 @@ message unitType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 5;
+	optional systemType system = 1;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 	optional string unit = 6;
 	enum typeType
 	{
@@ -111,57 +111,57 @@ message descriptionType
 {
 	optional UnspecifiedType measure_class = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 }
 
 message actionType
 {
 	optional UnspecifiedType measure_class = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 	optional UnspecifiedType code = 7;
 }
 
 message srcitemType
 {
 	repeated UnspecifiedType inline_class = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 	optional UnspecifiedType type = 6;
 }
 
 message spanType
 {
 	repeated UnspecifiedType inline_class = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 }
 
 message sepType
 {
-	optional string lang = 1;
-	optional string id = 2;
-	optional string _class = 3;
-	optional UnspecifiedType title = 4;
+	optional string id = 1;
+	optional string _class = 2;
+	optional UnspecifiedType title = 3;
+	optional string lang = 4;
 }
 
 message substepType
 {
 	repeated UnspecifiedType step_class = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 	optional UnspecifiedType duration = 6;
 	optional UnspecifiedType type = 7;
 	enum optionalType
@@ -174,20 +174,20 @@ message substepType
 
 message versionType
 {
-	optional string lang = 1;
-	optional string id = 2;
-	optional string _class = 3;
-	optional UnspecifiedType title = 4;
+	optional string id = 1;
+	optional string _class = 2;
+	optional UnspecifiedType title = 3;
+	optional string lang = 4;
 }
 
 message stepType
 {
 	optional UnspecifiedType step_class = 1;
 	optional substepType substep = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 	optional UnspecifiedType duration = 7;
 	optional UnspecifiedType type = 8;
 	enum optionalType
@@ -202,10 +202,10 @@ message conditionType
 {
 	optional UnspecifiedType measure_class = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 	optional UnspecifiedType code = 7;
 }
 
@@ -213,18 +213,18 @@ message brandnameType
 {
 	optional mfrType mfr = 1;
 	optional productType product = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 }
 
 message n_nameType
 {
-	optional string lang = 1;
-	optional string id = 2;
-	optional string _class = 3;
-	optional UnspecifiedType title = 4;
+	optional string id = 1;
+	optional string _class = 2;
+	optional UnspecifiedType title = 3;
+	optional string lang = 4;
 	enum alternateType
 	{
 		alternateType_no = 1;
@@ -238,18 +238,18 @@ message fracType
 	required string n = 1;
 	optional sepType sep = 2;
 	required string d = 3;
-	optional string lang = 4;
-	optional string id = 5;
-	optional string _class = 6;
-	optional UnspecifiedType title = 7;
+	optional string id = 4;
+	optional string _class = 5;
+	optional UnspecifiedType title = 6;
+	optional string lang = 7;
 }
 
 message timeunitType
 {
-	optional string lang = 1;
-	optional string id = 2;
-	optional string _class = 3;
-	optional UnspecifiedType title = 4;
+	optional string id = 1;
+	optional string _class = 2;
+	optional UnspecifiedType title = 3;
+	optional string lang = 4;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -266,30 +266,30 @@ message titleType
 {
 	optional brandnameType brandname = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 }
 
 message settingType
 {
 	optional UnspecifiedType measure_class = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 	optional UnspecifiedType value = 7;
 }
 
 message sourceType
 {
 	repeated srcitemType srcitem = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 }
 
 message qtyType
@@ -304,20 +304,20 @@ message itemType
 {
 	optional brandnameType brandname = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 }
 
 message subtitleType
 {
 	optional brandnameType brandname = 1;
 	optional UnspecifiedType inline_class = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 }
 
 message metaType
@@ -348,10 +348,10 @@ message metaType
 
 message catType
 {
-	optional string lang = 1;
-	optional string id = 2;
-	optional string _class = 3;
-	optional UnspecifiedType title = 4;
+	optional string id = 1;
+	optional string _class = 2;
+	optional UnspecifiedType title = 3;
+	optional string lang = 4;
 	optional UnspecifiedType type = 5;
 }
 
@@ -381,10 +381,10 @@ message nutrientType
 	}
 	optional unitType unit = 3;
 	optional percentType percent = 4;
-	optional string lang = 5;
-	optional string id = 6;
-	optional string _class = 7;
-	optional UnspecifiedType title = 8;
+	optional string id = 5;
+	optional string _class = 6;
+	optional UnspecifiedType title = 7;
+	optional string lang = 8;
 }
 
 message q1Type
@@ -398,10 +398,10 @@ message q1Type
 message categoriesType
 {
 	repeated catType cat = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 	optional string content = 6;
 }
 
@@ -409,9 +409,9 @@ message nutrient_groupType
 {
 	optional titleType title = 1;
 	repeated nutrientType nutrient = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
+	optional string id = 3;
+	optional string _class = 4;
+	optional string lang = 5;
 	optional UnspecifiedType standard = 6;
 }
 
@@ -429,20 +429,20 @@ message exchangeType
 {
 	optional qtyType qty = 1;
 	optional rangeType range = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 }
 
 message nutritionType
 {
 	optional nutrient_groupType nutrient_group = 1;
 	optional nutrientType nutrient = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 	optional UnspecifiedType standard = 7;
 }
 
@@ -467,10 +467,10 @@ message sizeType
 		unitType_K = 3;
 	}
 	optional unitType unit = 3;
-	optional string lang = 4;
-	optional string id = 5;
-	optional string _class = 6;
-	optional UnspecifiedType title = 7;
+	optional string id = 4;
+	optional string _class = 5;
+	optional UnspecifiedType title = 6;
+	optional string lang = 7;
 	optional string code = 8;
 }
 
@@ -485,10 +485,10 @@ message yieldType
 		unitType_K = 3;
 	}
 	optional unitType unit = 3;
-	optional string lang = 4;
-	optional string id = 5;
-	optional string _class = 6;
-	optional UnspecifiedType title = 7;
+	optional string id = 4;
+	optional string _class = 5;
+	optional UnspecifiedType title = 6;
+	optional string lang = 7;
 }
 
 message amtType
@@ -503,10 +503,6 @@ message amtType
 		unitType_K = 3;
 	}
 	optional unitType unit = 4;
-	optional string lang = 5;
-	optional string id = 6;
-	optional string _class = 7;
-	optional UnspecifiedType title = 8;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -515,7 +511,11 @@ message amtType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 9;
+	optional systemType system = 5;
+	optional string id = 6;
+	optional string _class = 7;
+	optional UnspecifiedType title = 8;
+	optional string lang = 9;
 	optional UnspecifiedType variation = 10;
 }
 
@@ -549,10 +549,10 @@ message toolrefType
 	}
 	optional unitType unit = 5;
 	optional UnspecifiedType inline_class = 6;
-	optional string lang = 7;
-	optional string id = 8;
-	optional string _class = 9;
-	optional UnspecifiedType title = 10;
+	optional string id = 7;
+	optional string _class = 8;
+	optional UnspecifiedType title = 9;
+	optional string lang = 10;
 	required string toolid = 11;
 }
 
@@ -570,10 +570,10 @@ message ingrefType
 	}
 	optional unitType unit = 5;
 	optional UnspecifiedType inline_class = 6;
-	optional string lang = 7;
-	optional string id = 8;
-	optional string _class = 9;
-	optional UnspecifiedType title = 10;
+	optional string id = 7;
+	optional string _class = 8;
+	optional UnspecifiedType title = 9;
+	optional string lang = 10;
 	required string ingid = 11;
 }
 
@@ -582,10 +582,10 @@ message modifierType
 	optional sizeType size = 1;
 	optional UnspecifiedType measure_class = 2;
 	optional UnspecifiedType inline_class = 3;
-	optional string lang = 4;
-	optional string id = 5;
-	optional string _class = 6;
-	optional UnspecifiedType title = 7;
+	optional string id = 4;
+	optional string _class = 5;
+	optional UnspecifiedType title = 6;
+	optional string lang = 7;
 }
 
 message toolType
@@ -602,10 +602,10 @@ message toolType
 	}
 	optional unitType unit = 5;
 	optional UnspecifiedType inline_class = 6;
-	optional string lang = 7;
-	optional string id = 8;
-	optional string _class = 9;
-	optional UnspecifiedType title = 10;
+	optional string id = 7;
+	optional string _class = 8;
+	optional UnspecifiedType title = 9;
+	optional string lang = 10;
 	enum optionalType
 	{
 		optionalType_no = 1;
@@ -617,10 +617,10 @@ message toolType
 message diet_exchangesType
 {
 	repeated exchangeType exchange = 1;
-	optional string lang = 2;
-	optional string id = 3;
-	optional string _class = 4;
-	optional UnspecifiedType title = 5;
+	optional string id = 2;
+	optional string _class = 3;
+	optional UnspecifiedType title = 4;
+	optional string lang = 5;
 	optional UnspecifiedType authority = 6;
 }
 
@@ -628,10 +628,10 @@ message preptimeType
 {
 	required timeType time = 1;
 	optional sepType sep = 2;
-	optional string lang = 3;
-	optional string id = 4;
-	optional string _class = 5;
-	optional UnspecifiedType title = 6;
+	optional string id = 3;
+	optional string _class = 4;
+	optional UnspecifiedType title = 5;
+	optional string lang = 6;
 	required UnspecifiedType type = 7;
 }
 
@@ -640,10 +640,10 @@ message prepType
 	optional sizeType size = 1;
 	optional UnspecifiedType measure_class = 2;
 	optional UnspecifiedType inline_class = 3;
-	optional string lang = 4;
-	optional string id = 5;
-	optional string _class = 6;
-	optional UnspecifiedType title = 7;
+	optional string id = 4;
+	optional string _class = 5;
+	optional UnspecifiedType title = 6;
+	optional string lang = 7;
 }
 
 message headType
@@ -667,6 +667,8 @@ message equip_divType
 	optional descriptionType description = 2;
 	repeated noteType note = 3;
 	required toolType tool = 4;
+	optional string id = 5;
+	optional string _class = 6;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -675,9 +677,7 @@ message equip_divType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 5;
-	optional string id = 6;
-	optional string _class = 7;
+	optional systemType system = 7;
 	optional string lang = 8;
 	enum typeType
 	{
@@ -707,10 +707,10 @@ message alt_ingType
 	optional prepType prep = 3;
 	repeated ing_noteType ing_note = 4;
 	repeated prodcodeType prodcode = 5;
-	optional string lang = 6;
-	optional string id = 7;
-	optional string _class = 8;
-	optional UnspecifiedType title = 9;
+	optional string id = 6;
+	optional string _class = 7;
+	optional UnspecifiedType title = 8;
+	optional string lang = 9;
 }
 
 message ingType
@@ -721,10 +721,10 @@ message ingType
 	repeated ing_noteType ing_note = 4;
 	repeated prodcodeType prodcode = 5;
 	repeated alt_ingType alt_ing = 6;
-	optional string lang = 7;
-	optional string id = 8;
-	optional string _class = 9;
-	optional UnspecifiedType title = 10;
+	optional string id = 7;
+	optional string _class = 8;
+	optional UnspecifiedType title = 9;
+	optional string lang = 10;
 	enum optionalType
 	{
 		optionalType_no = 1;
@@ -739,6 +739,8 @@ message ing_divType
 	optional descriptionType description = 2;
 	repeated noteType note = 3;
 	required ingType ing = 4;
+	optional string id = 5;
+	optional string _class = 6;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -747,9 +749,7 @@ message ing_divType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 5;
-	optional string id = 6;
-	optional string _class = 7;
+	optional systemType system = 7;
 	optional string lang = 8;
 	enum typeType
 	{
@@ -768,6 +768,10 @@ message equipmentType
 	repeated equip_divType equip_div = 1;
 	repeated noteType note = 2;
 	optional toolType tool = 3;
+	optional string id = 4;
+	optional string _class = 5;
+	optional UnspecifiedType title = 6;
+	optional string lang = 7;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -776,11 +780,7 @@ message equipmentType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 4;
-	optional string lang = 5;
-	optional string id = 6;
-	optional string _class = 7;
-	optional UnspecifiedType title = 8;
+	optional systemType system = 8;
 }
 
 message ingredientsType
@@ -788,6 +788,10 @@ message ingredientsType
 	repeated ing_divType ing_div = 1;
 	repeated noteType note = 2;
 	optional ingType ing = 3;
+	optional string id = 4;
+	optional string _class = 5;
+	optional UnspecifiedType title = 6;
+	optional string lang = 7;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -796,11 +800,7 @@ message ingredientsType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 4;
-	optional string lang = 5;
-	optional string id = 6;
-	optional string _class = 7;
-	optional UnspecifiedType title = 8;
+	optional systemType system = 8;
 }
 
 message dir_divType
@@ -810,6 +810,8 @@ message dir_divType
 	optional noteType note = 3;
 	optional ingType ing = 4;
 	required stepType step = 5;
+	optional string id = 6;
+	optional string _class = 7;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -818,9 +820,7 @@ message dir_divType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 6;
-	optional string id = 7;
-	optional string _class = 8;
+	optional systemType system = 8;
 	optional string lang = 9;
 	enum typeType
 	{
@@ -841,6 +841,10 @@ message directionsType
 	optional noteType note = 2;
 	optional ingType ing = 3;
 	optional stepType step = 4;
+	optional string id = 5;
+	optional string _class = 6;
+	optional UnspecifiedType title = 7;
+	optional string lang = 8;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -849,11 +853,7 @@ message directionsType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 5;
-	optional string lang = 6;
-	optional string id = 7;
-	optional string _class = 8;
-	optional UnspecifiedType title = 9;
+	optional systemType system = 9;
 }
 
 message recipeType
@@ -865,6 +865,10 @@ message recipeType
 	required directionsType directions = 5;
 	optional nutritionType nutrition = 6;
 	optional diet_exchangesType diet_exchanges = 7;
+	optional string id = 8;
+	optional string _class = 9;
+	optional UnspecifiedType title = 10;
+	optional string lang = 11;
 	enum systemType
 	{
 		systemType_Imperial = 1;
@@ -873,11 +877,7 @@ message recipeType
 		systemType_metric = 4;
 		systemType_other = 5;
 	}
-	optional systemType system = 8;
-	optional string lang = 9;
-	optional string id = 10;
-	optional string _class = 11;
-	optional UnspecifiedType title = 12;
+	optional systemType system = 12;
 }
 
 message menuType
@@ -894,10 +894,10 @@ message menuType
 		systemType_other = 5;
 	}
 	optional systemType system = 4;
-	optional string lang = 5;
-	optional string id = 6;
-	optional string _class = 7;
-	optional UnspecifiedType title = 8;
+	optional string id = 5;
+	optional string _class = 6;
+	optional UnspecifiedType title = 7;
+	optional string lang = 8;
 }
 
 message recipemlType
@@ -905,10 +905,10 @@ message recipemlType
 	repeated metaType meta = 1;
 	optional menuType menu = 2;
 	optional recipeType recipe = 3;
-	optional string lang = 4;
-	optional string id = 5;
-	optional string _class = 6;
-	optional UnspecifiedType title = 7;
+	optional string id = 4;
+	optional string _class = 5;
+	optional UnspecifiedType title = 6;
+	optional string lang = 7;
 	enum versionType
 	{
 		versionType_0_5 = 1;

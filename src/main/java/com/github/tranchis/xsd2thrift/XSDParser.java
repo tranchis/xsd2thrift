@@ -26,9 +26,10 @@ package com.github.tranchis.xsd2thrift;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -39,7 +40,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
-import com.sun.xml.xsom.parser.XSOMParser;
 import com.sun.xml.xsom.XSAttGroupDecl;
 import com.sun.xml.xsom.XSAttributeDecl;
 import com.sun.xml.xsom.XSAttributeUse;
@@ -54,6 +54,7 @@ import com.sun.xml.xsom.XSSchemaSet;
 import com.sun.xml.xsom.XSSimpleType;
 import com.sun.xml.xsom.XSTerm;
 import com.sun.xml.xsom.XSType;
+import com.sun.xml.xsom.parser.XSOMParser;
 
 public class XSDParser implements ErrorHandler {
     private File f;
@@ -74,9 +75,9 @@ public class XSDParser implements ErrorHandler {
     private void init(String stFile) {
 
         this.f = new File(stFile);
-        map = new HashMap<String, Struct>();
-        enums = new HashMap<String, Enumeration>();
-        simpleTypes = new HashMap<String, String>();
+		map = new TreeMap<String, Struct>();
+		enums = new TreeMap<String, Enumeration>();
+		simpleTypes = new TreeMap<String, String>();
         keywords = new TreeSet<String>();
         keywords.add("interface");
         keywords.add("is");
@@ -164,7 +165,7 @@ public class XSDParser implements ErrorHandler {
             }
         }
 
-        ss = new HashSet<Struct>(map.values());
+		ss = new TreeSet<Struct>(map.values());
         declared = new TreeSet<String>(basicTypes);
         declared.addAll(enums.keySet());
         declared.addAll(simpleTypes.keySet());
@@ -187,8 +188,8 @@ public class XSDParser implements ErrorHandler {
 
         if (!ss.isEmpty()) {
             // Check if we are missing a type or it's a circular dependency
-            Set<String> requiredTypes = new HashSet<String>();
-            Set<String> notYetDeclaredTypes = new HashSet<String>();
+			Set<String> requiredTypes = new TreeSet<String>();
+			Set<String> notYetDeclaredTypes = new TreeSet<String>();
             for (Struct s : ss) {
                 requiredTypes.addAll(s.getTypes());
                 notYetDeclaredTypes.add(s.getName());
@@ -234,7 +235,7 @@ public class XSDParser implements ErrorHandler {
         int order;
 
         os(st.getNamespace()).write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
-        itf = st.getFields().iterator();
+        itf = orderedIteratorForFields(st.getFields());
         usedInEnums = new TreeSet<String>();
         order = 1;
         while (itf.hasNext()) {
@@ -277,7 +278,21 @@ public class XSDParser implements ErrorHandler {
         declared.add(st.getName());
     }
 
-    private void writeEnum(String type) throws IOException {
+    private Iterator<Field> orderedIteratorForFields(List<Field> fields) {
+        Collections.sort(fields,new Comparator<Field>() {
+			@Override
+			public int compare(Field o1, Field o2) {
+				if(o1==null){
+					if(o2==null) return 0;
+					return 1;
+				}
+				return o1.getName().compareTo(o2.getName());
+			}
+		});
+        return fields.iterator();
+	}
+
+	private void writeEnum(String type) throws IOException {
         String enumValue;
         Enumeration en;
         Iterator<String> itg;
@@ -516,14 +531,15 @@ public class XSDParser implements ErrorHandler {
             enums.put(name, en);
         }
     }
-
-    private void write(Struct st, XSAttGroupDecl attGroup, boolean goingup) {
+    
+     private void write(Struct st, XSAttGroupDecl attGroup, boolean goingup) {
         Iterator<? extends XSAttributeUse> it;
         Iterator<? extends XSAttGroupDecl> itg;
         XSAttributeUse att;
         XSAttributeDecl decl;
 
         itg = attGroup.getAttGroups().iterator();
+        
         while (itg.hasNext()) {
             write(st, itg.next(), goingup);
         }

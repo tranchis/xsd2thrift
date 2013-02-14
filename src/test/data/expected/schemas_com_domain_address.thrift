@@ -11,7 +11,7 @@ struct addressType
 {
 	1 : required addressLinesType addressLines,
 	2 : required string city,
-	3 : required string postCode,
-	4 : required schemas_com_domain_common.country _country,
+	3 : required schemas_com_domain_common.country _country,
+	4 : required string postCode,
 }
 

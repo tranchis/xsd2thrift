@@ -27,7 +27,14 @@ import com.sun.xml.xsom.XmlString;
 public class Field
 {
 
-    private String name;
+    @Override
+	public String toString() {
+		return "Field [name=" + name + ", typeNamespace=" + typeNamespace
+				+ ", type=" + type + ", required=" + required + ", repeat="
+				+ repeat + ", def=" + def + "]";
+	}
+
+	private String name;
     private String typeNamespace;
 	private String type;
 	private boolean required;

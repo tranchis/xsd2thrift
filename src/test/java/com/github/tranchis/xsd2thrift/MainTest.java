@@ -1,16 +1,13 @@
 package com.github.tranchis.xsd2thrift;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import static com.github.tranchis.xsd2thrift.TestHelper.compareExpectedAndGenerated;
+import static com.github.tranchis.xsd2thrift.TestHelper.generateProtobuf;
+import static com.github.tranchis.xsd2thrift.TestHelper.generateThrift;
 
-import org.junit.Assert;
+import java.io.File;
+
 import org.junit.Ignore;
 import org.junit.Test;
-import static com.github.tranchis.xsd2thrift.TestHelper.*;
 
 public class MainTest {
 
@@ -80,6 +77,15 @@ public class MainTest {
     public void compareTestDatatypesThrift(){
         compareExpectedAndGenerated("src/test/data/expected/test-datatypes.thrift", generateThrift("test-datatypes"));
     }
+    @Test
+    public void compareTestDatatypesStringDatesThrift(){
+        compareExpectedAndGenerated("src/test/data/expected/test-datatypes-string-dates.thrift", generateThrift("test-datatypes-string-dates",true));
+    }
+    @Test
+    public void compareTestDatatypesStringDatesProtobuf(){
+        compareExpectedAndGenerated("src/test/data/expected/test-datatypes-string-dates.proto", generateProtobuf("test-datatypes-string-dates",true));
+    }
+    
     @Test
     public void compareTestExtensionProtobuf(){
         compareExpectedAndGenerated("src/test/data/expected/test-extension.proto", generateProtobuf("test-extension"));

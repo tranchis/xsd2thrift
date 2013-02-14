@@ -13,8 +13,8 @@ message Datatypes
 	required bytes a_base64Binary = 3;
 	required bool a_boolean = 4;
 	required bytes a_byte = 5;
-	required int32 a_date = 6;
-	required int64 a_dateTime = 7;
+	required string a_date = 6;
+	required string a_dateTime = 7;
 	required double a_decimal = 8;
 	required double a_double = 9;
 	required float a_float = 10;

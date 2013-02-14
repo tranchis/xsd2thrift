@@ -11,7 +11,7 @@ message addressType
 {
 	required addressLinesType addressLines = 1;
 	required string city = 2;
-	required string postCode = 3;
-	required schemas.com.domain.common.country _country = 4;
+	required schemas.com.domain.common.country _country = 3;
+	required string postCode = 4;
 }
 

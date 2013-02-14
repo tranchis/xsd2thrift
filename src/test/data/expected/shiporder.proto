@@ -6,27 +6,27 @@ message UnspecifiedType
 	required bytes object = 2;
 }
 
-message shiptoType
-{
-	required string name = 1;
-	required string address = 2;
-	required string city = 3;
-	required string country = 4;
-}
-
 message itemType
 {
-	required string title = 1;
-	optional string note = 2;
+	optional string note = 1;
+	required double price = 2;
 	required int64 quantity = 3;
-	required double price = 4;
+	required string title = 4;
+}
+
+message shiptoType
+{
+	required string address = 1;
+	required string city = 2;
+	required string country = 3;
+	required string name = 4;
 }
 
 message shiporderType
 {
-	required string orderperson = 1;
-	required shiptoType shipto = 2;
-	repeated itemType item = 3;
-	required string orderid = 4;
+	repeated itemType item = 1;
+	required string orderid = 2;
+	required string orderperson = 3;
+	required shiptoType shipto = 4;
 }
 

@@ -6,27 +6,27 @@ struct UnspecifiedType
 	2 : required binary object,
 }
 
-struct shiptoType
-{
-	1 : required string name,
-	2 : required string address,
-	3 : required string city,
-	4 : required string country,
-}
-
 struct itemType
 {
-	1 : required string title,
-	2 : optional string note,
+	1 : optional string note,
+	2 : required double price,
 	3 : required i64 quantity,
-	4 : required double price,
+	4 : required string title,
+}
+
+struct shiptoType
+{
+	1 : required string address,
+	2 : required string city,
+	3 : required string country,
+	4 : required string name,
 }
 
 struct shiporderType
 {
-	1 : required string orderperson,
-	2 : required shiptoType shipto,
-	3 : required list<itemType> item,
-	4 : required string orderid,
+	1 : required list<itemType> item,
+	2 : required string orderid,
+	3 : required string orderperson,
+	4 : required shiptoType shipto,
 }
 

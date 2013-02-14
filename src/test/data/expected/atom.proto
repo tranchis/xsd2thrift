@@ -6,7 +6,24 @@ message UnspecifiedType
 	required bytes object = 2;
 }
 
-message idType
+message categoryType
+{
+	optional UnspecifiedType base = 1;
+	optional string label = 2;
+	optional string lang = 3;
+	optional UnspecifiedType scheme = 4;
+	required string term = 5;
+}
+
+message contentType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
+	optional UnspecifiedType src = 3;
+	optional string type = 4;
+}
+
+message dateTimeType
 {
 	optional UnspecifiedType base = 1;
 	optional string lang = 2;
@@ -20,48 +37,31 @@ message generatorType
 	optional string version = 4;
 }
 
-message categoryType
+message iconType
 {
 	optional UnspecifiedType base = 1;
 	optional string lang = 2;
-	optional UnspecifiedType scheme = 3;
-	required string term = 4;
-	optional string label = 5;
+}
+
+message idType
+{
+	optional UnspecifiedType base = 1;
+	optional string lang = 2;
 }
 
 message linkType
 {
 	optional UnspecifiedType base = 1;
-	optional string lang = 2;
-	optional string type = 3;
-	optional string rel = 4;
+	required UnspecifiedType href = 2;
+	optional string hreflang = 3;
+	optional string lang = 4;
 	optional int64 length = 5;
-	optional string title = 6;
-	required UnspecifiedType href = 7;
-	optional string hreflang = 8;
-}
-
-message contentType
-{
-	optional UnspecifiedType base = 1;
-	optional string lang = 2;
-	optional string type = 3;
-	optional UnspecifiedType src = 4;
-}
-
-message uriType
-{
-	optional UnspecifiedType base = 1;
-	optional string lang = 2;
+	optional string rel = 6;
+	optional string title = 7;
+	optional string type = 8;
 }
 
 message logoType
-{
-	optional UnspecifiedType base = 1;
-	optional string lang = 2;
-}
-
-message dateTimeType
 {
 	optional UnspecifiedType base = 1;
 	optional string lang = 2;
@@ -80,73 +80,73 @@ message textType
 	optional typeType type = 3;
 }
 
-message personType
-{
-	optional string name = 1;
-	optional uriType uri = 2;
-	optional string email = 3;
-	optional UnspecifiedType base = 4;
-	optional string lang = 5;
-}
-
-message iconType
+message uriType
 {
 	optional UnspecifiedType base = 1;
 	optional string lang = 2;
 }
 
+message personType
+{
+	optional UnspecifiedType base = 1;
+	optional string email = 2;
+	optional string lang = 3;
+	optional string name = 4;
+	optional uriType uri = 5;
+}
+
 message sourceType
 {
 	repeated personType author = 1;
-	repeated categoryType category = 2;
-	repeated personType contributor = 3;
-	optional generatorType generator = 4;
-	optional iconType icon = 5;
-	optional idType id = 6;
-	repeated linkType link = 7;
-	optional logoType logo = 8;
-	optional textType rights = 9;
-	optional textType subtitle = 10;
-	optional textType title = 11;
-	optional dateTimeType updated = 12;
-	optional UnspecifiedType base = 13;
-	optional string lang = 14;
+	optional UnspecifiedType base = 2;
+	repeated categoryType category = 3;
+	repeated personType contributor = 4;
+	optional generatorType generator = 5;
+	optional iconType icon = 6;
+	optional idType id = 7;
+	optional string lang = 8;
+	repeated linkType link = 9;
+	optional logoType logo = 10;
+	optional textType rights = 11;
+	optional textType subtitle = 12;
+	optional textType title = 13;
+	optional dateTimeType updated = 14;
 }
 
 message entryType
 {
 	repeated personType author = 1;
-	repeated categoryType category = 2;
-	optional contentType content = 3;
-	repeated personType contributor = 4;
-	optional idType id = 5;
-	repeated linkType link = 6;
-	optional dateTimeType published = 7;
-	optional textType rights = 8;
-	optional textType source = 9;
-	optional textType summary = 10;
-	optional textType title = 11;
-	optional dateTimeType updated = 12;
-	optional UnspecifiedType base = 13;
-	optional string lang = 14;
+	optional UnspecifiedType base = 2;
+	repeated categoryType category = 3;
+	optional contentType content = 4;
+	repeated personType contributor = 5;
+	optional idType id = 6;
+	optional string lang = 7;
+	repeated linkType link = 8;
+	optional dateTimeType published = 9;
+	optional textType rights = 10;
+	optional textType source = 11;
+	optional textType summary = 12;
+	optional textType title = 13;
+	optional dateTimeType updated = 14;
 }
 
 message feedType
 {
 	repeated personType author = 1;
-	repeated categoryType category = 2;
-	repeated personType contributor = 3;
-	optional generatorType generator = 4;
-	optional iconType icon = 5;
-	optional idType id = 6;
-	repeated linkType link = 7;
-	optional logoType logo = 8;
-	optional textType rights = 9;
-	optional textType subtitle = 10;
-	optional textType title = 11;
-	optional dateTimeType updated = 12;
-	repeated entryType entry = 13;
-	optional UnspecifiedType base = 14;
-	optional string lang = 15;
+	optional UnspecifiedType base = 2;
+	repeated categoryType category = 3;
+	repeated personType contributor = 4;
+	repeated entryType entry = 5;
+	optional generatorType generator = 6;
+	optional iconType icon = 7;
+	optional idType id = 8;
+	optional string lang = 9;
+	repeated linkType link = 10;
+	optional logoType logo = 11;
+	optional textType rights = 12;
+	optional textType subtitle = 13;
+	optional textType title = 14;
+	optional dateTimeType updated = 15;
 }
 

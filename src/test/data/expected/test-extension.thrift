@@ -6,17 +6,17 @@ struct UnspecifiedType
 	2 : required binary object,
 }
 
-struct StringObject
-{
-	1 : required string value,
-	2 : required string name,
-	3 : optional string description,
-}
-
 struct BaseObject
 {
-	1 : required string name,
-	2 : optional string description,
+	1 : optional string description,
+	2 : required string name,
 	3 : optional string value,
+}
+
+struct StringObject
+{
+	1 : optional string description,
+	2 : required string name,
+	3 : required string value,
 }
 

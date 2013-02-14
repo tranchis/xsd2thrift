@@ -6,23 +6,23 @@ message UnspecifiedType
 	required bytes object = 2;
 }
 
-message OptionalAttributeGroup
-{
-	optional string no_default_attribute = 1;
-	optional string has_default_attribute = 2;
-	required string required_attribute = 3;
-	optional string optional_attribute = 4;
-}
-
 message Optional
 {
 	required string default_minoccurs_element = 1;
-	optional string optional_element = 2;
-	required string required_element = 3;
-	repeated string repeat_element = 4;
-	required string required_attribute = 5;
-	optional string has_default_attribute = 6;
-	optional string optional_attribute = 7;
-	optional string no_default_attribute = 8;
+	optional string has_default_attribute = 2;
+	optional string no_default_attribute = 3;
+	optional string optional_attribute = 4;
+	optional string optional_element = 5;
+	repeated string repeat_element = 6;
+	required string required_attribute = 7;
+	required string required_element = 8;
+}
+
+message OptionalAttributeGroup
+{
+	optional string has_default_attribute = 1;
+	optional string no_default_attribute = 2;
+	optional string optional_attribute = 3;
+	required string required_attribute = 4;
 }
 

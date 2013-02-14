@@ -6,17 +6,17 @@ message UnspecifiedType
 	required bytes object = 2;
 }
 
-message StringObject
-{
-	required string value = 1;
-	required string name = 2;
-	optional string description = 3;
-}
-
 message BaseObject
 {
-	required string name = 1;
-	optional string description = 2;
+	optional string description = 1;
+	required string name = 2;
 	optional string value = 3;
+}
+
+message StringObject
+{
+	optional string description = 1;
+	required string name = 2;
+	required string value = 3;
 }
 

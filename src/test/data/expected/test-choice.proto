@@ -10,11 +10,11 @@ message Choice
 {
 	optional string a_default_minoccurs_element = 1;
 	optional string a_optional_element = 2;
-	optional string a_required_element = 3;
-	repeated string a_repeat_element = 4;
+	repeated string a_repeat_element = 3;
+	optional string a_required_element = 4;
 	optional string b_default_minoccurs_element = 5;
 	optional string b_optional_element = 6;
-	optional string b_required_element = 7;
-	repeated string b_repeat_element = 8;
+	repeated string b_repeat_element = 7;
+	optional string b_required_element = 8;
 }
 
