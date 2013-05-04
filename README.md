@@ -3,18 +3,29 @@
 This tool allows for converting XML Schema files (.xsd) to Thrift (.thrift) and
 Protocol Buffers (.proto).
 
-## CONTACT
+## Importing from Maven
 
-Any feedback will be greatly appreciated, at the GitHub project page
-(http://github.com/tranchis/xsd2thrift) or at tranchis_-_AT_-_gmail.com.
+    <repositories>
+      <repository>
+        <id>xsd2thrift</id>
+        <url>http://dl.bintray.com/content/tranchis/xsd2thrift</url>
+      </repository>
+    </repositories>
+    
+    <dependency>
+      <groupid>com.github.tranchis</groupid>
+      <artifactid>xsd2thrift</artifactid>
+      <version>1.0</version>
+      <type>jar</type>
+    </dependency>
 
-## BUILDING
+## Building
 
 To build xsd2thrift, you need Maven (http://maven.apache.org/) installed. To build xsd2thrift, run `mvn install`.
 
 xsd2thrift has been tested on Java SE 6.
 
-## USAGE
+## Usage
 
 Usage: `java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME] [--package=NAME] filename.xsd`
 
@@ -25,7 +36,7 @@ Usage: `java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME] [--packa
     --nestEnums=true|false : nest enum declaration within messages that reference them, only supported by protobuf,
                              defaults to true
 
-## LICENSE
+## License
 
 The code contributed for this package is licensed under LGPL v3 (see LICENSE).
 
@@ -34,7 +45,12 @@ XSOM is covered by GPL v2 with classpath exception (see LICENSE-xsom.1).
 XSOM internally uses an URI class, which is copyrighted by Thai Open Source
 Center (see LICENSE-xsom.2).
 
-## CONTRIBUTORS (@github.com)
+## Contact
+
+Any feedback will be greatly appreciated, at the GitHub project page
+(http://github.com/tranchis/xsd2thrift) or at tranchis_-_AT_-_gmail.com.
+
+## Contributors (@github.com)
 
 * tranchis
 * Fred-dy-
