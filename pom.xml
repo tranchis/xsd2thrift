@@ -124,8 +124,13 @@
 		</pluginRepository>
 	</pluginRepositories>
 
+  <distributionManagement>
+    <repository>
+      <id>bintray-tranchis-xsd2thrift-com.github.tranchis.xsd2thrift</id>
+      <name>tranchis-xsd2thrift-com.github.tranchis.xsd2thrift</name>
+      <url>https://api.bintray.com/maven/tranchis/xsd2thrift/com.github.tranchis.xsd2thrift</url>
+    </repository>
+  </distributionManagement>
 
 </project>
-
-
 
