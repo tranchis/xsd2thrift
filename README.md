@@ -16,8 +16,7 @@ xsd2thrift has been tested on Java SE 6.
 
 ## USAGE
 
-Usage: `java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]`
-                           `[--package=NAME] filename.xsd`
+Usage: `java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME] [--package=NAME] filename.xsd`
 
     --thrift               : convert to Thrift
     --protobuf             : convertingonvert to Protocol Buffers
