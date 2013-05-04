@@ -22,7 +22,8 @@ Usage: `java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME] [--packa
     --protobuf             : convertingonvert to Protocol Buffers
     --output=FILENAME      : store the result in FILENAME instead of standard output
     --package=NAME         : set namespace/package of the output file
-    --nestEnums=true|false : nest enum declaration within messages that reference them, only supported by protobuf, defaults to true
+    --nestEnums=true|false : nest enum declaration within messages that reference them, only supported by protobuf,
+                             defaults to true
 
 ## LICENSE
 
