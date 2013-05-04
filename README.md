@@ -3,6 +3,10 @@
 This tool allows for converting XML Schema files (.xsd) to Thrift (.thrift) and
 Protocol Buffers (.proto).
 
+## Binary download
+
+[Version 1.0](http://dl.bintray.com/content/tranchis/xsd2thrift/com/github/tranchis/xsd2thrift/1.0/xsd2thrift-1.0-onejar.jar?direct)
+
 ## Importing from Maven
 
     <repositories>
