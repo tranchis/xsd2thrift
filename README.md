@@ -1,4 +1,4 @@
-# XSD2THRIFT
+# XSD2THRIFT [![Build Status](https://travis-ci.org/tranchis/xsd2thrift.png?branch=master)](https://travis-ci.org/tranchis/xsd2thrift)
 
 This tool allows for converting XML Schema files (.xsd) to Thrift (.thrift) and
 Protocol Buffers (.proto).
