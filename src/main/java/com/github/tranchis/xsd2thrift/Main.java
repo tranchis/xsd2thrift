@@ -38,7 +38,7 @@ public class Main {
 	        + "                           [--package=NAME] filename.xsd\n" + "\n"
 	        + "  --thrift          		: convert to Thrift\n"
 	        + "  --protobuf        		: convert to Protocol Buffers\n"
-	        + "  --output=FILENAME 		: store the result in FILENAME instead of standard output\n"
+	        + "  --filename=FILENAME 		: store the result in FILENAME instead of standard output\n"
 	        + "  --package=NAME    		: set namespace/package of the output file\n"
 	        + "  --nestEnums=true|false	: nest enum declaration within messages that reference them, only supported by protobuf, defaults to true\n"
 	        + "";
@@ -54,51 +54,46 @@ public class Main {
 	}
 
 	public Main(String[] args) throws Xsd2ThriftException, FileNotFoundException {
-		XSDParser xsdParser;
 		TreeMap<String, String> map = initMap();
-		String xsd, param;
-		int i;
-		IMarshaller im;
+		String xsd = null;
+		String fileParam = null;
+		String packageParam = null;
+		String param = null;
+		int i = 0;
+		IMarshaller im = null;
+		boolean nestEnums = true;
 
 		correct = true;
-		im = null;
 
 		if (args.length == 0 || args[args.length - 1].startsWith("--")) {
 			usage();
 		} else {
 			xsd = args[args.length - 1];
-			xsdParser = new XSDParser(xsd, map);
 
-			i = 0;
 			while (correct && i < args.length - 1) {
 				if (args[i].equals("--thrift")) {
 					if (im == null) {
 						im = new ThriftMarshaller();
-						xsdParser.addMarshaller(im);
+						nestEnums = false;
 					} else {
 						usage("Only one marshaller can be specified at a time.");
 					}
 				} else if (args[i].equals("--protobuf")) {
 					if (im == null) {
 						im = new ProtobufMarshaller();
-						xsdParser.addMarshaller(im);
 					} else {
 						usage("Only one marshaller can be specified at a time.");
 					}
 				} else if (args[i].startsWith("--filename=")) {
-					param = args[i].split("=")[1];
-					xsdParser.setOutputStream(new FileOutputStream(new File(param)));
+					fileParam = args[i].split("=")[1];
 				} else if (args[i].startsWith("--package=")) {
-					param = args[i].split("=")[1];
-					xsdParser.setPackage(param);
+					packageParam = args[i].split("=")[1];
 				} else if (args[i].startsWith("--nestEnums=")) {
 					param = args[i].split("=")[1];
-					boolean nestEnums = Boolean.valueOf(param);
-					xsdParser.setNestEnums(nestEnums);
+					nestEnums = Boolean.valueOf(param);
 				} else {
 					usage();
 				}
-
 				i = i + 1;
 			}
 
@@ -107,7 +102,13 @@ public class Main {
 			}
 
 			if (correct) {
-				xsdParser.parse();
+				FileOutputStream fos = null == fileParam ? null : new FileOutputStream(new File(fileParam));
+				XSDParser xsdParser = new XSDParser(fos, map);
+				xsdParser.addMarshaller(im);
+				xsdParser.setPackage(packageParam);
+				xsdParser.setNestEnums(nestEnums);
+
+				xsdParser.parse(xsd);
 			}
 		}
 

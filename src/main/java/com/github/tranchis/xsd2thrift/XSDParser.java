@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,33 +61,31 @@ import com.sun.xml.xsom.parser.JAXPParser;
 import com.sun.xml.xsom.parser.XSOMParser;
 
 public class XSDParser implements ErrorHandler {
-	private File stFile;
 	private Map<String, Struct> map;
 	private Map<String, Enumeration> enums;
 	private Map<String, String> simpleTypes;
 	private Set<String> keywords, basicTypes;
 	private TreeMap<String, String> xsdMapping;
 	private IMarshaller marshaller;
-	private OutputStream os;
+	private PrintStream printStream;
 	private String namespace;
 	private boolean nestEnums = true;
 
 	private final SAXParserFactory saxParserFactory;
 
-	public XSDParser(String stFile) {
-		this(stFile, new TreeMap<String, String>());
+	public XSDParser(OutputStream outputStream) {
+		this(outputStream, new TreeMap<String, String>());
 	}
 
-	public XSDParser(String stFile, TreeMap<String, String> xsdMapping) {
+	public XSDParser(OutputStream outputStream, TreeMap<String, String> xsdMapping) {
+		this.printStream = (null == outputStream) ? System.out : new PrintStream(outputStream);
 		this.xsdMapping = xsdMapping;
 		this.saxParserFactory = SAXParserFactory.newInstance();
-		init(stFile);
+		init();
 	}
 
-	private void init(String stFilename) {
-		os = System.out;
+	private void init() {
 
-		this.stFile = new File(stFilename);
 		map = new HashMap<String, Struct>();
 		enums = new HashMap<String, Enumeration>();
 		simpleTypes = new HashMap<String, String>();
@@ -141,15 +140,20 @@ public class XSDParser implements ErrorHandler {
 		// basicTypes.add("BaseObject");
 	}
 
-	public void parse() throws Xsd2ThriftException {
+	public void parse(String streamFilename) throws Xsd2ThriftException {
+		this.parse(new File(streamFilename));
+	}
+
+	public void parse(File streamFile) throws Xsd2ThriftException {
 		try {
 			XSOMParser parser = new XSOMParser(new JAXPParser(saxParserFactory));
 			parser.setErrorHandler(this);
-			parser.parse(stFile);
+			parser.parse(streamFile);
 
 			interpretResult(parser.getResult());
 			writeMap();
-		} catch (NullPointerException | SAXException | IOException e) {
+		} catch (SAXException | IOException e) {
+			// os.close();
 			throw new Xsd2ThriftException(e);
 		}
 	}
@@ -163,7 +167,7 @@ public class XSDParser implements ErrorHandler {
 			Iterator<String> ite;
 			boolean bModified;
 
-			os.write(marshaller.writeHeader(namespace).getBytes());
+			printStream.append(marshaller.writeHeader(namespace));
 
 			st = createSuperObject();
 
@@ -244,7 +248,7 @@ public class XSDParser implements ErrorHandler {
 		Set<String> usedInEnums;
 		int order;
 
-		os.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
+		printStream.write(marshaller.writeStructHeader(escape(st.getName())).getBytes());
 		itf = st.getFields().iterator();
 		usedInEnums = new TreeSet<String>();
 		order = 1;
@@ -271,12 +275,12 @@ public class XSDParser implements ErrorHandler {
 			if (marshaller.getTypeMapping(type) != null) {
 				type = marshaller.getTypeMapping(type);
 			}
-			os.write(marshaller
+			printStream.write(marshaller
 			        .writeStructParameter(order, f.isRequired(), f.isRepeat(), escape(fname), escapeType(type))
 			        .getBytes());
 			order = order + 1;
 		}
-		os.write(marshaller.writeStructFooter().getBytes());
+		printStream.write(marshaller.writeStructFooter().getBytes());
 		declared.add(st.getName());
 	}
 
@@ -286,20 +290,22 @@ public class XSDParser implements ErrorHandler {
 		Iterator<String> itg;
 		en = enums.get(type);
 		enumValue = escape(en.getName());
-		os.write(marshaller.writeEnumHeader(enumValue).getBytes());
+		printStream.write(marshaller.writeEnumHeader(enumValue).getBytes());
 		itg = en.iterator();
 		int enumOrder = 1;
 
 		if (itg.hasNext()) {
 			while (itg.hasNext()) {
-				os.write(marshaller.writeEnumValue(enumOrder, escape(en.getName() + "_" + itg.next())).getBytes());
+				printStream.write(
+				        marshaller.writeEnumValue(enumOrder, escape(en.getName() + "_" + itg.next())).getBytes());
 				enumOrder++;
 			}
 		} else {
-			os.write(marshaller.writeEnumValue(enumOrder, escape(en.getName() + "_UnspecifiedValue")).getBytes());
+			printStream
+			        .write(marshaller.writeEnumValue(enumOrder, escape(en.getName() + "_UnspecifiedValue")).getBytes());
 		}
 
-		os.write(marshaller.writeEnumFooter().getBytes());
+		printStream.write(marshaller.writeEnumFooter().getBytes());
 	}
 
 	private Struct createSuperObject() {
@@ -620,7 +626,7 @@ public class XSDParser implements ErrorHandler {
 	}
 
 	public void setOutputStream(FileOutputStream os) {
-		this.os = os;
+		this.printStream = new PrintStream(os);
 	}
 
 	public void setPackage(String namespace) {

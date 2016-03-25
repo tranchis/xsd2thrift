@@ -5,7 +5,7 @@
 	<groupId>com.github.tranchis</groupId>
 	<artifactId>xsd2thrift</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.1</version>
 
 	<dependencies>
 		<dependency>
