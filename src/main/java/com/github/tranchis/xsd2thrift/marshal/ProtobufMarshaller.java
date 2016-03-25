@@ -25,14 +25,12 @@ package com.github.tranchis.xsd2thrift.marshal;
 
 import java.util.TreeMap;
 
-public class ProtobufMarshaller implements IMarshaller
-{
+public class ProtobufMarshaller implements IMarshaller {
 	private TreeMap<String, String> typeMapping;
 	private String indent = "";
 
-	public ProtobufMarshaller()
-	{
-		typeMapping = new TreeMap<String,String>();
+	public ProtobufMarshaller() {
+		typeMapping = new TreeMap<String, String>();
 		typeMapping.put("positiveInteger", "int64");
 		typeMapping.put("nonPositiveInteger", "sint64");
 		typeMapping.put("negativeInteger", "sint64");
@@ -60,122 +58,85 @@ public class ProtobufMarshaller implements IMarshaller
 		typeMapping.put("hexBinary", "bytes");
 		typeMapping.put("base64Binary", "bytes");
 		typeMapping.put("byte", "bytes");
-		typeMapping.put("date", "int32"); //Number of days since January 1st, 1970
-		typeMapping.put("dateTime", "int64"); //Number of milliseconds since January 1st, 1970
+		typeMapping.put("date", "int32"); // Number of days since January 1st, 1970
+		typeMapping.put("dateTime", "int64"); // Number of milliseconds since January 1st, 1970
 	}
-	
+
 	@Override
-	public String writeHeader(String namespace)
-	{
-		String res;
-		
-		if(namespace != null && !namespace.isEmpty())
-		{
+	public String writeHeader(String namespace) {
+		String res = "";
+		if (namespace != null && !namespace.isEmpty()) {
 			res = "package " + namespace + ";\n\n";
 		}
-		else
-		{
-			res = "";
-		}
-		
 		return res;
 	}
 
 	@Override
-	public String writeEnumHeader(String name)
-	{
+	public String writeEnumHeader(String name) {
 		final String result = writeIndent() + "enum " + name + "\n" + writeIndent() + "{\n";
 		increaseIndent();
 		return result;
 	}
 
 	@Override
-	public String writeEnumValue(int order, String value)
-	{
-		return(writeIndent() + value + " = " + order + ";\n");
+	public String writeEnumValue(int order, String value) {
+		return (writeIndent() + value + " = " + order + ";\n");
 	}
 
 	@Override
-	public String writeEnumFooter()
-	{
+	public String writeEnumFooter() {
 		decreaseIndent();
 		return writeIndent() + "}\n";
 	}
 
 	@Override
-	public String writeStructHeader(String name)
-	{
+	public String writeStructHeader(String name) {
 		final String result = writeIndent() + "message " + name + "\n{\n";
 		increaseIndent();
 		return result;
 	}
 
 	@Override
-	public String writeStructParameter(int order, boolean required, boolean repeated, String name, String type)
-	{
-		String	sRequired;
-		
-		sRequired = getRequired(required, repeated);
-		
+	public String writeStructParameter(int order, boolean required, boolean repeated, String name, String type) {
+		String sRequired = getRequired(required, repeated);
+
 		return writeIndent() + sRequired + " " + type + " " + name + " = " + order + ";\n";
 	}
 
-	private String getRequired(boolean required, boolean repeated)
-	{
-		String res;
-
-		if(repeated)
-		{
-			res = "repeated";
-		}
-		else
-		{
-			if(required)
-			{
-				res = "required";
-			}
-			else
-			{
-				res = "optional";
-			}
-		}
-		
-		return res;
+	private String getRequired(boolean required, boolean repeated) {
+		return repeated ? "repeated" : (required ? "required" : "optional");
 	}
 
 	@Override
-	public String writeStructFooter()
-	{
+	public String writeStructFooter() {
 		decreaseIndent();
 		return writeIndent() + "}\n\n";
 	}
 
 	@Override
-	public String getTypeMapping(String type)
-	{
+	public String getTypeMapping(String type) {
 		return typeMapping.get(type);
 	}
 
 	@Override
-	public boolean isNestedEnums()
-	{
+	public boolean isNestedEnums() {
 		return true;
 	}
 
-    @Override
-    public boolean isCircularDependencySupported() {
-        return true;
-    }
-    
+	@Override
+	public boolean isCircularDependencySupported() {
+		return true;
+	}
+
 	private void increaseIndent() {
-    	indent += "\t";
-    }
-    
+		indent += "\t";
+	}
+
 	private void decreaseIndent() {
-    	indent = indent.substring(0, indent.length() > 0 ? indent.length() - 1 : 0);
-    }
-    
-    private String writeIndent() {
-    	return indent;
-    }
+		indent = indent.substring(0, indent.length() > 0 ? indent.length() - 1 : 0);
+	}
+
+	private String writeIndent() {
+		return indent;
+	}
 }
