@@ -34,8 +34,8 @@ public class Xsd2ProtobufTest {
 
 		List<String> args = new LinkedList<>();
 
-		Main myMain = new Main();
-		Main.main(args.toArray(new String[args.size()]));
+		Xsd2Thrift myMain = new Xsd2Thrift();
+		Xsd2Thrift.main(args.toArray(new String[args.size()]));
 		assertNotNull(myMain);
 		System.out.println();
 	}
@@ -50,8 +50,8 @@ public class Xsd2ProtobufTest {
 		args.add("--nestEnums=true");
 		args.add("contrib/" + xschema);
 
-		Main myMain = new Main();
-		Main.main(args.toArray(new String[args.size()]));
+		Xsd2Thrift myMain = new Xsd2Thrift();
+		Xsd2Thrift.main(args.toArray(new String[args.size()]));
 		assertNotNull(myMain);
 
 	}
@@ -72,8 +72,8 @@ public class Xsd2ProtobufTest {
 			args.add("--nestEnums=true");
 			args.add("contrib/" + xschema);
 
-			Main myMain = new Main();
-			Main.main(args.toArray(new String[args.size()]));
+			Xsd2Thrift myMain = new Xsd2Thrift();
+			Xsd2Thrift.main(args.toArray(new String[args.size()]));
 			assertNotNull(myMain);
 		}
 	}

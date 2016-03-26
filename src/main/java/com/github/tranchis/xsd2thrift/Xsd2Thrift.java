@@ -32,7 +32,7 @@ import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
 import com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller;
 import com.github.tranchis.xsd2thrift.marshal.ThriftMarshaller;
 
-public class Main {
+public class Xsd2Thrift {
 	private static boolean correct;
 	private static String usage = "" + "Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]\n"
 	        + "                           [--package=NAME] filename.xsd\n" + "\n"
@@ -62,7 +62,7 @@ public class Main {
 
 	private XSDParser xsdParser;
 
-	public Main() {
+	public Xsd2Thrift() {
 		map = initMap();
 
 	}
@@ -72,7 +72,7 @@ public class Main {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Xsd2ThriftException {
-		Main myMain = new Main();
+		Xsd2Thrift myMain = new Xsd2Thrift();
 		int i = 0;
 
 		correct = true;
