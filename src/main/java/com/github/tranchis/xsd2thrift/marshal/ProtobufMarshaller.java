@@ -25,11 +25,14 @@ package com.github.tranchis.xsd2thrift.marshal;
 
 import java.util.TreeMap;
 
-public class ProtobufMarshaller implements IMarshaller {
-	private TreeMap<String, String> typeMapping;
-	private String indent = "";
+public class ProtobufMarshaller extends AbstractMarshaller {
 
-	public ProtobufMarshaller() {
+	ProtobufMarshaller() {
+		super();
+	}
+
+	@Override
+	protected void initTypeMapping() {
 		typeMapping = new TreeMap<String, String>();
 		typeMapping.put("positiveInteger", "int64");
 		typeMapping.put("nonPositiveInteger", "sint64");

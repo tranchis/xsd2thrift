@@ -26,6 +26,7 @@ package com.github.tranchis.xsd2thrift;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -141,7 +142,13 @@ public class XSDParser implements ErrorHandler {
 	}
 
 	public void parse(String streamFilename) throws Xsd2ThriftException {
-		this.parse(new File(streamFilename));
+		File streamFile = new File(streamFilename);
+		if (streamFile.exists()) {
+			this.parse(new File(streamFilename));
+		} else {
+			InputStream stream = getClass().getResourceAsStream(File.separator + streamFilename);
+			this.parse(stream);
+		}
 	}
 
 	public void parse(File streamFile) throws Xsd2ThriftException {
@@ -153,9 +160,21 @@ public class XSDParser implements ErrorHandler {
 			interpretResult(parser.getResult());
 			writeMap();
 		} catch (SAXException | IOException e) {
-			// os.close();
 			throw new Xsd2ThriftException(e);
 		}
+	}
+
+	public void parse(InputStream source) throws Xsd2ThriftException {
+		try {
+			XSOMParser parser = new XSOMParser(new JAXPParser(saxParserFactory));
+			parser.parse(source);
+
+			interpretResult(parser.getResult());
+			writeMap();
+		} catch (SAXException e) {
+			throw new Xsd2ThriftException(e);
+		}
+
 	}
 
 	private void writeMap() throws Xsd2ThriftException {

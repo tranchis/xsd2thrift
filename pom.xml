@@ -52,7 +52,7 @@
 					<execution>
 						<phase>package</phase>
 						<configuration>
-							<mainClass>com.github.tranchis.xsd2thrift.Xsd2Thrift</mainClass>
+							<mainClass>com.github.tranchis.xsd2thrift.Main</mainClass>
 							<onejarVersion>0.98-RC2</onejarVersion>
 							<attachToBuild>true</attachToBuild>
 							<classifier>onejar</classifier>

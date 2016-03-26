@@ -29,93 +29,51 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
-import com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller;
-import com.github.tranchis.xsd2thrift.marshal.ThriftMarshaller;
+import com.github.tranchis.xsd2thrift.marshal.MarshallerFactory;
+import com.github.tranchis.xsd2thrift.marshal.MarshallerFactory.Protocol;
 
 public class Xsd2Thrift {
-	private static boolean correct;
-	private static String usage = "" + "Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]\n"
-	        + "                           [--package=NAME] filename.xsd\n" + "\n"
-	        + "  --thrift          		: convert to Thrift\n"
-	        + "  --protobuf        		: convert to Protocol Buffers\n"
-	        + "  --output=FILENAME 		: store the result in FILENAME instead of standard output\n"
-	        + "  --package=NAME    		: set namespace/package of the output file\n"
-	        + "  --nestEnums=true|false	: nest enum declaration within messages that reference them, only supported by protobuf, defaults to true\n"
-	        + "";
-
-	private static void usage(String error) {
-		System.err.println(error);
-		usage();
-	}
-
-	private static void usage() {
-		System.err.print(usage);
-		correct = false;
-	}
 
 	private TreeMap<String, String> map;
-	private String xschema = null;
-	private String fileParam = null;
-	private String packageParam = null;
-	private IMarshaller iMarshaller = null;
+	private String xschema;
+	private String packageName;
+	private IMarshaller iMarshaller;
 	boolean nestEnums = true;
 
-	private XSDParser xsdParser;
-
-	public Xsd2Thrift() {
-		map = initMap();
-
+	/**
+	 * @throws Xsd2ThriftException
+	 *             if construction fails
+	 * 
+	 */
+	public Xsd2Thrift() throws Xsd2ThriftException {
+		this(null, null, null, true);
 	}
 
 	/**
-	 * @param args
-	 * @throws Exception
+	 * 
+	 * @param xschema
+	 *            the schema to transform
+	 * @param packageName
+	 *            the package name of the generated objects
+	 * @param protocol
+	 *            the {@link Protocol}
+	 * @param nestEnums
+	 *            only available for protobuf, default true
+	 * @throws Xsd2ThriftException
+	 *             if construction fails
+	 * 
 	 */
-	public static void main(String[] args) throws Xsd2ThriftException {
-		Xsd2Thrift myMain = new Xsd2Thrift();
-		int i = 0;
-
-		correct = true;
-
-		if (args.length == 0 || args[args.length - 1].startsWith("--")) {
-			usage();
-		} else {
-			myMain.xschema = args[args.length - 1];
-
-			while (correct && i < args.length - 1) {
-				if (args[i].equals("--thrift")) {
-					if (myMain.iMarshaller == null) {
-						myMain.iMarshaller = new ThriftMarshaller();
-						myMain.nestEnums = false;
-					} else {
-						usage("Only one marshaller can be specified at a time.");
-					}
-				} else if (args[i].equals("--protobuf")) {
-					if (myMain.iMarshaller == null) {
-						myMain.iMarshaller = new ProtobufMarshaller();
-					} else {
-						usage("Only one marshaller can be specified at a time.");
-					}
-				} else if (args[i].startsWith("--output=")) {
-					myMain.fileParam = args[i].split("=")[1];
-				} else if (args[i].startsWith("--package=")) {
-					myMain.packageParam = args[i].split("=")[1];
-				} else if (args[i].startsWith("--nestEnums=")) {
-					String param = args[i].split("=")[1];
-					myMain.nestEnums = Boolean.valueOf(param);
-				} else {
-					usage();
-				}
-				i = i + 1;
-			}
-
-			if (myMain.iMarshaller == null) {
-				usage("A marshaller has to be specified.");
-			}
-			myMain.createXsdParser();
-			myMain.parseXsd(myMain.xschema);
+	public Xsd2Thrift(String xschema, String packageName, String protocol, Boolean nestEnums)
+	        throws Xsd2ThriftException {
+		map = initMap();
+		this.xschema = xschema;
+		this.packageName = packageName;
+		if (null != protocol) {
+			this.createMarshaller(protocol);
 		}
-
+		if (null != nestEnums) {
+			this.nestEnums = nestEnums;
+		}
 	}
 
 	private TreeMap<String, String> initMap() {
@@ -133,28 +91,83 @@ public class Xsd2Thrift {
 		return map;
 	}
 
-	private void createXsdParser() throws Xsd2ThriftException {
+	/**
+	 * 
+	 * @param fileParam
+	 *            the output file name
+	 * 
+	 * @throws Xsd2ThriftException
+	 *             if creation of the {@link XSDParser} failed
+	 */
+	private XSDParser createXsdParser(String fileParam) throws Xsd2ThriftException {
+		XSDParser xsdParser = null;
 
-		try (FileOutputStream fos = null == fileParam ? null : new FileOutputStream(new File(fileParam));) {
+		try {
+			FileOutputStream fos = null;
+			if (null != fileParam) {
+				File destFile = new File(fileParam);
+				if (!destFile.exists()) {
+					destFile.getParentFile().mkdirs();
+					destFile.createNewFile();
+				}
+				fos = new FileOutputStream(destFile);
+			}
+
 			xsdParser = new XSDParser(fos, map);
 			xsdParser.addMarshaller(iMarshaller);
-			xsdParser.setPackage(packageParam);
+			xsdParser.setPackage(packageName);
 			xsdParser.setNestEnums(nestEnums);
 		} catch (IOException e) {
 			throw new Xsd2ThriftException(e);
 		}
+		return xsdParser;
 	}
 
 	/**
 	 * 
 	 * @param streamFilename
 	 *            the xsd file to parse
+	 * @param destfileName
+	 *            the output file name
 	 * 
 	 * @throws Xsd2ThriftException
-	 * @{@link Xsd2ThriftException}
+	 *             a {@link Xsd2ThriftException} if creation of the {@link XSDParser} or parsing failed
 	 */
-	public void parseXsd(String streamFilename) throws Xsd2ThriftException {
-		xsdParser.parse(streamFilename);
+	public void parseXsd(String streamFilename, String destfileName) throws Xsd2ThriftException {
+		this.createXsdParser(destfileName).parse(streamFilename);
+	}
+
+	/**
+	 * 
+	 * @param protocol
+	 *            the desired {@link Protocol} to marshal into
+	 */
+	public void createMarshaller(String protocol) throws Xsd2ThriftException {
+		this.iMarshaller = MarshallerFactory.createMarshaller(Protocol.forName(protocol));
+	}
+
+	/**
+	 * 
+	 * @return true if a marshaller has been created
+	 */
+	public boolean hasMarshaller() {
+		return iMarshaller != null;
+	}
+
+	public String getXschema() {
+		return xschema;
+	}
+
+	public void setXschema(String xschema) {
+		this.xschema = xschema;
+	}
+
+	public void setPackageName(String packageParam) {
+		this.packageName = packageParam;
+	}
+
+	public void setNestEnums(boolean nestEnums) {
+		this.nestEnums = nestEnums;
 	}
 
 }

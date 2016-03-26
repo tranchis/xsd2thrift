@@ -34,10 +34,9 @@ public class Xsd2ProtobufTest {
 
 		List<String> args = new LinkedList<>();
 
-		Xsd2Thrift myMain = new Xsd2Thrift();
-		Xsd2Thrift.main(args.toArray(new String[args.size()]));
+		Main myMain = new Main();
+		Main.main(args.toArray(new String[args.size()]));
 		assertNotNull(myMain);
-		System.out.println();
 	}
 
 	@Test
@@ -50,8 +49,8 @@ public class Xsd2ProtobufTest {
 		args.add("--nestEnums=true");
 		args.add("contrib/" + xschema);
 
-		Xsd2Thrift myMain = new Xsd2Thrift();
-		Xsd2Thrift.main(args.toArray(new String[args.size()]));
+		Main myMain = new Main();
+		Main.main(args.toArray(new String[args.size()]));
 		assertNotNull(myMain);
 
 	}
@@ -63,7 +62,7 @@ public class Xsd2ProtobufTest {
 		for (String xschema : xschemas) {
 			String filename = xschema.replace('-', '_').replace(".xsd", ".proto");
 			String targetFilename = "target/generated-sources/proto/" + filename;
-			new File(targetFilename).createNewFile();
+			// new File(targetFilename).createNewFile();
 
 			List<String> args = new LinkedList<>();
 			args.add("--protobuf");
@@ -72,8 +71,8 @@ public class Xsd2ProtobufTest {
 			args.add("--nestEnums=true");
 			args.add("contrib/" + xschema);
 
-			Xsd2Thrift myMain = new Xsd2Thrift();
-			Xsd2Thrift.main(args.toArray(new String[args.size()]));
+			Main myMain = new Main();
+			Main.main(args.toArray(new String[args.size()]));
 			assertNotNull(myMain);
 		}
 	}
