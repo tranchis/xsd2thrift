@@ -141,6 +141,9 @@ public class Xsd2Thrift {
 	 * 
 	 * @param protocol
 	 *            the desired {@link Protocol} to marshal into
+	 * 
+	 * @throws Xsd2ThriftException
+	 *             if creation failed
 	 */
 	public void createMarshaller(String protocol) throws Xsd2ThriftException {
 		this.iMarshaller = MarshallerFactory.createMarshaller(Protocol.forName(protocol));

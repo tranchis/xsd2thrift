@@ -31,6 +31,10 @@ public class Main {
 
 	/**
 	 * @param args
+	 *            see usage
+	 * 
+	 * @throws Xsd2ThriftException
+	 *             if operation failed
 	 */
 	public static void main(String[] args) throws Xsd2ThriftException {
 		Xsd2Thrift myMain = new Xsd2Thrift();
