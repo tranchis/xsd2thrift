@@ -34,7 +34,8 @@ public class Xsd2ProtobufTest {
 
 		List<String> args = new LinkedList<>();
 
-		Main myMain = new Main(args.toArray(new String[args.size()]));
+		Main myMain = new Main();
+		Main.main(args.toArray(new String[args.size()]));
 		assertNotNull(myMain);
 		System.out.println();
 	}
@@ -49,7 +50,8 @@ public class Xsd2ProtobufTest {
 		args.add("--nestEnums=true");
 		args.add("contrib/" + xschema);
 
-		Main myMain = new Main(args.toArray(new String[args.size()]));
+		Main myMain = new Main();
+		Main.main(args.toArray(new String[args.size()]));
 		assertNotNull(myMain);
 
 	}
@@ -65,12 +67,13 @@ public class Xsd2ProtobufTest {
 
 			List<String> args = new LinkedList<>();
 			args.add("--protobuf");
-			args.add("--filename=" + targetFilename);
+			args.add("--output=" + targetFilename);
 			args.add("--package=com.github.tranchis.xsd2proto");
 			args.add("--nestEnums=true");
 			args.add("contrib/" + xschema);
 
-			Main myMain = new Main(args.toArray(new String[args.size()]));
+			Main myMain = new Main();
+			Main.main(args.toArray(new String[args.size()]));
 			assertNotNull(myMain);
 		}
 	}

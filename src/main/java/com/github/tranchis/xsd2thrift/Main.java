@@ -24,8 +24,8 @@
 package com.github.tranchis.xsd2thrift;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.TreeMap;
 
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
@@ -38,7 +38,7 @@ public class Main {
 	        + "                           [--package=NAME] filename.xsd\n" + "\n"
 	        + "  --thrift          		: convert to Thrift\n"
 	        + "  --protobuf        		: convert to Protocol Buffers\n"
-	        + "  --filename=FILENAME 		: store the result in FILENAME instead of standard output\n"
+	        + "  --output=FILENAME 		: store the result in FILENAME instead of standard output\n"
 	        + "  --package=NAME    		: set namespace/package of the output file\n"
 	        + "  --nestEnums=true|false	: nest enum declaration within messages that reference them, only supported by protobuf, defaults to true\n"
 	        + "";
@@ -53,64 +53,17 @@ public class Main {
 		correct = false;
 	}
 
-	public Main(String[] args) throws Xsd2ThriftException, FileNotFoundException {
-		TreeMap<String, String> map = initMap();
-		String xsd = null;
-		String fileParam = null;
-		String packageParam = null;
-		String param = null;
-		int i = 0;
-		IMarshaller im = null;
-		boolean nestEnums = true;
+	private TreeMap<String, String> map;
+	private String xschema = null;
+	private String fileParam = null;
+	private String packageParam = null;
+	private IMarshaller iMarshaller = null;
+	boolean nestEnums = true;
 
-		correct = true;
+	private XSDParser xsdParser;
 
-		if (args.length == 0 || args[args.length - 1].startsWith("--")) {
-			usage();
-		} else {
-			xsd = args[args.length - 1];
-
-			while (correct && i < args.length - 1) {
-				if (args[i].equals("--thrift")) {
-					if (im == null) {
-						im = new ThriftMarshaller();
-						nestEnums = false;
-					} else {
-						usage("Only one marshaller can be specified at a time.");
-					}
-				} else if (args[i].equals("--protobuf")) {
-					if (im == null) {
-						im = new ProtobufMarshaller();
-					} else {
-						usage("Only one marshaller can be specified at a time.");
-					}
-				} else if (args[i].startsWith("--filename=")) {
-					fileParam = args[i].split("=")[1];
-				} else if (args[i].startsWith("--package=")) {
-					packageParam = args[i].split("=")[1];
-				} else if (args[i].startsWith("--nestEnums=")) {
-					param = args[i].split("=")[1];
-					nestEnums = Boolean.valueOf(param);
-				} else {
-					usage();
-				}
-				i = i + 1;
-			}
-
-			if (im == null) {
-				usage("A marshaller has to be specified.");
-			}
-
-			if (correct) {
-				FileOutputStream fos = null == fileParam ? null : new FileOutputStream(new File(fileParam));
-				XSDParser xsdParser = new XSDParser(fos, map);
-				xsdParser.addMarshaller(im);
-				xsdParser.setPackage(packageParam);
-				xsdParser.setNestEnums(nestEnums);
-
-				xsdParser.parse(xsd);
-			}
-		}
+	public Main() {
+		map = initMap();
 
 	}
 
@@ -118,9 +71,51 @@ public class Main {
 	 * @param args
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
-		// Main myMain =
-		new Main(args);
+	public static void main(String[] args) throws Xsd2ThriftException {
+		Main myMain = new Main();
+		int i = 0;
+
+		correct = true;
+
+		if (args.length == 0 || args[args.length - 1].startsWith("--")) {
+			usage();
+		} else {
+			myMain.xschema = args[args.length - 1];
+
+			while (correct && i < args.length - 1) {
+				if (args[i].equals("--thrift")) {
+					if (myMain.iMarshaller == null) {
+						myMain.iMarshaller = new ThriftMarshaller();
+						myMain.nestEnums = false;
+					} else {
+						usage("Only one marshaller can be specified at a time.");
+					}
+				} else if (args[i].equals("--protobuf")) {
+					if (myMain.iMarshaller == null) {
+						myMain.iMarshaller = new ProtobufMarshaller();
+					} else {
+						usage("Only one marshaller can be specified at a time.");
+					}
+				} else if (args[i].startsWith("--output=")) {
+					myMain.fileParam = args[i].split("=")[1];
+				} else if (args[i].startsWith("--package=")) {
+					myMain.packageParam = args[i].split("=")[1];
+				} else if (args[i].startsWith("--nestEnums=")) {
+					String param = args[i].split("=")[1];
+					myMain.nestEnums = Boolean.valueOf(param);
+				} else {
+					usage();
+				}
+				i = i + 1;
+			}
+
+			if (myMain.iMarshaller == null) {
+				usage("A marshaller has to be specified.");
+			}
+			myMain.createXsdParser();
+			myMain.parseXsd(myMain.xschema);
+		}
+
 	}
 
 	private TreeMap<String, String> initMap() {
@@ -137,4 +132,29 @@ public class Main {
 
 		return map;
 	}
+
+	private void createXsdParser() throws Xsd2ThriftException {
+
+		try (FileOutputStream fos = null == fileParam ? null : new FileOutputStream(new File(fileParam));) {
+			xsdParser = new XSDParser(fos, map);
+			xsdParser.addMarshaller(iMarshaller);
+			xsdParser.setPackage(packageParam);
+			xsdParser.setNestEnums(nestEnums);
+		} catch (IOException e) {
+			throw new Xsd2ThriftException(e);
+		}
+	}
+
+	/**
+	 * 
+	 * @param streamFilename
+	 *            the xsd file to parse
+	 * 
+	 * @throws Xsd2ThriftException
+	 * @{@link Xsd2ThriftException}
+	 */
+	public void parseXsd(String streamFilename) throws Xsd2ThriftException {
+		xsdParser.parse(streamFilename);
+	}
+
 }
