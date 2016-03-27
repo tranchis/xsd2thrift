@@ -92,7 +92,7 @@ public class Xsd2Thrift {
 			if (null != fileParam) {
 				File destFile = new File(fileParam);
 				if (!destFile.exists()) {
-					destFile.getParentFile().mkdirs();
+					this.mkAllDirs(destFile.getParentFile());
 					destFile.createNewFile();
 				}
 				fos = new FileOutputStream(destFile);
@@ -156,6 +156,13 @@ public class Xsd2Thrift {
 
 	public void setNestEnums(boolean nestEnums) {
 		this.nestEnums = nestEnums;
+	}
+
+	private void mkAllDirs(File file) {
+		if (!file.exists()) {
+			mkAllDirs(file.getParentFile());
+		}
+		file.mkdir();
 	}
 
 }
