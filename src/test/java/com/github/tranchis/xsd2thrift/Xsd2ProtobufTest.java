@@ -58,7 +58,8 @@ public class Xsd2ProtobufTest {
 	@Test
 	public void shouldTransformXsd2Protobuf() throws Xsd2ThriftException, IOException {
 
-		List<String> xschemas = listXschemas();
+		String targetDir = "contrib/";
+		List<String> xschemas = listXschemas(targetDir);
 		for (String xschema : xschemas) {
 			String filename = xschema.replace('-', '_').replace(".xsd", ".proto");
 			String targetFilename = "target/generated-sources/proto/" + filename;
@@ -70,7 +71,7 @@ public class Xsd2ProtobufTest {
 			args.add("--package=com.github.tranchis.xsd2proto");
 			args.add("--nestEnums=true");
 			args.add("--debug");
-			args.add("contrib/" + xschema);
+			args.add(targetDir + xschema);
 
 			Main myMain = new Main();
 			Main.main(args.toArray(new String[args.size()]));
@@ -78,8 +79,8 @@ public class Xsd2ProtobufTest {
 		}
 	}
 
-	private List<String> listXschemas() {
-		File contrib = new File("contrib/");
+	private List<String> listXschemas(String targetDir) {
+		File contrib = new File(targetDir);
 		String[] list = contrib.list(new FilenameFilter() {
 
 			@Override
