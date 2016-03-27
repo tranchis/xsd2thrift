@@ -28,31 +28,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.TreeMap;
 
+import org.xml.sax.InputSource;
+
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
 import com.github.tranchis.xsd2thrift.marshal.MarshallerFactory;
 import com.github.tranchis.xsd2thrift.marshal.MarshallerFactory.Protocol;
+import com.github.tranchis.xsd2thrift.parse.XSDParser;
 
 public class Xsd2Thrift {
 
 	private TreeMap<String, String> map;
-	private String xschema;
 	private String packageName;
 	private IMarshaller iMarshaller;
 	boolean nestEnums = true;
 
 	/**
-	 * @throws Xsd2ThriftException
-	 *             if construction fails
 	 * 
-	 */
-	public Xsd2Thrift() throws Xsd2ThriftException {
-		this(null, null, null, true);
-	}
-
-	/**
-	 * 
-	 * @param xschema
-	 *            the schema to transform
 	 * @param packageName
 	 *            the package name of the generated objects
 	 * @param protocol
@@ -63,17 +54,11 @@ public class Xsd2Thrift {
 	 *             if construction fails
 	 * 
 	 */
-	public Xsd2Thrift(String xschema, String packageName, String protocol, Boolean nestEnums)
-	        throws Xsd2ThriftException {
+	public Xsd2Thrift(String packageName, String protocol, boolean nestEnums) throws Xsd2ThriftException {
 		map = initMap();
-		this.xschema = xschema;
 		this.packageName = packageName;
-		if (null != protocol) {
-			this.createMarshaller(protocol);
-		}
-		if (null != nestEnums) {
-			this.nestEnums = nestEnums;
-		}
+		this.createMarshaller(protocol);
+		this.nestEnums = nestEnums;
 	}
 
 	private TreeMap<String, String> initMap() {
@@ -129,12 +114,28 @@ public class Xsd2Thrift {
 	 *            the xsd file to parse
 	 * @param destfileName
 	 *            the output file name
-	 * 
+	 * @param debug
+	 *            whether SAX should report parsing errors
 	 * @throws Xsd2ThriftException
 	 *             a {@link Xsd2ThriftException} if creation of the {@link XSDParser} or parsing failed
 	 */
-	public void parseXsd(String streamFilename, String destfileName) throws Xsd2ThriftException {
-		this.createXsdParser(destfileName).parse(streamFilename);
+	public void parseXsd(String streamFilename, String destfileName, boolean debug) throws Xsd2ThriftException {
+		InputSource source = null;
+		try {
+			File streamFile = new File(streamFilename);
+			if (streamFile.exists()) {
+				source = new InputSource(streamFile.toURI().toURL().toExternalForm());
+			} else {
+				source = new InputSource(getClass().getResourceAsStream(File.separator + streamFilename));
+			}
+			if (debug) {
+				System.out.println("Parsing " + streamFilename + " to "
+				        + (null == destfileName ? "system out" : destfileName) + ".");
+			}
+			this.createXsdParser(destfileName).parse(source, debug);
+		} catch (IOException e) {
+			throw new Xsd2ThriftException(e);
+		}
 	}
 
 	/**
@@ -147,22 +148,6 @@ public class Xsd2Thrift {
 	 */
 	public void createMarshaller(String protocol) throws Xsd2ThriftException {
 		this.iMarshaller = MarshallerFactory.createMarshaller(Protocol.forName(protocol));
-	}
-
-	/**
-	 * 
-	 * @return true if a marshaller has been created
-	 */
-	public boolean hasMarshaller() {
-		return iMarshaller != null;
-	}
-
-	public String getXschema() {
-		return xschema;
-	}
-
-	public void setXschema(String xschema) {
-		this.xschema = xschema;
 	}
 
 	public void setPackageName(String packageParam) {

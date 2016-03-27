@@ -69,6 +69,7 @@ public class Xsd2ProtobufTest {
 			args.add("--output=" + targetFilename);
 			args.add("--package=com.github.tranchis.xsd2proto");
 			args.add("--nestEnums=true");
+			args.add("--debug");
 			args.add("contrib/" + xschema);
 
 			Main myMain = new Main();

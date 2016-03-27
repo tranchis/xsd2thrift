@@ -21,12 +21,10 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.github.tranchis.xsd2thrift;
+package com.github.tranchis.xsd2thrift.parse;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -40,9 +38,13 @@ import java.util.TreeSet;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
+import com.github.tranchis.xsd2thrift.Enumeration;
+import com.github.tranchis.xsd2thrift.Field;
+import com.github.tranchis.xsd2thrift.Struct;
+import com.github.tranchis.xsd2thrift.Xsd2ThriftException;
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
 import com.sun.xml.xsom.XSAttGroupDecl;
 import com.sun.xml.xsom.XSAttributeDecl;
@@ -61,7 +63,7 @@ import com.sun.xml.xsom.XSType;
 import com.sun.xml.xsom.parser.JAXPParser;
 import com.sun.xml.xsom.parser.XSOMParser;
 
-public class XSDParser implements ErrorHandler {
+public class XSDParser {
 	private Map<String, Struct> map;
 	private Map<String, Enumeration> enums;
 	private Map<String, String> simpleTypes;
@@ -141,32 +143,23 @@ public class XSDParser implements ErrorHandler {
 		// basicTypes.add("BaseObject");
 	}
 
-	public void parse(String streamFilename) throws Xsd2ThriftException {
-		File streamFile = new File(streamFilename);
-		if (streamFile.exists()) {
-			this.parse(new File(streamFilename));
-		} else {
-			InputStream stream = getClass().getResourceAsStream(File.separator + streamFilename);
-			this.parse(stream);
-		}
-	}
-
-	public void parse(File streamFile) throws Xsd2ThriftException {
+	/**
+	 * 
+	 * @param source
+	 *            the InputStream to parse from
+	 * @param debug
+	 *            whether a SAX {@link ErrorHandler} should report details
+	 * 
+	 * @throws Xsd2ThriftException
+	 *             if parsing fails
+	 */
+	public void parse(InputSource source, boolean debug) throws Xsd2ThriftException {
+		ErrorHandler errorHandler = debug ? new XsdErrorHandler() : null;
 		try {
 			XSOMParser parser = new XSOMParser(new JAXPParser(saxParserFactory));
-			parser.setErrorHandler(this);
-			parser.parse(streamFile);
-
-			interpretResult(parser.getResult());
-			writeMap();
-		} catch (SAXException | IOException e) {
-			throw new Xsd2ThriftException(e);
-		}
-	}
-
-	public void parse(InputStream source) throws Xsd2ThriftException {
-		try {
-			XSOMParser parser = new XSOMParser(new JAXPParser(saxParserFactory));
+			if (null != errorHandler) {
+				parser.setErrorHandler(errorHandler);
+			}
 			parser.parse(source);
 
 			interpretResult(parser.getResult());
@@ -174,7 +167,6 @@ public class XSDParser implements ErrorHandler {
 		} catch (SAXException e) {
 			throw new Xsd2ThriftException(e);
 		}
-
 	}
 
 	private void writeMap() throws Xsd2ThriftException {
@@ -620,24 +612,6 @@ public class XSDParser implements ErrorHandler {
 				}
 			}
 		}
-	}
-
-	@Override
-	public void error(SAXParseException exception) throws SAXException {
-		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
-		exception.printStackTrace();
-	}
-
-	@Override
-	public void fatalError(SAXParseException exception) throws SAXException {
-		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
-		exception.printStackTrace();
-	}
-
-	@Override
-	public void warning(SAXParseException exception) throws SAXException {
-		System.out.println(exception.getMessage() + " at " + exception.getSystemId());
-		exception.printStackTrace();
 	}
 
 	public void addMarshaller(IMarshaller marshaller) {
