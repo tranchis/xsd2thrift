@@ -45,6 +45,14 @@ public class MarshallerFactory {
 			this.name = name;
 		}
 
+		/**
+		 * this method doesn't throw Exceptions as {@link Protocol#valueOf(String)} does
+		 * 
+		 * @param name
+		 *            the enum name
+		 * 
+		 * @return the enum constant
+		 */
 		public static Protocol forName(String name) {
 			for (Protocol protocol : Protocol.values()) {
 				if (protocol.name.equals(name)) {

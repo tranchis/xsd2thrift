@@ -47,7 +47,7 @@ public class Xsd2Thrift {
 	 * @param packageName
 	 *            the package name of the generated objects
 	 * @param protocol
-	 *            the {@link Protocol}
+	 *            the {@link Protocol} name
 	 * @param nestEnums
 	 *            only available for protobuf, default true
 	 * @throws Xsd2ThriftException
@@ -146,7 +146,7 @@ public class Xsd2Thrift {
 	 * @throws Xsd2ThriftException
 	 *             if creation failed
 	 */
-	public void createMarshaller(String protocol) throws Xsd2ThriftException {
+	private void createMarshaller(String protocol) throws Xsd2ThriftException {
 		this.iMarshaller = MarshallerFactory.createMarshaller(Protocol.forName(protocol));
 	}
 
