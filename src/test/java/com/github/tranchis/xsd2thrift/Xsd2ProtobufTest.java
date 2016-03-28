@@ -32,7 +32,7 @@ public class Xsd2ProtobufTest {
 	@Ignore
 	public void shouldDislplayUsage() throws FileNotFoundException, Xsd2ThriftException {
 
-		List<String> args = new LinkedList<>();
+		List<String> args = new LinkedList<String>();
 
 		Main myMain = new Main();
 		Main.main(args.toArray(new String[args.size()]));
@@ -43,7 +43,7 @@ public class Xsd2ProtobufTest {
 	public void shouldPrintToSysout() throws Xsd2ThriftException, IOException {
 
 		String xschema = "atom.xsd";
-		List<String> args = new LinkedList<>();
+		List<String> args = new LinkedList<String>();
 		args.add("--protobuf");
 		args.add("--package=com.github.tranchis.xsd2proto");
 		args.add("--nestEnums=true");
@@ -65,7 +65,7 @@ public class Xsd2ProtobufTest {
 			String targetFilename = "target/generated-sources/proto/" + filename;
 			// new File(targetFilename).createNewFile();
 
-			List<String> args = new LinkedList<>();
+			List<String> args = new LinkedList<String>();
 			args.add("--protobuf");
 			args.add("--output=" + targetFilename);
 			args.add("--package=com.github.tranchis.xsd2proto");

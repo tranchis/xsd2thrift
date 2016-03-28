@@ -62,7 +62,7 @@ public class Xsd2Thrift {
 	}
 
 	private TreeMap<String, String> initMap() {
-		TreeMap<String, String> map = new TreeMap<>();
+		TreeMap<String, String> map = new TreeMap<String, String>();
 		map.put("schema_._type", "binary");
 		map.put("EString", "string");
 		map.put("EBoolean", "boolean");
