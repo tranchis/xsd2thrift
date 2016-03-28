@@ -1,39 +1,46 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-  		http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
 	<name>xsd2thrift</name>
 	<groupId>com.github.tranchis</groupId>
 	<artifactId>xsd2thrift</artifactId>
-
 	<packaging>jar</packaging>
-	<version>1.0</version>
+	<version>1.1.0</version>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>com.sun.xsom</groupId>
 			<artifactId>xsom</artifactId>
-			<version>20110101-SNAPSHOT</version>
+			<version>20130531</version>
 		</dependency>
 
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 
 	<build>
 		<plugins>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.0.2</version>
+				<version>3.5.1</version>
 				<configuration>
+					<encoding>utf-8</encoding>
 					<source>1.6</source>
 					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
 
@@ -124,13 +131,13 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-  <distributionManagement>
-    <repository>
-      <id>bintray-tranchis-xsd2thrift-com.github.tranchis.xsd2thrift</id>
-      <name>tranchis-xsd2thrift-com.github.tranchis.xsd2thrift</name>
-      <url>https://api.bintray.com/maven/tranchis/xsd2thrift/com.github.tranchis.xsd2thrift</url>
-    </repository>
-  </distributionManagement>
+	<distributionManagement>
+		<repository>
+			<id>bintray-tranchis-xsd2thrift-com.github.tranchis.xsd2thrift</id>
+			<name>tranchis-xsd2thrift-com.github.tranchis.xsd2thrift</name>
+			<url>https://api.bintray.com/maven/tranchis/xsd2thrift/com.github.tranchis.xsd2thrift</url>
+		</repository>
+	</distributionManagement>
 
 </project>
 

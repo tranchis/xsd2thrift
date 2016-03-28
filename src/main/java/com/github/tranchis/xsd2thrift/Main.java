@@ -23,136 +23,91 @@
  */
 package com.github.tranchis.xsd2thrift;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.TreeMap;
+/**
+ * @author marug
+ *
+ */
+public class Main {
 
-import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
-import com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller;
-import com.github.tranchis.xsd2thrift.marshal.ThriftMarshaller;
+	private static boolean correct;
 
-public class Main
-{
-	private static boolean	correct;
-	private static String	usage = "" + 
-			"Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]\n" +
-			"                           [--package=NAME] filename.xsd\n" + 
-			"\n" + 
-			"  --thrift          		: convert to Thrift\n" + 
-			"  --protobuf        		: convert to Protocol Buffers\n" + 
-			"  --output=FILENAME 		: store the result in FILENAME instead of standard output\n" + 
-			"  --package=NAME    		: set namespace/package of the output file\n" + 
-			"  --nestEnums=true|false	: nest enum declaration within messages that reference them, only supported by protobuf, defaults to true\n" + 
-			"";
-	
+	private static String usage = "Usage: java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]\n"
+	        + "                           [--package=NAME] [--debug] filename.xsd\n\n"
+	        + "  --thrift          		: convert to Thrift\n"
+	        + "  --protobuf        		: convert to Protocol Buffers\n"
+	        + "  --output=FILENAME 		: store the result in FILENAME instead of standard output\n"
+	        + "  --package=NAME    		: set namespace/package of the output file\n"
+	        + "  --nestEnums=true|false	: nest enum declaration within messages that reference them, only supported by protobuf, defaults to true\n"
+	        + "  --debug                : report SAX parsing errors; defaults to false\n\n";
 
-	private static void usage(String error)
-	{
+	private static void usage(String error) {
 		System.err.println(error);
 		usage();
 	}
 
-	private static void usage()
-	{
+	private static void usage() {
 		System.err.print(usage);
 		correct = false;
 	}
 
 	/**
 	 * @param args
-	 * @throws Exception 
+	 *            see usage
+	 * 
+	 * @throws Xsd2ThriftException
+	 *             if operation failed
 	 */
-	public static void main(String[] args) throws Exception
-	{
-		XSDParser				xp;
-		TreeMap<String,String>	map;
-		String					xsd, param;
-		int						i;
-		IMarshaller				im;
-		
+	public static void main(String[] args) throws Xsd2ThriftException {
+		String xschema = null;
+		String protocol = null;
+		String fileParam = null;
+		String packageName = null;
+		boolean nestEnums = true;
+		boolean debug = false;
+
+		int i = 0;
 		correct = true;
-		im = null;
-		
-		map = new TreeMap<String,String>();
-		map.put("schema_._type", "binary");
-		map.put("EString", "string");
-		map.put("EBoolean", "boolean");
-		map.put("EInt", "integer");
-		map.put("EDate", "long");
-		map.put("EChar", "byte");
-		map.put("EFloat", "decimal");
-		map.put("EObject", "binary");
-		map.put("Extension", "binary");
-		
-		if(args.length == 0 || args[args.length-1].startsWith("--"))
-		{
+
+		if (args.length == 0 || args[args.length - 1].startsWith("--") || !args[args.length - 1].endsWith(".xsd")) {
 			usage();
-		}
-		else
-		{
-			xsd = args[args.length - 1];
-			xp = new XSDParser(xsd, map);
-			
-			i = 0;
-			while(correct && i < args.length - 1)
-			{
-				if(args[i].equals("--thrift"))
-				{
-					if(im == null)
-					{
-						im = new ThriftMarshaller();
-						xp.addMarshaller(im);
+		} else {
+			xschema = args[args.length - 1];
+
+			while (correct && i < args.length - 1) {
+				if (args[i].equals("--thrift")) {
+					if (null == protocol) {
+						protocol = "thrift";
+						nestEnums = false;
+					} else {
+						usage("Only one protocol can be specified at a time.");
 					}
-					else
-					{
-						usage("Only one marshaller can be specified at a time.");
+				} else if (args[i].equals("--protobuf")) {
+					if (null == protocol) {
+						protocol = "protobuf";
+					} else {
+						usage("Only one protocol can be specified at a time.");
 					}
-				}
-				else if(args[i].equals("--protobuf"))
-				{
-					if(im == null)
-					{
-						im = new ProtobufMarshaller();
-						xp.addMarshaller(im);
-					}
-					else
-					{
-						usage("Only one marshaller can be specified at a time.");
-					}
-				}
-				else if(args[i].startsWith("--filename="))
-				{
-					param = args[i].split("=")[1];
-					xp.setOutputStream(new FileOutputStream(new File(param)));
-				}
-				else if(args[i].startsWith("--package="))
-				{
-					param = args[i].split("=")[1];
-					xp.setPackage(param);
-				}
-				else if (args[i].startsWith("--nestEnums="))
-				{
-					param = args[i].split("=")[1];
-					boolean nestEnums = Boolean.valueOf(param);
-					xp.setNestEnums(nestEnums);
-				}
-				else
-				{
+				} else if (args[i].startsWith("--output=")) {
+					fileParam = args[i].split("=")[1];
+				} else if (args[i].startsWith("--package=")) {
+					packageName = args[i].split("=")[1];
+				} else if (args[i].startsWith("--nestEnums=")) {
+					String param = args[i].split("=")[1];
+					nestEnums = Boolean.valueOf(param);
+				} else if (args[i].startsWith("--debug")) {
+					debug = true;
+				} else {
 					usage();
 				}
-				
 				i = i + 1;
 			}
-			
-			if(im == null)
-			{
-				usage("A marshaller has to be specified.");
+			if (null == protocol) {
+				usage("A protocol has to be specified.");
 			}
-			
-			if(correct)
-			{
-				xp.parse();
-			}
+
+			Xsd2Thrift xsd2Thrift = new Xsd2Thrift(packageName, protocol, nestEnums);
+			xsd2Thrift.parseXsd(xschema, fileParam, debug);
+
 		}
 	}
 }

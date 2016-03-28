@@ -1,7 +1,11 @@
-# XSD2THRIFT [![Build Status](https://travis-ci.org/tranchis/xsd2thrift.png?branch=master)](https://travis-ci.org/tranchis/xsd2thrift)
+# XSD2THRIFT fork
 
 This tool allows for converting XML Schema files (.xsd) to Thrift (.thrift) and
 Protocol Buffers (.proto).
+
+
+See branch feature/maven-plugin for changes needed for the (https://github.com/Xorejing/xsd2thrift-maven-plugin). Branch version moved to 1.1.0.
+  
 
 ## Binary download
 
