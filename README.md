@@ -31,14 +31,15 @@ xsd2thrift has been tested on Java SE 6.
 
 ## Usage
 
-Usage: `java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME] [--package=NAME] filename.xsd`
+Usage: `java xsd2thrift.jar [--thrift] [--protobuf] [--output=FILENAME]
+                            [--package=NAME] filename.xsd`
 
-    --thrift               : convert to Thrift
-    --protobuf             : convertingonvert to Protocol Buffers
-    --output=FILENAME      : store the result in FILENAME instead of standard output
-    --package=NAME         : set namespace/package of the output file
-    --nestEnums=true|false : nest enum declaration within messages that reference them, only supported by protobuf,
-                             defaults to true
+  --thrift                   : convert to Thrift
+  --protobuf                 : convert to Protocol Buffers
+  --filename=FILENAME        : store the result in FILENAME instead of standard output
+  --package=NAME             : set namespace/package of the output file
+  --nestEnums=true|false     : nest enum declaration within messages that reference them, only supported by protobuf, defaults to true
+  --splitBySchema=true|false : split output into namespace-specific files, defaults to false
 
 ## License
 
@@ -57,6 +58,7 @@ Any feedback will be greatly appreciated, at the GitHub project page
 ## Contributors (@github.com)
 
 * tranchis
+* p14n
 * Fred-dy-
 * pfisterer
 * wesyoung
