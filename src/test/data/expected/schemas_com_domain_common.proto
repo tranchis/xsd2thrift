@@ -1,0 +1,14 @@
+package schemas.com.domain.common;
+
+message UnspecifiedType
+{
+	required string baseObjectType = 1;
+	required bytes object = 2;
+}
+
+message country
+{
+	required string description = 1;
+	required string iso3 = 2;
+}
+

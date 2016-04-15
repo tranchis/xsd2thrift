@@ -24,32 +24,36 @@
 package com.github.tranchis.xsd2thrift;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import com.sun.xml.xsom.XmlString;
 
-public class Struct
+public class Struct implements Comparable<Struct>
 {
 	private Map<String,Field>	map;
 	private Set<String>			types;
 	private List<Field>			orderedFields;
 	private String				name;
+	private String				namespace;
 	private String				parent;
 
-	public Struct(String name)
+	public Struct(String name,String namespace)
 	{
 		this.name = name;
-		map = new HashMap<String,Field>();
+		this.namespace = namespace;
+		map = new TreeMap<String, Field>();
 		types = new TreeSet<String>();
 		orderedFields = new LinkedList<Field>();
 	}
-
-	public void addField(String name, String type, boolean required, boolean repeat, XmlString def, Map<String, String> xsdMapping)
+    public void addField(String name, String type, boolean required, boolean repeat, XmlString def, Map<String, String> xsdMapping){
+        addField(name, null, type, required, repeat, def, xsdMapping);
+    }
+	public void addField(String name, String namespace, String type, boolean required, boolean repeat, XmlString def, Map<String, String> xsdMapping)
 	{
 		Field	f;
 		
@@ -70,7 +74,7 @@ public class Struct
 					type = "binary";
 				}
 			}
-			f = new Field(name, type, repeat, def, required);
+			f = new Field(name,NamespaceConverter.convertFromSchema(namespace), type, repeat, def, required);
 			map.put(name, f);
 			orderedFields.add(f);
 			if(!type.equals(this.name))
@@ -138,5 +142,14 @@ public class Struct
             return false;
         return true;
     }
+
+	public String getNamespace() {
+		return namespace;
+	}
+
+	@Override
+	public int compareTo(Struct s) {
+		return name.compareTo(s.name);
+	}
 	
 }

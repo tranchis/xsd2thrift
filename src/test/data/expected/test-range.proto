@@ -1,0 +1,18 @@
+package default;
+
+message UnspecifiedType
+{
+	required string baseObjectType = 1;
+	required bytes object = 2;
+}
+
+message TestRangeDecimal
+{
+	optional double value = 1;
+}
+
+message TestRangeInt
+{
+	optional int64 value = 1;
+}
+

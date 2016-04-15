@@ -23,16 +23,31 @@
  */
 package com.github.tranchis.xsd2thrift.marshal;
 
-public interface IMarshaller
-{
+import java.util.Map;
+
+public interface IMarshaller {
+	String writeInclude(String namespace);
+
 	String writeHeader(String namespace);
+
 	String writeEnumHeader(String name);
+
 	String writeEnumValue(int order, String value);
+
 	String writeEnumFooter();
+
 	String writeStructHeader(String name);
-	String writeStructParameter(int order, boolean required, boolean repeated, String name, String type);
+
+	String writeStructParameter(int order, boolean required, boolean repeated,
+			String name, String type);
+
 	String writeStructFooter();
+
 	String getTypeMapping(String type);
+
 	boolean isNestedEnums();
-    boolean isCircularDependencySupported();
+
+	boolean isCircularDependencySupported();
+
+	void setCustomMappings(Map<String, String> customMappings);
 }
