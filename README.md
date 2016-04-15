@@ -31,15 +31,16 @@ xsd2thrift has been tested on Java SE 6.
 
 ## Usage
 
-Usage: `java xsd2thrift-1.0.jar [--thrift] [--protobuf] [--output=FILENAME]
-                                [--package=NAME] filename.xsd`
-
+```bash
+java xsd2thrift-1.0.jar [--thrift] [--protobuf] [--output=FILENAME] [--package=NAME]
+                        [--nestEnums=true|false] [--splitBySchema=true|false] filename.xsd`
   --thrift                   : convert to Thrift
   --protobuf                 : convert to Protocol Buffers
   --filename=FILENAME        : store the result in FILENAME instead of standard output
   --package=NAME             : set namespace/package of the output file
   --nestEnums=true|false     : nest enum declaration within messages that reference them, only supported by protobuf, defaults to true
   --splitBySchema=true|false : split output into namespace-specific files, defaults to false
+```
 
 ## License
 
