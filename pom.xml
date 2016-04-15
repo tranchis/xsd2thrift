@@ -20,6 +20,11 @@
 			<artifactId>xsom</artifactId>
 			<version>20110101-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+		</dependency>
 
 	</dependencies>
 

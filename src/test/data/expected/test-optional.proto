@@ -1,0 +1,28 @@
+package default;
+
+message UnspecifiedType
+{
+	required string baseObjectType = 1;
+	required bytes object = 2;
+}
+
+message Optional
+{
+	required string default_minoccurs_element = 1;
+	optional string has_default_attribute = 2;
+	optional string no_default_attribute = 3;
+	optional string optional_attribute = 4;
+	optional string optional_element = 5;
+	repeated string repeat_element = 6;
+	required string required_attribute = 7;
+	required string required_element = 8;
+}
+
+message OptionalAttributeGroup
+{
+	optional string has_default_attribute = 1;
+	optional string no_default_attribute = 2;
+	optional string optional_attribute = 3;
+	required string required_attribute = 4;
+}
+

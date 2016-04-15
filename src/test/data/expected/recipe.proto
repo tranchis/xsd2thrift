@@ -1,0 +1,51 @@
+package default;
+
+message UnspecifiedType
+{
+	required string baseObjectType = 1;
+	required bytes object = 2;
+}
+
+message ingredientsType
+{
+	repeated string item = 1;
+}
+
+message bulletType
+{
+	repeated string strong = 1;
+}
+
+message paraType
+{
+	repeated string strong = 1;
+}
+
+message metaType
+{
+	required string author = 1;
+	required string _date = 2;
+	required string version = 3;
+}
+
+message directionsType
+{
+	optional paraType para = 1;
+	optional bulletType bullet = 2;
+}
+
+message recipeType
+{
+	required metaType meta = 1;
+	optional string recipe_author = 2;
+	required string recipe_name = 3;
+	required string meal = 4;
+	required ingredientsType ingredients = 5;
+	required directionsType directions = 6;
+}
+
+message listType
+{
+	repeated recipeType recipe = 1;
+}
+

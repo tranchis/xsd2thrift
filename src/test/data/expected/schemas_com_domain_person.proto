@@ -1,0 +1,12 @@
+package schemas.com.domain.person;
+
+import "schemas_com_domain_address.proto";
+import "schemas_com_domain_common.proto";
+
+message personType
+{
+	required schemas.com.domain.address.addressType address = 1;
+	required schemas.com.domain.common.country domicile = 2;
+	required string name = 3;
+}
+

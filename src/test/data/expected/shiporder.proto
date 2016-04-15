@@ -1,0 +1,32 @@
+package default;
+
+message UnspecifiedType
+{
+	required string baseObjectType = 1;
+	required bytes object = 2;
+}
+
+message itemType
+{
+	optional string note = 1;
+	required double price = 2;
+	required int64 quantity = 3;
+	required string title = 4;
+}
+
+message shiptoType
+{
+	required string address = 1;
+	required string city = 2;
+	required string country = 3;
+	required string name = 4;
+}
+
+message shiporderType
+{
+	repeated itemType item = 1;
+	required string orderid = 2;
+	required string orderperson = 3;
+	required shiptoType shipto = 4;
+}
+

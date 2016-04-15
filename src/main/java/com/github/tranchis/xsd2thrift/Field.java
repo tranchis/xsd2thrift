@@ -27,22 +27,35 @@ import com.sun.xml.xsom.XmlString;
 public class Field
 {
 
+    @Override
+	public String toString() {
+		return "Field [name=" + name + ", typeNamespace=" + typeNamespace
+				+ ", type=" + type + ", required=" + required + ", repeat="
+				+ repeat + ", def=" + def + "]";
+	}
+
 	private String name;
+    private String typeNamespace;
 	private String type;
 	private boolean required;
 	private boolean repeat;
 	private XmlString def;
 
-	public Field(String name, String type, boolean repeat, XmlString def, boolean required)
+	public Field(String name, String typeNamespace, String type, boolean repeat, XmlString def, boolean required)
 	{
 		this.name = name;
 		this.type = type;
 		this.required = required;
 		this.def = def;
 		this.repeat = repeat;
+		this.typeNamespace = typeNamespace;
 	}
 
-	public String getName()
+	public String getTypeNamespace() {
+        return typeNamespace;
+    }
+
+    public String getName()
 	{
 		return name;
 	}
