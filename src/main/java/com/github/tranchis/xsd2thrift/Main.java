@@ -29,6 +29,8 @@ import java.util.TreeMap;
 
 import com.github.tranchis.xsd2thrift.marshal.IMarshaller;
 import com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller;
+import static com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller.Version.V2;
+import static com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller.Version.V3;
 import com.github.tranchis.xsd2thrift.marshal.ThriftMarshaller;
 
 public class Main {
@@ -38,7 +40,8 @@ public class Main {
 			+ "                           [--package=NAME] filename.xsd\n"
 			+ "\n"
 			+ "  --thrift                    : convert to Thrift\n"
-			+ "  --protobuf                  : convert to Protocol Buffers\n"
+			+ "  --protobuf2                 : convert to Protocol Buffers proto2\n"
+			+ "  --protobuf3                 : convert to Protocol Buffers proto3\n"
 			+ "  --output=FILENAME           : store the result in FILENAME instead of standard output\n"
 			+ "  --package=NAME              : set namespace/package of the output file\n"
 			+ "  --nestEnums=true|false      : nest enum declaration within messages that reference them, only supported by protobuf, defaults to true\n"
@@ -102,15 +105,24 @@ public class Main {
 					} else {
 						usage("Only one marshaller can be specified at a time.");
 					}
-				} else if (args[i].equals("--protobuf")) {
+				} else if (args[i].equals("--protobuf2")) {
 					if (im == null) {
-						im = new ProtobufMarshaller();
+						im = new ProtobufMarshaller(V2);
 						xp.addMarshaller(im);
 						writer.setMarshaller(im);
 						writer.setDefaultExtension("proto");
 					} else {
 						usage("Only one marshaller can be specified at a time.");
 					}
+				} else if (args[i].equals("--protobuf3")) {
+					if (im == null) {
+						im = new ProtobufMarshaller(V3);
+						xp.addMarshaller(im);
+						writer.setMarshaller(im);
+						writer.setDefaultExtension("proto");
+					} else {
+						usage("Only one marshaller can be specified at a time.");
+                                        }
 				} else if (args[i].startsWith("--filename=")) {
 					param = args[i].split("=")[1];
 					writer.setFilename(param);
