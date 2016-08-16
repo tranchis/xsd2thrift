@@ -1,0 +1,26 @@
+package default;
+
+message UnspecifiedType
+{
+	required string baseObjectType = 1;
+	required bytes object = 2;
+}
+
+message BaseObject
+{
+	optional string description = 1;
+	required string name = 2;
+	optional string value = 3;
+	optional string value2_required_attr = 4;
+	optional string value3_optional_attr = 5;
+}
+
+message StringObject
+{
+	optional string description = 1;
+	required string name = 2;
+	required string value = 3;
+	required string value2_required_attr = 4;
+	optional string value3_optional_attr = 5;
+}
+
