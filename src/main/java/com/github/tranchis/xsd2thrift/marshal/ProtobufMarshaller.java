@@ -23,6 +23,8 @@
  */
 package com.github.tranchis.xsd2thrift.marshal;
 
+import static com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller.Version.V2;
+import static com.github.tranchis.xsd2thrift.marshal.ProtobufMarshaller.Version.V3;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -30,8 +32,13 @@ import java.util.TreeMap;
 public class ProtobufMarshaller implements IMarshaller {
 	private TreeMap<String, String> typeMapping;
 	private String indent = "";
+        
+        public enum Version { V2, V3}
+        
+        private Version version;
 
-	public ProtobufMarshaller() {
+	public ProtobufMarshaller(Version version) {
+                this.version = version;
 		typeMapping = new TreeMap<String, String>();
 		typeMapping.put("positiveInteger", "int64");
 		typeMapping.put("nonPositiveInteger", "sint64");
@@ -76,6 +83,10 @@ public class ProtobufMarshaller implements IMarshaller {
 		} else {
 			res = "";
 		}
+                
+                if (version == V3) {
+                        res += "syntax = \"proto3\";\n\n";
+                }
 
 		return res;
 	}
@@ -90,6 +101,10 @@ public class ProtobufMarshaller implements IMarshaller {
 
 	@Override
 	public String writeEnumValue(int order, String value) {
+                if (version == V3) {
+                    // enum start at 0 in V3
+                    order--;
+                }
 		return (writeIndent() + value + " = " + order + ";\n");
 	}
 
@@ -118,16 +133,23 @@ public class ProtobufMarshaller implements IMarshaller {
 	}
 
 	private String getRequired(boolean required, boolean repeated) {
-		String res;
+		String res = "";
 
 		if (repeated) {
 			res = "repeated";
 		} else {
-			if (required) {
-				res = "required";
-			} else {
-				res = "optional";
-			}
+                        if (null != version) switch (version) {
+                        case V2:
+                            if (required) {
+                                res = "required";
+                            } else {
+                                res = "optional";
+                            }
+                            break;
+                        case V3:
+                            res = "";
+                            break;
+                    }
 		}
 
 		return res;
