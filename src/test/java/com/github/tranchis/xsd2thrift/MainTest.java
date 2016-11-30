@@ -141,6 +141,20 @@ public class MainTest {
 	}
 
 	@Test
+	public void compareTestExtensionAttributesProtobuf() {
+		compareExpectedAndGenerated(
+				"src/test/data/expected/test-extension-attributes.proto",
+				generateProtobuf("test-extension-attributes"));
+	}
+
+	@Test
+	public void compareTestExtensionAttributesThrift() {
+		compareExpectedAndGenerated(
+				"src/test/data/expected/test-extension-attributes.thrift",
+				generateThrift("test-extension-attributes"));
+	}
+
+	@Test
 	public void compareTestOptionalProtobuf() {
 		compareExpectedAndGenerated(
 				"src/test/data/expected/test-optional.proto",

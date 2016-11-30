@@ -603,14 +603,38 @@ public class XSDParser implements ErrorHandler {
 		Iterator<XSType> ity;
 		XSType xt;
 		XSParticle particle;
+		XSComplexType type;
+		Iterator<? extends XSAttributeUse> itau;
+		XSAttributeUse att;
+		XSAttributeDecl decl;
+		Iterator<? extends XSAttGroupDecl> itagd;
 
 		ity = sset.iterateTypes();
 		while (ity.hasNext()) {
 			xt = ity.next();
 			if (xt.getBaseType() == cType) {
-				particle = xt.asComplexType().getContentType().asParticle();
+				// NOTE: the below code is almost identical to the contents of
+				// the write() function which takes an XSComplexType argument -
+				// the only difference is in the "goingup" variable passed to
+				// the other write() functions internally
+				
+				type = xt.asComplexType();
+				
+				particle = type.getContentType().asParticle();
 				if (particle != null) {
 					write(st, particle.getTerm(), false, sset);
+				}
+
+				itagd = type.getAttGroups().iterator();
+				while (itagd.hasNext()) {
+					write(st, itagd.next(), false);
+				}
+
+				itau = type.getAttributeUses().iterator();
+				while (itau.hasNext()) {
+					att = itau.next();
+					decl = att.getDecl();
+					write(st, decl, false);
 				}
 
 				processInheritance(st, xt.asComplexType(), sset);
