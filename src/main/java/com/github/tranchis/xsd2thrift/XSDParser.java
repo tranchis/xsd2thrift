@@ -66,6 +66,8 @@ public class XSDParser implements ErrorHandler {
 	private IMarshaller marshaller;
 	private OutputWriter writer;
 	private boolean nestEnums = true;
+	private int enumOrderStart = 1;
+	private boolean typeInEnums = true;
 
 	public XSDParser(String stFile) {
 		this.xsdMapping = new TreeMap<String, String>();
@@ -315,20 +317,25 @@ public class XSDParser implements ErrorHandler {
 		os(en.getNamespace()).write(
 				marshaller.writeEnumHeader(enumValue).getBytes());
 		itg = en.iterator();
-		int enumOrder = 1;
-
+		int enumOrder = this.enumOrderStart;
+		String typePrefix;
+		if (typeInEnums) {
+			typePrefix = en.getName() + "_";
+		} else {
+			typePrefix = "";
+		}
 		if (itg.hasNext()) {
 			while (itg.hasNext()) {
 				os(en.getNamespace()).write(
 						marshaller.writeEnumValue(enumOrder,
-								escape(en.getName() + "_" + itg.next()))
+								escape(typePrefix + itg.next()))
 								.getBytes());
 				enumOrder++;
 			}
 		} else {
 			os(en.getNamespace()).write(
 					marshaller.writeEnumValue(enumOrder,
-							escape(en.getName() + "_UnspecifiedValue"))
+							escape(typePrefix + "UnspecifiedValue"))
 							.getBytes());
 		}
 
@@ -729,4 +736,11 @@ public class XSDParser implements ErrorHandler {
 		this.writer = writer;
 	}
 
+	public void setEnumOrderStart(int enumOrderStart) {
+		this.enumOrderStart = enumOrderStart;
+	}
+
+	public void setTypeInEnums(boolean typeInEnums) {
+		this.typeInEnums = typeInEnums;
+	}
 }
