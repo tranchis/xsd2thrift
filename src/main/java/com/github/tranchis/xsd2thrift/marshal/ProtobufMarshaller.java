@@ -30,6 +30,7 @@ import java.util.TreeMap;
 public class ProtobufMarshaller implements IMarshaller {
 	private TreeMap<String, String> typeMapping;
 	private String indent = "";
+	private int version = 2;
 
 	public ProtobufMarshaller() {
 		typeMapping = new TreeMap<String, String>();
@@ -109,11 +110,18 @@ public class ProtobufMarshaller implements IMarshaller {
 	@Override
 	public String writeStructParameter(int order, boolean required,
 			boolean repeated, String name, String type) {
-		String sRequired;
+		String sRequired = "";
 
-		sRequired = getRequired(required, repeated);
+		// Only versions prior to 3 have required/optional
+		if (version < 3) {
+			sRequired = getRequired(required, repeated) + " ";
+		} else {
+			if (repeated) {
+				sRequired = "repeated ";
+			}
+		}
 
-		return writeIndent() + sRequired + " " + type + " " + name + " = "
+		return writeIndent() + sRequired + type + " " + name + " = "
 				+ order + ";\n";
 	}
 
@@ -189,4 +197,7 @@ public class ProtobufMarshaller implements IMarshaller {
 		}
 	}
 
+	public void setProtobufVersion(int version) {
+		 this.version = version;
+	}
 }

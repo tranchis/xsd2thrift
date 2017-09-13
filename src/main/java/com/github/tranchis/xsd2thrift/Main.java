@@ -44,6 +44,8 @@ public class Main {
 			+ "  --nestEnums=true|false      : nest enum declaration within messages that reference them, only supported by protobuf, defaults to true\n"
 			+ "  --splitBySchema=true|false  : split output into namespace-specific files, defaults to false\n"
 			+ "  --customMappings=a:b,x:y    : represent schema types as specific output types\n"
+			+ "  --protobufVersion=2|3       : if generating protobuf, choose the version (2 or 3)\n"
+			+ "  --typeInEnums=true|false    : include type as a prefix in enums, defaults to true\n"
 			+ "";
 
 	private static void usage(String error) {
@@ -65,6 +67,8 @@ public class Main {
 		TreeMap<String, String> map;
 		String xsd, param;
 		int i;
+		int protobufVersion = 2;
+		ProtobufMarshaller pbm = null;
 		IMarshaller im;
 		OutputWriter writer;
 		correct = true;
@@ -104,10 +108,12 @@ public class Main {
 					}
 				} else if (args[i].equals("--protobuf")) {
 					if (im == null) {
-						im = new ProtobufMarshaller();
+						pbm = new ProtobufMarshaller();
+						im = pbm;
 						xp.addMarshaller(im);
 						writer.setMarshaller(im);
 						writer.setDefaultExtension("proto");
+						pbm.setProtobufVersion(protobufVersion);
 					} else {
 						usage("Only one marshaller can be specified at a time.");
 					}
@@ -140,6 +146,14 @@ public class Main {
 					param = args[i].split("=")[1];
 					boolean nestEnums = Boolean.valueOf(param);
 					xp.setNestEnums(nestEnums);
+				} else if (args[i].startsWith("--protobufVersion=")) {
+					protobufVersion = Integer.parseInt(args[i].split("=")[1]);
+					xp.setEnumOrderStart(0);
+					if (pbm != null) {
+						pbm.setProtobufVersion(protobufVersion);
+					}
+				} else if (args[i].startsWith("--typeInEnums=")) {
+					xp.setTypeInEnums(Boolean.parseBoolean(args[i].split("=")[1]));
 				} else {
 					usage();
 				}
