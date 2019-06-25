@@ -115,6 +115,7 @@ public class XSDParser implements ErrorHandler {
 		basicTypes.add("boolean");
 		basicTypes.add("date");
 		basicTypes.add("dateTime");
+		basicTypes.add("duration");
 		basicTypes.add("decimal");
 		basicTypes.add("float");
 		basicTypes.add("double");
