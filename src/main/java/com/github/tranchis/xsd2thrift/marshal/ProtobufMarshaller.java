@@ -65,6 +65,7 @@ public class ProtobufMarshaller implements IMarshaller {
 											// 1970
 		typeMapping.put("dateTime", "int64"); // Number of milliseconds since
 												// January 1st, 1970
+		typeMapping.put("duration", "int64"); // Number of seconds during a period.
 	}
 
 	@Override
