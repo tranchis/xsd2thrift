@@ -32,7 +32,7 @@ xsd2thrift has been tested on Java SE 6.
 ## Usage
 
 ```bash
-java xsd2thrift-1.0.jar [--thrift] [--protobuf] [--output=FILENAME] [--package=NAME]
+java -jar xsd2thrift-1.0.jar [--thrift] [--protobuf] [--output=FILENAME] [--package=NAME]
                         [--nestEnums=true|false] [--splitBySchema=true|false] filename.xsd
   --thrift                   : convert to Thrift
   --protobuf                 : convert to Protocol Buffers
